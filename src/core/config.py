@@ -1,27 +1,10 @@
-import os
-from pydantic_settings import BaseSettings
+"""
+DEPRECATED: 이 파일은 하위 호환성을 위해 유지됩니다.
+새 코드는 config.settings를 직접 import하세요.
 
-class Settings(BaseSettings):
-    # App
-    APP_NAME: str = "OntoFin System"
-    ENV: str = "dev"
-    
-    # LLM (Ollama)
-    OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "llama3.2" # Default model, can be overridden env var
-    
-    # Database
-    NEO4J_URI: str = "bolt://localhost:7687"
-    NEO4J_USER: str = "neo4j"
-    NEO4J_PASSWORD: str = "password"
-    
-    # Persistence
-    PERSISTENCE_FILE: str = "ontofin_graph.json"
+from config.settings import settings
+"""
+# Backward compatibility: re-export from new location
+from config.settings import settings
 
-    # External APIs
-    FRED_API_KEY: str = "" # User must provide this in .env
-    
-    class Config:
-        env_file = ".env"
-
-settings = Settings()
+__all__ = ["settings"]

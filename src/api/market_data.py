@@ -6,12 +6,14 @@ from datetime import datetime, timedelta
 import yfinance as yf
 from fredapi import Fred
 import numpy as np
-from src.core.config import settings
+from config.settings import settings
 from src.core.logger import logger
 
-CACHE_FILE = "market_cache.json"
+# 캐시 파일 경로는 settings에서 관리
+CACHE_DIR = settings.CACHE_DIR
+CACHE_FILE = str(settings.market_cache_path)
+CUSTOM_MAPPING_FILE = str(CACHE_DIR / "custom_market_mapping.json")
 
-CUSTOM_MAPPING_FILE = "custom_market_mapping.json"
 
 class MarketDataProvider:
     """

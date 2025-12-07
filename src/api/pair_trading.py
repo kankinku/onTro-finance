@@ -11,6 +11,7 @@ from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
 import json
 import os
+from config.settings import settings
 from src.core.logger import logger
 
 # ==================== 유니버스 정의 ====================
@@ -60,7 +61,8 @@ DEFAULT_UNIVERSE = pd.DataFrame([
 class PairTradingAnalyzer:
     """페어 트레이딩 분석 클래스"""
     
-    CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "pair_cache")
+    # 캐시 디렉토리는 settings에서 관리
+    CACHE_DIR = str(settings.CACHE_DIR)
     
     def __init__(self, universe: pd.DataFrame = None):
         self.universe = universe if universe is not None else DEFAULT_UNIVERSE

@@ -1,6 +1,6 @@
 import logging
 import sys
-from src.core.config import settings
+from config.settings import settings
 
 def setup_logger(name: str = "ontofin"):
     logger = logging.getLogger(name)

@@ -2,7 +2,7 @@ import requests
 import json
 from typing import List
 from src.schemas.base_models import Fragment
-from src.core.config import settings
+from config.settings import settings
 from src.core.logger import logger
 
 class InputAnalyzer:

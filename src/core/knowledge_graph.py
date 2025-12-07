@@ -4,7 +4,7 @@ import os
 from typing import List, Optional
 from networkx.readwrite import json_graph
 from src.schemas.base_models import Relation, Term, PredicateType
-from src.core.config import settings
+from config.settings import settings
 from src.core.logger import logger
 
 class KnowledgeGraph:
@@ -14,7 +14,7 @@ class KnowledgeGraph:
     
     def __init__(self):
         self.graph = nx.DiGraph()
-        self.persistence_path = settings.PERSISTENCE_FILE
+        self.persistence_path = settings.persistence_path
         self._load_from_disk()
 
     def add_term(self, term: Term):

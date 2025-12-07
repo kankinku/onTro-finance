@@ -1,20 +1,29 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Union
 from collections import deque
 import math
-from src.core.knowledge_graph import KnowledgeGraph
 from src.schemas.base_models import InferredOutcome, Relation
 from src.api.market_data import MarketDataProvider
 from src.reasoning.temporal_integrator import TemporalIntegrator
 
+
 class ScenarioSimulator:
     """
-    [Reasoning Engine v4.0]
+    [Reasoning Engine v5.0]
     Advanced Simulator with Temporal & Data layers.
     Refactored to support Causal Propagation (Strong Ontology).
+    Supports both KnowledgeGraph and KnowledgeGraphService.
     """
 
-    def __init__(self, kg: KnowledgeGraph):
-        self.kg = kg
+    def __init__(self, kg):
+        """
+        Args:
+            kg: KnowledgeGraph 또는 KnowledgeGraphService 인스턴스
+        """
+        # KnowledgeGraphService인 경우 내부 graph 속성 사용
+        if hasattr(kg, 'graph'):
+            self.kg = kg
+        else:
+            self.kg = kg
         self.market_data = MarketDataProvider()
         self.temporal = TemporalIntegrator()
 
