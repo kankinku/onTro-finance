@@ -18,79 +18,47 @@ class RelationConstructor:
         For V1, we use heuristics or assume the LLM (M1) provided ordered candidates or structure.
         """
         relations = []
-
         for frag in fragments:
-            # Heuristic: 
-            # If M1 provided explicit structure, great. 
-            # Here we assume the LLM extraction in M1 implies:
-            # Fact/Mech usually implies Cause -> Effect.
-            # We look at the top 2 term candidates as Subject -> Object for simplicity in this demo,
-            # OR we rely on the specific semantic roles if M1 gave them.
-            
-            # Let's try to parse the 'mechanism_candidates' or just map the first two terms.
-            # In a real system, M1 should output {subject: "...", object: "..."} explicitly.
-            # For this demo, we will perform a 'smart guess' based on the M1 output structure from the example.
-            
-            # Example M1 Output:
-            # Terms: ["SLR 규제", "바젤3", "대차대조표", "국채 수요"]
-            # Mechanism: "규제 강화 -> 대차대조표 감소"
-            
-            # We want to build:
-            # 1. SLR Rule (Subject) -> CAUSES/DECREASES -> Balance Sheet Cap (Object)
+            # Strong Ontology Logic:
+            # We trust M1 (LLM) output which is now structured with strict extraction rules.
+            # Variables[0] -> Subject, Variables[1] -> Object
             
             if len(frag.term_candidates) >= 2:
-                # Naive Heuristic: First term is Subject, Third term (or specific target) is Object
-                # In the specific user example: "SLR 규제"(0) ... "대차대조표"(2)
+                subj_text = frag.term_candidates[0]
+                obj_text = frag.term_candidates[1]
                 
-                subj_text = frag.term_candidates[0] # SLR 규제
-                # Let's find the 'effect' term. "대차대조표" seems to be index 2 in the example list
-                # or we simply take the next relevant noun.
-                
-                # To make this robust without a full dependency parser, let's map known patterns.
-                try:
-                    # Let's look for known "Subject" and "Object" in the resolved map
-                    # This is where 'Entity Resolver' helps.
-                    
-                    subj = resolution_map.get(subj_text)
-                    
-                    # Try to find 'Balance Sheet' or 'Treasury Demand'
-                    obj_text = next((t for t in frag.term_candidates if "대차대조표" in t or "국채" in t), None)
-                    obj = resolution_map.get(obj_text) if obj_text else None
+                # entity resolution
+                subj = resolution_map.get(subj_text)
+                obj = resolution_map.get(obj_text)
 
-                    if subj and obj:
-                        pred = self._map_predicate(frag.predicate_candidate)
-                        
-                        rel = Relation(
-                            rel_id=f"REL_{uuid.uuid4().hex[:8].upper()}",
-                            subject_id=subj.entity_id,
-                            predicate=pred,
-                            object_id=obj.entity_id,
-                            conditions={
-                                "time": frag.condition_text,
-                                "context": frag.mechanism_text
-                            }
-                        )
-                        relations.append(rel)
-                        
-                        # Chained Relation Check (Pattern: A->B, B->C)
-                        # If there are more terms like "국채 매수 여력" (Treasury Buying Power)
-                        # We might infer B -> C
-                        second_obj_text = next((t for t in frag.term_candidates if "국채" in t and t != obj_text), None)
-                        if second_obj_text:
-                            second_obj = resolution_map.get(second_obj_text)
-                            if second_obj:
-                                rel2 = Relation(
-                                    rel_id=f"REL_{uuid.uuid4().hex[:8].upper()}",
-                                    subject_id=obj.entity_id, # Previous Object becomes Subject
-                                    predicate=PredicateType.DECREASES, # Inferred from context "줄어든다"
-                                    object_id=second_obj.entity_id,
-                                    conditions={"context": "Outcome of reduced B/S"}
-                                )
-                                relations.append(rel2)
+                if subj and obj:
+                    # Determine predicate for GraphViz/display compatibility
+                    # If relation_kind is PROPORTIONAL, sign determines INC/DEC
+                    final_pred = frag.predicate_candidate
+                    if not final_pred:
+                        if frag.sign > 0: final_pred = PredicateType.INCREASES
+                        elif frag.sign < 0: final_pred = PredicateType.DECREASES
+                        else: final_pred = PredicateType.CAUSES
 
-                except Exception as e:
-                    print(f"Error constructing relation for fragment {frag.fragment_id}: {e}")
-                    continue
+                    rel = Relation(
+                        rel_id=f"REL_{uuid.uuid4().hex[:8].upper()}",
+                        subject_id=subj.entity_id,
+                        predicate=final_pred or PredicateType.CAUSES,
+                        object_id=obj.entity_id,
+                        conditions={
+                            "time": frag.condition_text,
+                            "context": frag.mechanism_text,
+                            "raw_kind": frag.relation_kind
+                        },
+                        # Strong Ontology Fields
+                        relation_kind=frag.relation_kind or "CAUSAL",
+                        sign=frag.sign if frag.sign is not None else 1,
+                        strength=frag.strength if frag.strength is not None else 1.0,
+                        lag_days=frag.lag_days if frag.lag_days is not None else 0
+                    )
+                    relations.append(rel)
+                else:
+                    print(f"Skipping fragment {frag.fragment_id}: Unresolved entities {subj_text}, {obj_text}")
 
         return relations
 

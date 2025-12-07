@@ -69,6 +69,14 @@ def create_app() -> FastAPI:
     @app.get("/detail_view")
     async def detail_view():
         return FileResponse(os.path.join(static_dir, "detail.html"))
+
+    @app.get("/pair_trading")
+    async def pair_trading_view():
+        return FileResponse(os.path.join(static_dir, "pair_trading.html"))
+
+    @app.get("/scenario")
+    async def scenario_view():
+        return FileResponse(os.path.join(static_dir, "scenario.html"))
         
     return app
 

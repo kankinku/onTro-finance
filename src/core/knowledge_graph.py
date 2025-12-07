@@ -27,7 +27,8 @@ class KnowledgeGraph:
             relation_id=relation.rel_id,
             predicate=relation.predicate,
             conditions=relation.conditions,
-            weight=1.0
+            weight=getattr(relation, 'strength', 1.0),
+            relation_object=relation.model_dump() # Store as dict for JSON serialization
         )
         # Auto-save on update (Simple strategy for prototype)
         self.save_to_disk()

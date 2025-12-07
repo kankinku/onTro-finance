@@ -46,6 +46,12 @@ class Fragment(BaseModel):
     term_candidates: List[str] = []
     mechanism_candidates: List[str] = []
     predicate_candidate: Optional[str] = None
+    
+    # Enhanced Fields for Strong Ontology
+    relation_kind: Optional[str] = None # CAUSAL, PROPORTIONAL, etc.
+    sign: Optional[int] = None # +1, -1
+    strength: Optional[float] = None # 0.0 ~ 1.0
+    lag_days: Optional[int] = None
 
 class ResolvedEntity(BaseModel):
     surface_form: str
@@ -75,6 +81,12 @@ class Relation(BaseModel):
     object_id: str
     conditions: Dict[str, Any] = Field(default_factory=dict, description="Time, market state conditions")
     rationale_ids: List[str] = []
+    
+    # Enhanced Fields for Strong Ontology
+    relation_kind: str = "CAUSAL"
+    sign: int = 1
+    strength: float = 1.0
+    lag_days: int = 0
     
 class Chain(BaseModel):
     chain_id: str

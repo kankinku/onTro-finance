@@ -4,271 +4,71 @@
   "graph": {},
   "nodes": [
     {
-      "term_id": "TERM_SLR_RULE",
-      "label": "SLR 규제",
-      "aliases": [
-        "SLR 규제"
-      ],
-      "attributes": {},
-      "id": "TERM_SLR_RULE"
+      "id": "NODE_INTEREST_RATE"
     },
     {
-      "term_id": "TERM_BASEL3",
-      "label": "바젤 III",
-      "aliases": [
-        "Basel 3",
-        "바젤III"
-      ],
-      "attributes": {},
-      "id": "TERM_BASEL3"
+      "id": "NODE_MARKET_LIQUIDITY"
     },
     {
-      "term_id": "TERM_LCR",
-      "label": "LCR",
-      "aliases": [
-        "Liquidity Coverage Ratio",
-        "유동성 커버리지 비율"
-      ],
-      "attributes": {},
-      "id": "TERM_LCR"
-    },
-    {
-      "term_id": "TERM_BIS_RATIO",
-      "label": "BIS 비율",
-      "aliases": [
-        "BIS Ratio",
-        "BIS"
-      ],
-      "attributes": {},
-      "id": "TERM_BIS_RATIO"
-    },
-    {
-      "term_id": "TERM_BASE_RATE",
-      "label": "기준금리",
-      "aliases": [
-        "Policy Rate",
-        "Base Rate"
-      ],
-      "attributes": {},
-      "id": "TERM_BASE_RATE"
-    },
-    {
-      "term_id": "TERM_INFLATION",
-      "label": "인플레이션",
-      "aliases": [
-        "물가상승",
-        "Inflation Rate"
-      ],
-      "attributes": {},
-      "id": "TERM_INFLATION"
-    },
-    {
-      "term_id": "TERM_EXCHANGE_RATE",
-      "label": "환율",
-      "aliases": [
-        "FX Rate",
-        "원달러 환율"
-      ],
-      "attributes": {},
-      "id": "TERM_EXCHANGE_RATE"
-    },
-    {
-      "term_id": "TERM_TREASURY_YIELD",
-      "label": "국채 금리",
-      "aliases": [
-        "Treasury Yield",
-        "국채 수익률"
-      ],
-      "attributes": {},
-      "id": "TERM_TREASURY_YIELD"
-    },
-    {
-      "term_id": "TERM_LIQUIDITY",
-      "label": "유동성",
-      "aliases": [
-        "Market Liquidity",
-        "자금 사정"
-      ],
-      "attributes": {},
-      "id": "TERM_LIQUIDITY"
-    },
-    {
-      "term_id": "TERM_CREDIT_SPREAD",
-      "label": "신용 스프레드",
-      "aliases": [
-        "회사채 스프레드",
-        "Credit Spread"
-      ],
-      "attributes": {},
-      "id": "TERM_CREDIT_SPREAD"
-    },
-    {
-      "term_id": "TERM_ASSET_PRICE",
-      "label": "자산 가격",
-      "aliases": [
-        "주가",
-        "부동산 가격"
-      ],
-      "attributes": {},
-      "id": "TERM_ASSET_PRICE"
-    },
-    {
-      "term_id": "TERM_BALANCE_SHEET_CAP",
-      "label": "대차대조표",
-      "aliases": [
-        "대차대조표"
-      ],
-      "attributes": {},
-      "id": "TERM_BALANCE_SHEET_CAP"
-    },
-    {
-      "term_id": "TERM_TREASURY_DEMAND",
-      "label": "국채 수요",
-      "aliases": [
-        "UST Demand",
-        "국채 매수"
-      ],
-      "attributes": {},
-      "id": "TERM_TREASURY_DEMAND"
-    },
-    {
-      "term_id": "TERM_TREASURY_BUYING_POWER",
-      "label": "국채 매수 여력",
-      "aliases": [],
-      "attributes": {},
-      "id": "TERM_TREASURY_BUYING_POWER"
-    },
-    {
-      "term_id": "TERM_UST",
-      "label": "미국채",
-      "aliases": [
-        "UST",
-        "U.S. Treasury"
-      ],
-      "attributes": {},
-      "id": "TERM_UST"
-    },
-    {
-      "term_id": "TERM_CORP_BOND",
-      "label": "회사채",
-      "aliases": [
-        "Corporate Bond"
-      ],
-      "attributes": {},
-      "id": "TERM_CORP_BOND"
-    },
-    {
-      "term_id": "NODE_CENTRAL_BANK",
-      "label": "중앙은행",
-      "aliases": [
-        "Fed",
-        "BOK",
-        "한국은행"
-      ],
-      "attributes": {},
-      "id": "NODE_CENTRAL_BANK"
-    },
-    {
-      "term_id": "NODE_COMMERCIAL_BANK",
-      "label": "시중은행",
-      "aliases": [
-        "Commercial Bank",
-        "은행권"
-      ],
-      "attributes": {},
-      "id": "NODE_COMMERCIAL_BANK"
-    },
-    {
-      "term_id": "NODE_HEDGE_FUND",
-      "label": "헤지펀드",
-      "aliases": [
-        "Hedge Fund"
-      ],
-      "attributes": {},
-      "id": "NODE_HEDGE_FUND"
+      "id": "NODE_ASSET_PRICE"
     }
   ],
   "links": [
     {
-      "relation_id": "REL_D62EEF07",
+      "relation_id": "REL_05BBDFBE",
       "predicate": "P_DECREASES",
       "conditions": {
         "time": null,
-        "context": "Mock Mechanism"
+        "context": "긴축 효과",
+        "raw_kind": "PROPORTIONAL"
       },
-      "weight": 1.0,
-      "source": "TERM_SLR_RULE",
-      "target": "TERM_BALANCE_SHEET_CAP"
+      "weight": 0.9,
+      "relation_object": {
+        "rel_id": "REL_05BBDFBE",
+        "subject_id": "NODE_INTEREST_RATE",
+        "predicate": "P_DECREASES",
+        "object_id": "NODE_MARKET_LIQUIDITY",
+        "conditions": {
+          "time": null,
+          "context": "긴축 효과",
+          "raw_kind": "PROPORTIONAL"
+        },
+        "rationale_ids": [],
+        "relation_kind": "PROPORTIONAL",
+        "sign": -1,
+        "strength": 0.9,
+        "lag_days": 0
+      },
+      "source": "NODE_INTEREST_RATE",
+      "target": "NODE_MARKET_LIQUIDITY"
     },
     {
-      "relation_id": "REL_RATE_YIELD",
+      "relation_id": "REL_F71A5444",
       "predicate": "P_INCREASES",
       "conditions": {
-        "context": "Correlation"
+        "time": null,
+        "context": "자금 유입 효과",
+        "raw_kind": "PROPORTIONAL"
       },
-      "weight": 1.0,
-      "source": "TERM_BASE_RATE",
-      "target": "TERM_TREASURY_YIELD"
-    },
-    {
-      "relation_id": "REL_INFLATION_RATE",
-      "predicate": "P_INCREASES",
-      "conditions": {
-        "context": "Taylor Rule"
+      "weight": 0.8,
+      "relation_object": {
+        "rel_id": "REL_F71A5444",
+        "subject_id": "NODE_MARKET_LIQUIDITY",
+        "predicate": "P_INCREASES",
+        "object_id": "NODE_ASSET_PRICE",
+        "conditions": {
+          "time": null,
+          "context": "자금 유입 효과",
+          "raw_kind": "PROPORTIONAL"
+        },
+        "rationale_ids": [],
+        "relation_kind": "PROPORTIONAL",
+        "sign": 1,
+        "strength": 0.8,
+        "lag_days": 7
       },
-      "weight": 1.0,
-      "source": "TERM_INFLATION",
-      "target": "TERM_BASE_RATE"
-    },
-    {
-      "relation_id": "REL_RISK_SPREAD",
-      "predicate": "P_INCREASES",
-      "conditions": {
-        "context": "Risk Off"
-      },
-      "weight": 1.0,
-      "source": "TERM_INFLATION",
-      "target": "TERM_CREDIT_SPREAD"
-    },
-    {
-      "relation_id": "REL_LIQ_ASSET",
-      "predicate": "P_INCREASES",
-      "conditions": {
-        "context": "Market"
-      },
-      "weight": 1.0,
-      "source": "TERM_LIQUIDITY",
-      "target": "TERM_ASSET_PRICE"
-    },
-    {
-      "relation_id": "REL_BS_BUYPOWER",
-      "predicate": "P_INCREASES",
-      "conditions": {
-        "context": "Mechanism"
-      },
-      "weight": 1.0,
-      "source": "TERM_BALANCE_SHEET_CAP",
-      "target": "TERM_TREASURY_BUYING_POWER"
-    },
-    {
-      "relation_id": "REL_BUYPOWER_DEMAND",
-      "predicate": "P_INCREASES",
-      "conditions": {
-        "context": "Mechanism"
-      },
-      "weight": 1.0,
-      "source": "TERM_TREASURY_BUYING_POWER",
-      "target": "TERM_TREASURY_DEMAND"
-    },
-    {
-      "relation_id": "REL_CB_RATE",
-      "predicate": "P_INCREASES",
-      "conditions": {
-        "context": "Policy"
-      },
-      "weight": 1.0,
-      "source": "NODE_CENTRAL_BANK",
-      "target": "TERM_BASE_RATE"
+      "source": "NODE_MARKET_LIQUIDITY",
+      "target": "NODE_ASSET_PRICE"
     }
   ]
 }

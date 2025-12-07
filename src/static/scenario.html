@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OntoFin - 금융 시나리오</title>
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <style>
+        :root {
+            --bg-color: #101010;
+            --card-bg: #202022;
+            --card-hover: #2c2c2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b8c1;
+            --text-tertiary: #6b7684;
+            --accent: #3182f6;
+            --accent-hover: #1b64da;
+            --danger: #ef4444;
+            --success: #34c759;
+            --warning: #ffb300;
+
+            --radius-l: 24px;
+            --radius-m: 16px;
+            --radius-s: 12px;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        /* Header */
+        header {
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+
+        .subtitle {
+            font-size: 17px;
+            color: var(--text-secondary);
+        }
+
+        /* Dashboard Section */
+        .dashboard-grid {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scroll-behavior: smooth;
+        }
+
+        .dashboard-grid::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .dashboard-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .dashboard-grid::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .dashboard-grid::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .dash-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-m);
+            padding: 20px;
+            min-width: 240px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .dash-card:hover {
+            transform: translateY(-2px);
+            background-color: var(--card-hover);
+        }
+
+        .dash-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .dash-value-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .dash-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .dash-change {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .change-pos {
+            color: var(--success);
+        }
+
+        .change-neg {
+            color: var(--danger);
+        }
+
+        .dash-desc {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            line-height: 1.4;
+            border-top: 1px solid #333;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+
+        .dash-interpret {
+            margin-top: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Card Style */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-l);
+            padding: 24px;
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .card-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Inputs */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            background-color: #2c2c2e;
+            border: 1px solid transparent;
+            border-radius: var(--radius-m);
+            padding: 16px;
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+            box-sizing: border-box;
+            resize: none;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+            background-color: #333335;
+            border-color: var(--accent);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: var(--radius-m);
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .link-btn {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 10px 16px;
+            background: rgba(49, 130, 246, 0.1);
+            border-radius: var(--radius-s);
+        }
+
+        .output-box {
+            margin-top: 24px;
+            background-color: #171719;
+            border-radius: var(--radius-m);
+            padding: 20px;
+            min-height: 100px;
+        }
+
+        .empty-state {
+            color: var(--text-tertiary);
+            text-align: center;
+            padding: 20px 0;
+            font-size: 15px;
+        }
+
+        .log-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #2c2c2e;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .chip-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .chip {
+            background: #2c2c2e;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .chip:hover {
+            background: #3c3c3e;
+            color: white;
+        }
+
+        .chip.active {
+            background: rgba(49, 130, 246, 0.15);
+            color: var(--accent);
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s infinite linear;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>금융 시나리오 실험실</h1>
+            <div class="subtitle">AI와 함께 시장의 흐름을 예측해보세요.</div>
+            <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
+                <a href="/graph_view" class="link-btn">지식 그래프 전체 보기 (Graph) &rarr;</a>
+                <a href="/pair_trading" class="link-btn" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+                    📊 페어 트레이딩 분석 &rarr;
+                </a>
+            </div>
+        </header>
+
+        <!-- AI Insight -->
+        <section id="aiInsightBox" style="display:none; margin-bottom: 24px;">
+            <div class="card"
+                style="border: 1px solid rgba(49, 130, 246, 0.3); background: linear-gradient(145deg, #202022, #1a1a1c);">
+                <div class="card-title" style="font-size: 18px; margin-bottom: 12px; color: var(--accent);">
+                    🧠 AI Market Briefing (Liquidity Focus)
+                </div>
+                <div id="aiInsightText"
+                    style="white-space: pre-wrap; line-height: 1.6; font-size: 15px; color: #e0e0e0;">
+                    분석 중...
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section>
+            <div style="margin-bottom:12px; font-size:18px; font-weight:700;">📊 실시간 시장 현황</div>
+            <div class="dashboard-grid" id="dashboardGrid">
+                <div class="dash-card">
+                    <div class="empty-state">데이터 로딩 중...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 1: Learn -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">1. 지식 학습하기</h2>
+                <div class="card-desc">AI에게 금융 뉴스나 보고서 내용을 알려주세요.</div>
+            </div>
+            <div class="input-group">
+                <textarea id="learnInput" rows="4"
+                    placeholder="예시: 연준이 기준금리를 인상하면 대출 금리가 오르고, 이는 부동산 가격 하락 압력으로 작용한다."></textarea>
+            </div>
+            <button onclick="runLearn()" id="btnLearn"><span class="spinner" id="loaderLearn"></span>지식 추출 및 저장</button>
+            <div class="output-box" id="outputLearn">
+                <div class="empty-state">학습된 내용이 여기에 표시됩니다.</div>
+            </div>
+        </section>
+
+        <!-- Step 2: Infer -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">2. 시나리오 시뮬레이션</h2>
+                <div class="card-desc">특정 사건이 발생했을 때, 시장에 미치는 영향을 분석합니다.</div>
+            </div>
+            <div class="input-group">
+                <label>어떤 사건에서 시작할까요?</label>
+                <input type="text" id="inferInput" placeholder="용어 ID 입력 (예: TERM_BASE_RATE)">
+                <div class="chip-container">
+                    <div class="chip" onclick="setInferTerm('TERM_BASE_RATE')">기준금리</div>
+                    <div class="chip" onclick="setInferTerm('TERM_INFLATION')">인플레이션</div>
+                    <div class="chip" onclick="setInferTerm('TERM_EXCHANGE_RATE')">환율</div>
+                    <div class="chip" onclick="setInferTerm('TERM_TREASURY_YIELD')">국채 금리</div>
+                    <div class="chip" onclick="setInferTerm('TERM_SLR_RULE')">SLR 규제</div>
+                </div>
+            </div>
+            <button onclick="runInfer()" id="btnInfer"><span class="spinner" id="loaderInfer"></span>파급 효과 분석하기</button>
+            <div class="output-box" id="outputInfer">
+                <div class="empty-state">시뮬레이션 결과가 이곳에 나타납니다.</div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = "/api/v1";
+
+        // Init
+        loadDashboard();
+
+        async function loadDashboard() {
+            const grid = document.getElementById('dashboardGrid');
+            const insightBox = document.getElementById('aiInsightBox');
+            const insightText = document.getElementById('aiInsightText');
+
+            try {
+                const res = await fetch(`${API_BASE}/market/dashboard`);
+                const data = await res.json();
+
+                const cards = data.cards || [];
+                grid.innerHTML = "";
+
+                cards.forEach(item => {
+                    const changeClass = item.is_positive ? 'change-pos' : 'change-neg';
+                    const html = `
+                    <div class="dash-card" onclick="openDetail('${item.source}', '${item.ticker}', '${item.title}', '${item.value}')">
+                        <div class="dash-title">${item.title}</div>
+                        <div class="dash-value-row">
+                            <div class="dash-value">${item.value}</div>
+                            <div class="dash-change ${changeClass}">${item.change}</div>
+                        </div>
+                        <div class="dash-desc">${item.desc}</div>
+                        <div class="dash-interpret">${item.interpretation}</div>
+                    </div>`;
+                    grid.innerHTML += html;
+                });
+
+                if (data.insight) {
+                    insightBox.style.display = 'block';
+                    insightText.innerText = data.insight;
+                }
+
+            } catch (e) {
+                console.error(e);
+                grid.innerHTML = '<div class="empty-state" style="color:var(--danger)">시장 데이터를 불러오는데 실패했습니다.</div>';
+            }
+        }
+
+        function openDetail(source, ticker, title, value) {
+            const url = `/detail_view?source=${source}&ticker=${ticker}&title=${title}&value=${value}`;
+            window.location.href = url;
+        }
+
+        function setInferTerm(termId) {
+            document.getElementById('inferInput').value = termId;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        async function runLearn() {
+            const input = document.getElementById('learnInput').value;
+            if (!input.trim()) return alert("내용을 입력해주세요.");
+            setLoading('Learn', true);
+
+            try {
+                const res = await fetch(`${API_BASE}/learn`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: input })
+                });
+                const data = await res.json();
+                const out = document.getElementById('outputLearn');
+                out.innerHTML = "";
+
+                if (data.length === 0) {
+                    out.innerHTML = '<div class="empty-state">추출된 정보가 없습니다.</div>';
+                } else {
+                    data.forEach(f => {
+                        out.innerHTML += `<div class="log-item"><b>Fact:</b> ${f.fact}<br><span style="color:var(--secondary); font-size:13px;">-> ${f.outcome_text}</span></div>`;
+                    });
+                }
+            } catch (e) { alert(e); }
+            finally { setLoading('Learn', false); }
+        }
+
+        async function runInfer() {
+            const termId = document.getElementById('inferInput').value;
+            if (!termId) return alert("용어를 선택해주세요.");
+            setLoading('Infer', true);
+
+            try {
+                const res = await fetch(`${API_BASE}/infer?target_term_id=${termId}`, { method: 'POST' });
+                const data = await res.json();
+                const out = document.getElementById('outputInfer');
+                out.innerHTML = "";
+
+                if (data.outcome_text.length === 0) {
+                    out.innerHTML = '<div class="empty-state">결과가 없습니다.</div>';
+                } else {
+                    const conf = (data.confidence * 100).toFixed(0);
+                    out.innerHTML += `<div style="padding-bottom:12px; margin-bottom:12px; border-bottom:1px solid #333; color:var(--success); font-weight:700;">신뢰도: ${conf}%</div>`;
+
+                    data.outcome_text.forEach(line => {
+                        let style = "";
+                        if (line.includes("현황 데이터")) style = "color:#ffd700; font-weight:bold;";
+                        if (line.includes("검증")) style = "padding-left:20px; color:#aaa;";
+                        out.innerHTML += `<div class="log-item" style="${style}">${line}</div>`;
+                    });
+                }
+            } catch (e) { alert(e); }
+            finally { setLoading('Infer', false); }
+        }
+
+        function setLoading(type, isLoading) {
+            document.getElementById(`btn${type}`).disabled = isLoading;
+            document.getElementById(`loader${type}`).style.display = isLoading ? 'inline-block' : 'none';
+        }
+    </script>
+</body>
+
+</html>

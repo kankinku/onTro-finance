@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OntoFin - 페어 트레이딩 분석</title>
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #101010;
+            --card-bg: #202022;
+            --card-hover: #2c2c2e;
+            --card-border: #333336;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b8c1;
+            --text-tertiary: #6b7684;
+            --accent: #3182f6;
+            --accent-hover: #1b64da;
+            --accent-light: rgba(49, 130, 246, 0.15);
+            --danger: #ef4444;
+            --success: #34c759;
+            --warning: #ffb300;
+            --purple: #a855f7;
+            --cyan: #22d3ee;
+
+            --radius-xl: 28px;
+            --radius-l: 24px;
+            --radius-m: 16px;
+            --radius-s: 12px;
+            --radius-xs: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(16, 16, 16, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo span {
+            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 10px 18px;
+            border-radius: var(--radius-s);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 88px 24px 40px;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header .badge {
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .page-header .subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1200px) {
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Component */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-l);
+            padding: 24px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--card-border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select,
+        input[type="number"],
+        input[type="text"] {
+            background: #2c2c2e;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-s);
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            min-width: 140px;
+            transition: all 0.2s;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #333335;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: var(--radius-s);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #4F93FF);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(49, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--card-hover);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #3c3c3e;
+            color: var(--text-primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Pair Card */
+        .pair-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-m);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .pair-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px rgba(49, 130, 246, 0.15);
+        }
+
+        .pair-card.selected {
+            border-color: var(--accent);
+            background: rgba(49, 130, 246, 0.1);
+        }
+
+        .pair-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .pair-tickers {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ticker {
+            font-size: 16px;
+            font-weight: 700;
+            padding: 6px 10px;
+            background: #333;
+            border-radius: var(--radius-xs);
+        }
+
+        .ticker-divider {
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+
+        .sector-tag {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .pair-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        .positive {
+            color: var(--success);
+        }
+
+        .negative {
+            color: var(--danger);
+        }
+
+        .neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .chart-container.tall {
+            height: 400px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: #171719;
+            border-radius: var(--radius-m);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* Trade Table */
+        .trade-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .trade-table th,
+        .trade-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #2c2c2e;
+            font-size: 13px;
+        }
+
+        .trade-table th {
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .trade-table tbody tr:hover {
+            background: #1a1a1c;
+        }
+
+        /* Loading & Empty States */
+        .loading-state,
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--text-tertiary);
+            text-align: center;
+            grid-column: 1 / -1;
+            /* 그리드 전체 너비 사용 */
+            min-height: 300px;
+        }
+
+        .loading-state .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--card-border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Pairs List Container */
+        .pairs-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 8px;
+            min-height: 300px;
+        }
+
+        .pairs-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .pairs-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .pairs-list::-webkit-scrollbar-thumb {
+            background: var(--card-border);
+            border-radius: 10px;
+        }
+
+        /* Tooltip */
+        .tooltip-container {
+            position: relative;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: #333;
+            border-radius: var(--radius-xs);
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .tooltip-container:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Scatter Plot Legend */
+        .scatter-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* Insight Box */
+        .insight-box {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(49, 130, 246, 0.3);
+            border-radius: var(--radius-l);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .insight-content {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #e0e0e0;
+        }
+
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: #171719;
+            border-radius: var(--radius-m);
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: var(--radius-s);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--text-secondary);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <a href="/" class="nav-logo">
+            <span>OntoFin</span>
+        </a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">홈</a>
+            <a href="/pair_trading" class="nav-link active">페어 트레이딩</a>
+            <a href="/graph_view" class="nav-link">지식 그래프</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1>
+                페어 트레이딩 분석
+                <span class="badge">BETA</span>
+            </h1>
+            <p class="subtitle">
+                섹터 내 상관계수 기반 종목쌍을 분석하고, 펀더멘털/모멘텀 스프레드를 통해<br>
+                Mean-reversion 전략의 백테스트를 수행합니다.
+            </p>
+        </header>
+
+        <!-- Filter Controls -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">분석 설정</div>
+                    <div class="card-desc">섹터와 상관계수 임계값을 설정하세요</div>
+                </div>
+                <button class="btn btn-primary" id="btnAnalyze" onclick="loadPairs()">
+                    분석 시작
+                </button>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">섹터</label>
+                    <select id="sectorSelect">
+                        <option value="">전체 섹터</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">상관계수 임계값</label>
+                    <input type="number" id="corrThreshold" value="0.7" min="0" max="1" step="0.05">
+                </div>
+                <div class="control-group">
+                    <label class="control-label">롤링 윈도우</label>
+                    <input type="number" id="corrWindow" value="120" min="20" max="252" step="10">
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs" style="margin-top: 24px;">
+            <button class="tab active" onclick="switchTab('pairs')">종목쌍 리스트</button>
+            <button class="tab" onclick="switchTab('scatter')">스프레드 산점도</button>
+            <button class="tab" onclick="switchTab('backtest')">백테스트</button>
+        </div>
+
+        <!-- Tab Content: Pairs List -->
+        <div id="tabPairs" class="tab-content">
+            <div class="section-title">상관계수 기반 종목쌍</div>
+            <div id="pairsList" class="pairs-list">
+                <div class="empty-state">
+                    <!-- <div style="font-size: 48px; margin-bottom: 16px;">📊</div> -->
+                    <div class="spinner" style="border-width:2px; margin-bottom:16px;"></div>
+                    <p style="font-size: 16px; font-weight: 500;">상단의 <strong style="color: var(--accent);">분석
+                            시작</strong> 버튼을 클릭하세요</p>
+                    <p style="font-size: 13px; margin-top: 8px;">섹터 내 상관계수가 높은 종목쌍을 분석합니다</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Scatter Plot -->
+        <div id="tabScatter" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">롱숏 기회 맵</div>
+                <div class="card-desc">X축: P/E 스프레드 (양수=T1 고평가), Y축: 가격 Z-Score (양수=T1 상대 고가)</div>
+
+                <!-- 사분면 가이드 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; font-size: 12px;">
+                    <div
+                        style="padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        <strong style="color: var(--danger);">1사분면 (우상)</strong>: T1 고평가 + 고가 → <strong>Short
+                            T1</strong>
+                    </div>
+                    <div style="padding: 10px; background: rgba(107, 114, 128, 0.1); border-radius: 8px;">
+                        <strong style="color: var(--text-tertiary);">2사분면 (좌상)</strong>: T1 저평가 + 고가 → Mixed Signal
+                    </div>
+                    <div style="padding: 10px; background: rgba(107, 114, 128, 0.1); border-radius: 8px;">
+                        <strong style="color: var(--text-tertiary);">4사분면 (우하)</strong>: T1 고평가 + 저가 → Mixed Signal
+                    </div>
+                    <div
+                        style="padding: 10px; background: rgba(52, 199, 89, 0.1); border-radius: 8px; border: 1px solid rgba(52, 199, 89, 0.3);">
+                        <strong style="color: var(--success);">3사분면 (좌하)</strong>: T1 저평가 + 저가 → <strong>Long
+                            T1</strong>
+                    </div>
+                </div>
+
+                <div class="chart-container tall">
+                    <canvas id="scatterChart"></canvas>
+                </div>
+                <div class="scatter-legend" id="scatterLegend"></div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Backtest -->
+        <div id="tabBacktest" class="tab-content" style="display: none;">
+            <div class="grid-2">
+                <!-- Backtest Config -->
+                <div class="card">
+                    <div class="card-title">백테스트 설정</div>
+                    <div class="card-desc">전략을 선택하고 파라미터를 조정하세요</div>
+
+                    <!-- Strategy Selection -->
+                    <div style="margin-top: 16px; display: flex; gap: 8px;">
+                        <button class="btn btn-primary strategy-btn" id="btnStrategySpread"
+                            onclick="selectStrategy('spread')" style="flex: 1; font-size: 13px;">
+                            스프레드 전략
+                        </button>
+                        <button class="btn btn-secondary strategy-btn" id="btnStrategyFundamental"
+                            onclick="selectStrategy('fundamental')" style="flex: 1; font-size: 13px;">
+                            펀더멘털 전략
+                        </button>
+                    </div>
+
+                    <div class="controls" style="margin-top: 20px;">
+                        <div class="control-group">
+                            <label class="control-label">종목 1</label>
+                            <input type="text" id="btTicker1" placeholder="NVDA" value="NVDA">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">종목 2</label>
+                            <input type="text" id="btTicker2" placeholder="AMD" value="AMD">
+                        </div>
+                    </div>
+                    <!-- Spread Strategy Options -->
+                    <div id="spreadOptions" class="controls">
+                        <div class="control-group">
+                            <label class="control-label">Entry Z-Score</label>
+                            <input type="number" id="btEntryZ" value="1.5" min="0.5" max="3" step="0.1">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Exit Z-Score</label>
+                            <input type="number" id="btExitZ" value="0.0" min="-1" max="1" step="0.1">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Lookback</label>
+                            <input type="number" id="btLookback" value="63" min="20" max="126" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Max Holding</label>
+                            <input type="number" id="btMaxHolding" value="60" min="10" max="120" step="5">
+                        </div>
+                    </div>
+
+                    <!-- Fundamental Strategy Options (Hidden by default) -->
+                    <div id="fundamentalOptions" style="display: none;">
+                        <div class="controls">
+                            <div class="control-group">
+                                <label class="control-label">진입 시점 (거래일 전)</label>
+                                <input type="number" id="btEntryDaysAgo" value="42" min="1" max="252" step="1">
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">청산 시점 (0=오늘)</label>
+                                <input type="number" id="btExitDaysAgo" value="0" min="0" max="252" step="1">
+                            </div>
+                        </div>
+                        <div class="controls">
+                            <div class="control-group" style="flex: 2;">
+                                <label class="control-label">펀더멘털 지표</label>
+                                <select id="btFundMetric">
+                                    <option value="pe">P/E (낮을수록 Long)</option>
+                                    <option value="pb">P/B (낮을수록 Long)</option>
+                                    <option value="combined">Combined Score</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategy Description -->
+                    <div id="strategyDescBox"
+                        style="margin-top: 16px; padding: 16px; background: #171719; border-radius: 12px; font-size: 13px; line-height: 1.6;">
+                        <div style="color: var(--accent); font-weight: 600; margin-bottom: 8px;">📊 스프레드 전략</div>
+                        <div style="color: var(--text-secondary);">가격 스프레드 Z-Score가 임계값을 넘으면 진입, 평균 회귀 시 청산하는
+                            Mean-Reversion 전략</div>
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="runBacktest()">
+                        백테스트 실행
+                    </button>
+                </div>
+
+                <!-- Spread Chart -->
+                <div class="card">
+                    <div class="card-title" id="spreadChartTitle">📉 모멘텀 스프레드</div>
+                    <div class="chart-container">
+                        <canvas id="spreadChart"></canvas>
+                    </div>
+                    <div id="spreadStats" class="stats-grid" style="display: none;">
+                        <!-- Dynamic stats -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backtest Results -->
+            <div id="backtestResults" style="display: none; margin-top: 24px;">
+                <div class="section-title">📊 백테스트 결과</div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="btReturn">--</div>
+                        <div class="stat-label">총 수익률</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="btMDD">--</div>
+                        <div class="stat-label">최대 낙폭</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="btSharpe">--</div>
+                        <div class="stat-label">샤프 비율</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="btTrades">--</div>
+                        <div class="stat-label">거래 횟수</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-title">📈 Equity Curve</div>
+                    <div class="chart-container">
+                        <canvas id="equityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-title">📋 최근 거래 내역</div>
+                    <table class="trade-table">
+                        <thead>
+                            <tr>
+                                <th>진입일</th>
+                                <th>청산일</th>
+                                <th>포지션</th>
+                                <th>진입 Z</th>
+                                <th>청산 Z</th>
+                                <th>보유일</th>
+                                <th>청산 사유</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "/api/v1";
+        let pairsData = [];
+        let scatterChart = null;
+        let spreadChart = null;
+        let equityChart = null;
+        let selectedStrategy = 'spread';  // 'spread' or 'fundamental'
+
+        // Sector Colors
+        const sectorColors = {
+            'Semiconductor': '#ef4444',
+            'Cloud': '#3b82f6',
+            'BigTech': '#8b5cf6',
+            'ECommerce': '#f59e0b',
+            'Fintech': '#10b981'
+        };
+
+        // Strategy Selection
+        function selectStrategy(strategy) {
+            selectedStrategy = strategy;
+
+            // Update buttons
+            document.getElementById('btnStrategySpread').className =
+                strategy === 'spread' ? 'btn btn-primary strategy-btn' : 'btn btn-secondary strategy-btn';
+            document.getElementById('btnStrategyFundamental').className =
+                strategy === 'fundamental' ? 'btn btn-primary strategy-btn' : 'btn btn-secondary strategy-btn';
+
+            // Toggle options visibility
+            document.getElementById('spreadOptions').style.display = strategy === 'spread' ? 'flex' : 'none';
+            document.getElementById('fundamentalOptions').style.display = strategy === 'fundamental' ? 'block' : 'none';
+
+            // Update description
+            const descBox = document.getElementById('strategyDescBox');
+            if (strategy === 'spread') {
+                descBox.innerHTML = `
+                    <div style="color: var(--accent); font-weight: 600; margin-bottom: 8px;">스프레드 전략</div>
+                    <div style="color: var(--text-secondary);">가격 스프레드 Z-Score가 임계값을 넘으면 진입, 평균 회귀 시 청산하는 Mean-Reversion 전략</div>
+                `;
+            } else {
+                descBox.innerHTML = `
+                    <div style="color: var(--success); font-weight: 600; margin-bottom: 8px;">펀더멘털 전략</div>
+                    <div style="color: var(--text-secondary);">P/E, P/B 등 펀더멘털이 좋은 종목을 <strong>Long</strong>, 나쁜 종목을 <strong>Short</strong>하여 지정된 기간 동안 보유</div>
+                `;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUniverse();
+        });
+
+        async function loadUniverse() {
+            try {
+                const res = await fetch(`${API_BASE}/pairs/universe`);
+                const data = await res.json();
+
+                const select = document.getElementById('sectorSelect');
+                Object.keys(data.sectors).forEach(sector => {
+                    const opt = document.createElement('option');
+                    opt.value = sector;
+                    opt.textContent = `${sector} (${data.sectors[sector].length})`;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Universe load error:', e);
+            }
+        }
+
+        async function loadPairs() {
+            const sector = document.getElementById('sectorSelect').value;
+            const corr = document.getElementById('corrThreshold').value;
+            const window = document.getElementById('corrWindow').value;
+
+            const list = document.getElementById('pairsList');
+            list.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>종목쌍 분석 중... (첫 로딩 시 1-2분 소요)</p></div>';
+
+            try {
+                let url = `${API_BASE}/pairs/list?corr_threshold=${corr}&window=${window}`;
+                if (sector) url += `&sector=${sector}`;
+
+                const res = await fetch(url);
+                const data = await res.json();
+                pairsData = data.pairs;
+
+                renderPairs(pairsData);
+                loadScatterData();
+            } catch (e) {
+                console.error('Pairs load error:', e);
+                list.innerHTML = '<div class="empty-state">데이터를 불러오는데 실패했습니다.</div>';
+            }
+        }
+
+        function renderPairs(pairs) {
+            const list = document.getElementById('pairsList');
+
+            if (pairs.length === 0) {
+                list.innerHTML = '<div class="empty-state">조건을 만족하는 종목쌍이 없습니다.</div>';
+                return;
+            }
+
+            // 시그널 색상 맵핑
+            const signalColors = {
+                'Long Spread': 'positive',
+                'Short Spread': 'negative',
+                'Weak Long': 'positive',
+                'Weak Short': 'negative',
+                'Neutral': 'neutral'
+            };
+
+            list.innerHTML = pairs.map((p, i) => `
+                <div class="pair-card fade-in" style="animation-delay: ${i * 0.05}s" onclick="selectPair('${p.ticker1}', '${p.ticker2}')">
+                    <div class="pair-header">
+                        <div class="pair-tickers">
+                            <span class="ticker">${p.ticker1}</span>
+                            <span class="ticker-divider">/</span>
+                            <span class="ticker">${p.ticker2}</span>
+                        </div>
+                        <span class="sector-tag">${p.sector}</span>
+                    </div>
+                    
+                    <!-- 가격 정보 -->
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding: 10px; background: #171719; border-radius: 8px;">
+                        <div style="font-size: 13px;">
+                            <span style="color: var(--text-tertiary)">가격:</span>
+                            <span style="color: var(--text-primary); font-weight: 600;">$${p.price1 || '--'}</span>
+                            <span style="color: var(--text-tertiary)"> / </span>
+                            <span style="color: var(--text-primary); font-weight: 600;">$${p.price2 || '--'}</span>
+                        </div>
+                        <div style="font-size: 13px;">
+                            <span style="color: var(--text-tertiary)">비율:</span>
+                            <span style="color: var(--text-primary); font-weight: 600;">${p.price_ratio || '--'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pair-metrics" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="metric">
+                            <div class="metric-value neutral">${(p.mean_corr * 100).toFixed(0)}%</div>
+                            <div class="metric-label">상관계수</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value ${Math.abs(p.price_spread_zscore || 0) > 1.5 ? 'positive' : Math.abs(p.price_spread_zscore || 0) > 1 ? 'warning' : 'neutral'}">
+                                ${p.price_spread_zscore !== null ? p.price_spread_zscore : '--'}
+                            </div>
+                            <div class="metric-label">Z-Score</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value ${signalColors[p.spread_signal] || 'neutral'}" style="font-size: 12px;">
+                                ${p.spread_signal || 'N/A'}
+                            </div>
+                            <div class="metric-label">시그널</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value ${(p.mom6_spread || 0) > 0 ? 'positive' : (p.mom6_spread || 0) < 0 ? 'negative' : 'neutral'}">
+                                ${((p.mom6_spread || 0) * 100).toFixed(0)}%
+                            </div>
+                            <div class="metric-label">6M 모멘텀</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectPair(t1, t2) {
+            document.getElementById('btTicker1').value = t1;
+            document.getElementById('btTicker2').value = t2;
+
+            // Visual feedback
+            document.querySelectorAll('.pair-card').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+
+            // Load spread chart
+            loadSpreadChart(t1, t2);
+        }
+
+        async function loadSpreadChart(t1, t2) {
+            try {
+                const res = await fetch(`${API_BASE}/pairs/spread?ticker1=${t1}&ticker2=${t2}&window=63`);
+                const data = await res.json();
+
+                document.getElementById('spreadChartTitle').textContent = `📉 ${t1}/${t2} 가격 스프레드 Z-Score`;
+
+                renderSpreadChart(data);
+
+                // 시그널 결정
+                const zScore = data.current_z;
+                let signal = 'Neutral';
+                let signalClass = 'neutral';
+                if (zScore > 1.5) { signal = 'Short Spread (매도 진입)'; signalClass = 'negative'; }
+                else if (zScore < -1.5) { signal = 'Long Spread (매수 진입)'; signalClass = 'positive'; }
+                else if (zScore > 1) { signal = 'Weak Short'; signalClass = 'neutral'; }
+                else if (zScore < -1) { signal = 'Weak Long'; signalClass = 'neutral'; }
+
+                // Show stats
+                const statsDiv = document.getElementById('spreadStats');
+                statsDiv.style.display = 'grid';
+                statsDiv.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value ${zScore > 0 ? 'positive' : 'negative'}">${data.current_z}</div>
+                        <div class="stat-label">현재 Z-Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value neutral">${data.current_ratio}</div>
+                        <div class="stat-label">가격 비율</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value neutral">$${data.current_price1} / $${data.current_price2}</div>
+                        <div class="stat-label">현재 가격</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value ${signalClass}" style="font-size: 16px;">${signal}</div>
+                        <div class="stat-label">트레이딩 시그널</div>
+                    </div>
+                `;
+            } catch (e) {
+                console.error('Spread chart error:', e);
+            }
+        }
+
+        function renderSpreadChart(data) {
+            const ctx = document.getElementById('spreadChart').getContext('2d');
+
+            if (spreadChart) spreadChart.destroy();
+
+            // Z-Score 시리즈가 있으면 사용, 없으면 스프레드 사용
+            const zScoreData = data.z_score_series || data.spread;
+
+            spreadChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.dates,
+                    datasets: [{
+                        label: 'Z-Score',
+                        data: zScoreData,
+                        borderColor: '#3182f6',
+                        backgroundColor: 'rgba(49, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0
+                    }, {
+                        label: '+1.5 (Short Entry)',
+                        data: data.dates.map(() => 1.5),
+                        borderColor: 'rgba(239, 68, 68, 0.5)',
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }, {
+                        label: '-1.5 (Long Entry)',
+                        data: data.dates.map(() => -1.5),
+                        borderColor: 'rgba(52, 199, 89, 0.5)',
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }, {
+                        label: '0 (Exit)',
+                        data: data.dates.map(() => 0),
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        borderDash: [3, 3],
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#6b7684', maxTicksLimit: 8 }
+                        },
+                        y: {
+                            display: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#6b7684' },
+                            suggestedMin: -3,
+                            suggestedMax: 3
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadScatterData() {
+            try {
+                const corr = document.getElementById('corrThreshold').value;
+                const res = await fetch(`${API_BASE}/pairs/scatter?corr_threshold=${corr}`);
+                const data = await res.json();
+
+                renderScatterChart(data.data);
+            } catch (e) {
+                console.error('Scatter data error:', e);
+            }
+        }
+
+        function renderScatterChart(data) {
+            const ctx = document.getElementById('scatterChart').getContext('2d');
+
+            if (scatterChart) scatterChart.destroy();
+
+            // 시그널 기반 색상
+            const signalColors = {
+                'Long T1': '#34c759',
+                'Short T1': '#ef4444',
+                'Weak Long T1': 'rgba(52, 199, 89, 0.5)',
+                'Weak Short T1': 'rgba(239, 68, 68, 0.5)',
+                'Mixed Signal': '#6b7684'
+            };
+
+            // Group by opportunity
+            const datasets = {};
+            data.forEach(p => {
+                const signal = p.signal || 'Mixed Signal';
+                const opportunity = p.opportunity || 'low';
+
+                if (!datasets[signal]) {
+                    datasets[signal] = {
+                        label: signal,
+                        data: [],
+                        backgroundColor: signalColors[signal] || '#888',
+                        pointRadius: opportunity === 'high' ? 12 : opportunity === 'medium' ? 8 : 6,
+                        pointHoverRadius: 14
+                    };
+                }
+                datasets[signal].data.push({
+                    x: p.x,
+                    y: p.y,
+                    label: p.label,
+                    signal: signal,
+                    sector: p.sector,
+                    price1: p.price1,
+                    price2: p.price2
+                });
+            });
+
+            scatterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: Object.values(datasets)
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { color: '#6b7684', font: { size: 11 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    const d = ctx.raw;
+                                    return [
+                                        `${d.label} ($${d.price1 || '-'} / $${d.price2 || '-'})`,
+                                        `P/E Gap: ${d.x?.toFixed(1)}`,
+                                        `Z-Score: ${d.y?.toFixed(2)}`,
+                                        `시그널: ${d.signal}`,
+                                        `섹터: ${d.sector}`
+                                    ];
+                                }
+                            }
+                        },
+                        // 축 참조선 (0, 0)
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    xMin: 0, xMax: 0,
+                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5]
+                                },
+                                line2: {
+                                    type: 'line',
+                                    yMin: 0, yMax: 0,
+                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5]
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'P/E Spread (T1-T2)', color: '#6b7684' },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#6b7684' }
+                        },
+                        y: {
+                            title: { display: true, text: '가격 Z-Score', color: '#6b7684' },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#6b7684' }
+                        }
+                    }
+                }
+            });
+
+            // Render signal legend instead of sector legend
+            const legendDiv = document.getElementById('scatterLegend');
+            legendDiv.innerHTML = Object.keys(signalColors).map(sig => `
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: ${signalColors[sig]}"></span>
+                    ${sig}
+                </div>
+            `).join('');
+        }
+
+        async function runBacktest() {
+            const t1 = document.getElementById('btTicker1').value.toUpperCase();
+            const t2 = document.getElementById('btTicker2').value.toUpperCase();
+
+            if (!t1 || !t2) {
+                alert('종목을 입력해주세요.');
+                return;
+            }
+
+            try {
+                let url, data;
+
+                if (selectedStrategy === 'spread') {
+                    // 스프레드 전략 (Mean-Reversion)
+                    const entryZ = document.getElementById('btEntryZ').value;
+                    const exitZ = document.getElementById('btExitZ').value;
+                    const lookback = document.getElementById('btLookback').value;
+                    const maxHolding = document.getElementById('btMaxHolding').value;
+
+                    url = `${API_BASE}/pairs/backtest?ticker1=${t1}&ticker2=${t2}&entry_z=${entryZ}&exit_z=${exitZ}&lookback=${lookback}&max_holding_days=${maxHolding}`;
+                    const res = await fetch(url, { method: 'POST' });
+                    data = await res.json();
+
+                    renderBacktestResults(data);
+                } else {
+                    // 펀더멘털 전략 (Long-Short)
+                    const entryDaysAgo = document.getElementById('btEntryDaysAgo').value;
+                    const exitDaysAgo = document.getElementById('btExitDaysAgo').value;
+                    const metric = document.getElementById('btFundMetric').value;
+
+                    url = `${API_BASE}/pairs/backtest-fundamental?ticker1=${t1}&ticker2=${t2}&entry_days_ago=${entryDaysAgo}&exit_days_ago=${exitDaysAgo}&metric=${metric}`;
+                    const res = await fetch(url, { method: 'POST' });
+                    data = await res.json();
+
+                    if (data.error) {
+                        alert(`Error: ${data.error}`);
+                        return;
+                    }
+
+                    renderFundamentalResults(data);
+                }
+
+                loadSpreadChart(t1, t2);
+            } catch (e) {
+                console.error('Backtest error:', e);
+                alert('백테스트 실행 중 오류가 발생했습니다.');
+            }
+        }
+
+        function renderFundamentalResults(data) {
+            document.getElementById('backtestResults').style.display = 'block';
+
+            const perf = data.performance;
+            const pos = data.position;
+            const trade = data.trade;
+            const risk = data.risk || {};
+            const warnings = data.warnings || [];
+
+            // Stats
+            const returnEl = document.getElementById('btReturn');
+            returnEl.textContent = `${perf.total_return > 0 ? '+' : ''}${perf.total_return}%`;
+            returnEl.className = `stat-value ${perf.total_return > 0 ? 'positive' : 'negative'}`;
+
+            const mddEl = document.getElementById('btMDD');
+            mddEl.textContent = `${perf.max_drawdown}%`;
+            mddEl.className = 'stat-value negative';
+
+            document.getElementById('btSharpe').textContent = '-';
+            document.getElementById('btTrades').textContent = `${trade.holding_days}일`;
+
+            // Equity Chart
+            renderEquityChart(data.equity_curve);
+
+            // Trades Table - 펀더멘털 결과로 표시
+            const tbody = document.getElementById('tradesTable');
+
+            // Warnings Render
+            const warningHtml = warnings.length > 0 ? `
+                <div style="margin-bottom: 16px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; font-size: 13px; color: var(--danger);">
+                    ${warnings.map(w => `<div>${w}</div>`).join('')}
+                </div>
+            ` : '';
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="padding: 20px; background: #171719; border-radius: 8px;">
+                        ${warningHtml}
+                        
+                        <div style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: var(--accent);">
+                            펀더멘털 롱숏 결과
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div style="padding: 12px; background: rgba(52, 199, 89, 0.1); border-radius: 8px; border: 1px solid rgba(52, 199, 89, 0.3);">
+                                <div style="color: var(--success); font-weight: 600; margin-bottom: 8px;">Long: ${pos.long}</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">
+                                    진입: $${trade.entry_prices.long} → 청산: $${trade.exit_prices.long}<br>
+                                    수익률: <span class="${perf.long_return > 0 ? 'positive' : 'negative'}">${perf.long_return > 0 ? '+' : ''}${perf.long_return}%</span>
+                                </div>
+                            </div>
+                            <div style="padding: 12px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                <div style="color: var(--danger); font-weight: 600; margin-bottom: 8px;">Short: ${pos.short}</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">
+                                    진입: $${trade.entry_prices.short} → 청산: $${trade.exit_prices.short}<br>
+                                    수익률: <span class="${perf.short_return > 0 ? 'positive' : 'negative'}">${perf.short_return > 0 ? '+' : ''}${perf.short_return}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                            <div style="background: #0d0d0e; padding: 10px; border-radius: 6px;">
+                                <div style="color: var(--text-tertiary); font-size: 11px;">Half-Life (평균회귀)</div>
+                                <div style="color: var(--text-primary); font-weight: 600; font-size: 13px;">${risk.half_life || 'N/A'}일</div>
+                                <div style="color: var(--text-tertiary); font-size: 10px;">${risk.half_life_note || '-'}</div>
+                            </div>
+                            <div style="background: #0d0d0e; padding: 10px; border-radius: 6px;">
+                                <div style="color: var(--text-tertiary); font-size: 11px;">스프레드 변동성</div>
+                                <div style="color: var(--text-primary); font-weight: 600; font-size: 13px;">${risk.volatility?.spread_annual || 0}%</div>
+                            </div>
+                            <div style="background: #0d0d0e; padding: 10px; border-radius: 6px;">
+                                <div style="color: var(--text-tertiary); font-size: 11px;">헤지 비율 (Beta)</div>
+                                <div style="color: var(--text-primary); font-weight: 600; font-size: 13px;">${risk.beta_ratio || 1.0}</div>
+                                <div style="color: var(--text-tertiary); font-size: 10px;">${risk.beta_note || '-'}</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 12px; padding: 12px; background: #0d0d0e; border-radius: 8px; font-size: 13px; color: var(--text-secondary);">
+                            <strong>전략 근거:</strong> ${pos.reasoning}<br>
+                            <strong>기간:</strong> ${trade.entry_date} → ${trade.exit_date} (${trade.holding_days}일)
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function renderBacktestResults(data) {
+            document.getElementById('backtestResults').style.display = 'block';
+
+            const perf = data.performance;
+
+            // Stats
+            const returnEl = document.getElementById('btReturn');
+            returnEl.textContent = `${perf.total_return > 0 ? '+' : ''}${perf.total_return}%`;
+            returnEl.className = `stat-value ${perf.total_return > 0 ? 'positive' : 'negative'}`;
+
+            const mddEl = document.getElementById('btMDD');
+            mddEl.textContent = `${perf.max_drawdown}%`;
+            mddEl.className = 'stat-value negative';
+
+            document.getElementById('btSharpe').textContent = perf.sharpe_ratio;
+            document.getElementById('btTrades').textContent = perf.num_trades;
+
+            // Equity Chart
+            renderEquityChart(data.equity_curve);
+
+            // Trades Table
+            const tbody = document.getElementById('tradesTable');
+            tbody.innerHTML = data.trades.map(t => `
+                <tr>
+                    <td>${t.date}</td>
+                    <td>${t.exit_date || '--'}</td>
+                    <td>${t.type}</td>
+                    <td>${t.z}</td>
+                    <td>${t.exit_z || '--'}</td>
+                    <td>${t.holding_days}일</td>
+                    <td>${t.exit_reason || '--'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderEquityChart(curve) {
+            const ctx = document.getElementById('equityChart').getContext('2d');
+
+            if (equityChart) equityChart.destroy();
+
+            equityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: curve.map(c => c.date),
+                    datasets: [{
+                        label: 'Cumulative Return',
+                        data: curve.map(c => c.equity * 100),
+                        borderColor: '#34c759',
+                        backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#6b7684', maxTicksLimit: 10 }
+                        },
+                        y: {
+                            display: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: {
+                                color: '#6b7684',
+                                callback: v => v.toFixed(1) + '%'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById(`tab${capitalize(tab)}`).style.display = 'block';
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+    </script>
+</body>
+
+</html>
