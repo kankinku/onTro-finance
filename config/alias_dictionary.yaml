@@ -1,169 +1,176 @@
 # Domain Dictionary (Alias Table)
-# Entity Resolution의 1순위 매핑 규칙
-# 코드 수정 없이 alias 추가/수정 가능
-
-# 형식: canonical_name -> [alias1, alias2, ...]
-# Entity Resolution에서 alias를 발견하면 canonical_name으로 매핑
+# Entity Resolution의 1순위 매핑 규칙 (세종시 교통 도메인)
 
 entities:
-  # 중앙은행
-  Federal_Reserve:
-    canonical_name: "Federal Reserve"
-    type: Agent
-    subtype: CentralBank
+  # 주요 지역
+  Sejong_City:
+    canonical_name: "세종시"
+    type: Location
+    subtype: AdminArea
     aliases:
-      - "연준"
-      - "Fed"
-      - "FRB"
-      - "미국 연방준비제도"
-      - "연방준비은행"
-      - "파월"  # 현 의장, 문맥에 따라
+      - "세종특별자치시"
+      - "행복도시"
+      - "행정중심복합도시"
 
-  Bank_of_Japan:
-    canonical_name: "Bank of Japan"
-    type: Agent
-    subtype: CentralBank
+  Naseong_Dong:
+    canonical_name: "나성동"
+    type: Location
+    subtype: AdminArea
     aliases:
-      - "BOJ"
-      - "일본은행"
-      - "일은"
+      - "나성"
+      - "국세청 인근"
+      - "2-4생활권"
 
-  ECB:
-    canonical_name: "European Central Bank"
-    type: Agent
-    subtype: CentralBank
+  Jochiwon:
+    canonical_name: "조치원읍"
+    type: Location
+    subtype: AdminArea
     aliases:
-      - "ECB"
-      - "유럽중앙은행"
+      - "조치원"
+      - "조치원역"
+      - "구도심"
 
-  # 채권
-  US_10Y_Treasury:
-    canonical_name: "US 10Y Treasury"
-    type: Instrument
-    subtype: Bond
+  Gov_Complex:
+    canonical_name: "정부세종청사"
+    type: Location
+    subtype: Landmark
     aliases:
-      - "10년물"
-      - "US10Y"
-      - "TNX"
-      - "미국채 10년"
-      - "10년 국채"
-      - "US 10-Year"
+      - "청사"
+      - "정부청사"
+      - "어진동 청사"
 
-  US_2Y_Treasury:
-    canonical_name: "US 2Y Treasury"
-    type: Instrument
-    subtype: Bond
+  # 주요 도로
+  Route_1:
+    canonical_name: "1번 국도"
+    type: Location
+    subtype: Road
     aliases:
-      - "2년물"
-      - "US2Y"
-      - "미국채 2년"
+      - "국도 1호선"
+      - "조치원로" # (구간에 따라)
 
-  # 지수
-  SP500:
-    canonical_name: "S&P 500"
-    type: Instrument
-    subtype: ETF
+  Hannuri_Blvd:
+    canonical_name: "한누리대로"
+    type: Location
+    subtype: Road
     aliases:
-      - "S&P"
-      - "S&P500"
-      - "에스엔피"
-      - "SPX"
-      - "SPY"
+      - "BRT 도로"
+      - "내부순환도로" # (일부)
 
-  Nasdaq:
-    canonical_name: "NASDAQ Composite"
-    type: Instrument
-    subtype: ETF
+  # 교통 수단
+  BRT:
+    canonical_name: "BRT"
+    type: Infrastructure
+    subtype: TransitMode
     aliases:
-      - "나스닥"
-      - "IXIC"
-      - "QQQ"
-      - "나스닥 지수"
+      - "간선급행버스"
+      - "바로타"
+      - "비알티"
 
-  # 지표
-  Federal_Funds_Rate:
-    canonical_name: "Federal Funds Rate"
-    type: Indicator
-    subtype: MacroIndicator
+  # 날씨/환경
+  Heavy_Rain:
+    canonical_name: "폭우"
+    type: Condition
+    subtype: Weather
     aliases:
-      - "금리"
-      - "기준금리"
-      - "연방기금금리"
-      - "정책금리"
-      - "Fed 금리"
+      - "호우"
+      - "많은 비"
+      - "장마"
+      - "집중호우"
 
-  CPI:
-    canonical_name: "Consumer Price Index"
-    type: Indicator
-    subtype: MacroIndicator
+  Heavy_Snow:
+    canonical_name: "폭설"
+    type: Condition
+    subtype: Weather
     aliases:
-      - "CPI"
-      - "소비자물가지수"
-      - "소비자물가"
+      - "대설"
+      - "많은 눈"
+      - "눈폭탄"
 
-  VIX:
-    canonical_name: "CBOE Volatility Index"
-    type: Indicator
-    subtype: MarketIndicator
+  Icy_Road:
+    canonical_name: "결빙"
+    type: Condition
+    subtype: RoadStatus
     aliases:
-      - "VIX"
-      - "공포지수"
-      - "변동성 지수"
+      - "빙판길"
+      - "도로 살얼음"
+      - "블랙아이스"
+      - "미끄러운 도로"
 
-  # 개념
-  Inflation:
-    canonical_name: "Inflation"
-    type: Concept
-    subtype: EconomicCycle
+  Fog:
+    canonical_name: "안개"
+    type: Condition
+    subtype: Weather
     aliases:
-      - "인플레이션"
-      - "인플레"
-      - "물가상승"
-      - "물가 상승"
+      - "짙은 안개"
+      - "박무"
+      - "연무"
 
-  Liquidity:
-    canonical_name: "Liquidity"
-    type: Concept
-    subtype: RiskFactor
+  # 교통 상태/현상
+  Congestion:
+    canonical_name: "정체"
+    type: Phenomenon
+    subtype: FlowState
     aliases:
-      - "유동성"
-      - "시중 자금"
-      - "유동자금"
+      - "혼잡"
+      - "밀림"
+      - "거북이 걸음"
+      - "차량 꼬리"
+      - "지체"
 
-  Rate_Hike:
-    canonical_name: "Interest Rate Hike"
+  Accident:
+    canonical_name: "교통사고"
     type: Event
-    subtype: MonetaryPolicy
+    subtype: Accident
     aliases:
-      - "금리 인상"
-      - "금리인상"
-      - "기준금리 인상"
-      - "rate hike"
+      - "사고"
+      - "추돌"
+      - "접촉사고"
 
-  Rate_Cut:
-    canonical_name: "Interest Rate Cut"
+  Construction:
+    canonical_name: "도로공사"
     type: Event
-    subtype: MonetaryPolicy
+    subtype: Construction
     aliases:
-      - "금리 인하"
-      - "금리인하"
-      - "기준금리 인하"
-      - "rate cut"
+      - "보수공사"
+      - "공사"
+      - "차선 통제 공사"
 
-  Growth_Stocks:
-    canonical_name: "Growth Stocks"
-    type: Instrument
-    subtype: Stock
+  Rush_Hour:
+    canonical_name: "출퇴근 시간"
+    type: Phenomenon
+    subtype: Pattern
     aliases:
-      - "성장주"
-      - "그로스주"
-      - "growth stock"
+      - "러시아워"
+      - "출근길"
+      - "퇴근길"
 
-  Value_Stocks:
-    canonical_name: "Value Stocks"
-    type: Instrument
-    subtype: Stock
+
+  Traffic_Speed:
+    canonical_name: "교통속도"
+    type: Quantity
+    subtype: Speed
     aliases:
-      - "가치주"
-      - "밸류주"
-      - "value stock"
+      - "평균 속도"
+      - "평균 주행속도"
+      - "선호 속도"
+      - "교통 속도"
+
+  Travel_Time:
+    canonical_name: "통행 시간"
+    type: Quantity
+    subtype: DelayTime
+    aliases:
+      - "이동 시간"
+      - "도착 시간"
+      - "지연 시간"
+      - "여정 시간"
+
+  Bus_Headway:
+    canonical_name: "버스 배차간격"
+    type: Quantity
+    subtype: DelayTime
+    aliases:
+      - "배차 간격"
+      - "운행 간격"
+      - "버스 간격"
+      - "배차 시간"

@@ -1,116 +1,151 @@
 # Static Domain 규칙 정의
-# 절대 법칙: 이 규칙들은 경제/금융의 보편적 원리
+# 교통/날씨 도메인의 보편적 규칙
 
 static_rules:
-  # 금리와 채권가격의 역관계 (절대 법칙)
-  - rule_id: STATIC_001
-    head: Federal_Funds_Rate
-    tail: US_10Y_Treasury
-    relation: Affect
-    polarity: "-"
-    certainty: 1.0
-    description: "금리 상승 → 채권가격 하락 (이자율-채권가격 역관계)"
-  
-  - rule_id: STATIC_002
-    head: Federal_Funds_Rate
-    tail: US_2Y_Treasury
-    relation: Affect
-    polarity: "-"
-    certainty: 1.0
-    description: "금리 상승 → 채권가격 하락"
-  
-  # 금리와 성장주의 역관계
-  - rule_id: STATIC_003
-    head: Federal_Funds_Rate
-    tail: Growth_Stocks
-    relation: Affect
-    polarity: "-"
-    certainty: 0.9
-    description: "금리 상승 → 성장주 밸류에이션 압박"
-  
-  # 금리와 가치주
-  - rule_id: STATIC_004
-    head: Federal_Funds_Rate
-    tail: Value_Stocks
-    relation: Affect
+  # 날씨와 도로 상태
+  - rule_id: TRAFFIC_001
+    head: Heavy_Rain
+    tail: Road_Slippery
+    relation: Cause
     polarity: "+"
-    certainty: 0.7
-    description: "금리 상승 → 가치주 상대 강세 (일반적 경향)"
-  
-  # 인플레이션과 금리
-  - rule_id: STATIC_005
-    head: Inflation
-    tail: Federal_Funds_Rate
+    certainty: 1.0
+    description: "폭우 → 도로 미끄러움/수막현상"
+
+  - rule_id: TRAFFIC_002
+    head: Heavy_Snow
+    tail: Icy_Road
+    relation: Cause
+    polarity: "+"
+    certainty: 1.0
+    description: "폭설 → 도로 결빙"
+
+  - rule_id: TRAFFIC_003
+    head: Fog
+    tail: Visibility
+    relation: Affect
+    polarity: "-"
+    certainty: 1.0
+    description: "안개 → 가시거리 감소"
+
+  # 도로 상태와 교통 흐름
+  - rule_id: TRAFFIC_004
+    head: Icy_Road
+    tail: Traffic_Speed
+    relation: Affect
+    polarity: "-"
+    certainty: 0.95
+    description: "결빙 → 통행 속도 감소/지체"
+
+  - rule_id: TRAFFIC_005
+    head: Road_Construction
+    tail: Traffic_Congestion
+    relation: Cause
+    polarity: "+"
+    certainty: 0.9
+    description: "도로 공사 → 정체 유발"
+
+  - rule_id: TRAFFIC_006
+    head: Car_Accident
+    tail: Traffic_Congestion
     relation: Cause
     polarity: "+"
     certainty: 0.95
-    description: "인플레이션 상승 → 금리 인상 유발"
-  
-  # VIX와 주가
-  - rule_id: STATIC_006
-    head: VIX
-    tail: SP500
-    relation: CorrelateWith
-    polarity: "-"
-    certainty: 0.95
-    description: "VIX 상승 → 주가 하락 (역상관)"
-  
-  # 유동성과 자산가격
-  - rule_id: STATIC_007
-    head: Liquidity
-    tail: Growth_Stocks
-    relation: Affect
-    polarity: "+"
-    certainty: 0.85
-    description: "유동성 증가 → 성장주 강세"
-  
-  - rule_id: STATIC_008
-    head: Liquidity
-    tail: SP500
-    relation: Affect
-    polarity: "+"
-    certainty: 0.8
-    description: "유동성 증가 → 주가 상승"
+    description: "교통사고 → 정체 유발"
 
-# Sign 추정 패턴
+  # 출퇴근 시간
+  - rule_id: TRAFFIC_007
+    head: Rush_Hour
+    tail: Traffic_Volume
+    relation: Affect
+    polarity: "+"
+    certainty: 0.95
+    description: "출퇴근 시간 → 교통량 증가"
+
+  - rule_id: TRAFFIC_008
+    head: Rush_Hour
+    tail: Travel_Time
+    relation: Affect
+    polarity: "+"
+    certainty: 0.9
+    description: "출퇴근 시간 → 이동 시간 증가"
+
+# Sign 추정 패턴 (기존 유지, 교통 맥락에 맞게 해석됨)
+
+  - rule_id: TRAFFIC_009
+    head: BRT
+    tail: Traffic_Congestion
+    relation: Affect
+    polarity: "-"
+    certainty: 0.8
+    description: "BRT ??? ???? ??"
+
+  - rule_id: TRAFFIC_010
+    head: BRT
+    tail: Travel_Time
+    relation: Affect
+    polarity: "-"
+    certainty: 0.8
+    description: "BRT ?? ? ??/?? ?? ??"
+
+  - rule_id: TRAFFIC_011
+    head: Heavy_Rain
+    tail: Bus_Headway
+    relation: Affect
+    polarity: "+"
+    certainty: 0.9
+    description: "?? ? ???? ??"
+
+  - rule_id: TRAFFIC_012
+    head: Heavy_Rain
+    tail: Travel_Time
+    relation: Affect
+    polarity: "+"
+    certainty: 0.9
+    description: "?? ? ??/?? ?? ??"
+
+  - rule_id: TRAFFIC_013
+    head: Road_Construction
+    tail: Travel_Time
+    relation: Affect
+    polarity: "+"
+    certainty: 0.9
+    description: "?? ??? ?? ??? ???"
+
+  - rule_id: TRAFFIC_014
+    head: Road_Construction
+    tail: Traffic_Speed
+    relation: Affect
+    polarity: "-"
+    certainty: 0.9
+    description: "?? ??? ?? ?? ??"
+
 sign_patterns:
   positive:
     - "상승"
     - "증가"
     - "강세"
-    - "호조"
-    - "개선"
     - "확대"
-    - "상향"
-    - "올라"
-    - "높아"
-    - "지지"
-    - "긍정적"
-    - "반등"
-    - "회복"
+    - "심화"
+    - "유발"
+    - "높음"
+    - "많음"
+    - "지연" # 지연 시간 증가 = positive quantity
   
   negative:
     - "하락"
     - "감소"
     - "약세"
-    - "부진"
-    - "악화"
     - "축소"
-    - "하향"
-    - "내려"
-    - "낮아"
-    - "압박"
-    - "부정적"
-    - "급락"
-    - "위축"
+    - "해소"
+    - "원활" # 정체 감소
+    - "낮음"
+    - "적음"
+    - "단축"
   
   inverse:
     - "반대로"
     - "역으로"
     - "반비례"
-    - "역의 관계"
-    - "역상관"
-    - "거꾸로"
 
 # Semantic weak/spurious 패턴
 semantic_patterns:
@@ -119,17 +154,13 @@ semantic_patterns:
     - "절대"
     - "반드시"
     - "무조건"
-    - "틀림없이"
   
   correlation_as_causation:
     - "동반"
     - "함께"
-    - "같이"
     - "동시에"
   
   weak_evidence:
     - "아마"
-    - "것 같다"
-    - "생각된다"
-    - "추측"
     - "가능성"
+    - "보인다"

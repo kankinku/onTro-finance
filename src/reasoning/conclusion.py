@@ -69,8 +69,13 @@ class ConclusionSynthesizer:
         result: ReasoningResult,
     ) -> str:
         """결론 텍스트 생성"""
-        head_name = query.entity_names.get(query.head_entity, query.head_entity or "")
-        tail_name = query.entity_names.get(query.tail_entity, query.tail_entity or "")
+        head_name = query.head_entity or "알 수 없는 대상"
+        tail_name = query.tail_entity or "알 수 없는 결과"
+        
+        # Try to find better naems
+        if hasattr(query, 'entity_names') and query.entity_names:
+            head_name = query.entity_names.get(query.head_entity, head_name)
+            tail_name = query.entity_names.get(query.tail_entity, tail_name)
         
         direction = result.direction
         confidence = result.confidence
@@ -99,7 +104,7 @@ class ConclusionSynthesizer:
             return "높음"
         elif confidence >= 0.4:
             return "중간"
-        elif confidence >= 0.2:
+        elif confidence >= 0.1:
             return "낮음"
         else:
             return "매우 낮음"

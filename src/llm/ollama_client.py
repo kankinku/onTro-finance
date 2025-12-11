@@ -7,7 +7,10 @@ import json
 import logging
 import time
 from typing import Optional, Dict, Any, List
-import httpx
+try:
+    import httpx
+except ImportError:  # pragma: no cover
+    httpx = None
 
 from config.settings import get_settings, OllamaSettings
 from src.shared.exceptions import LLMError
@@ -28,6 +31,8 @@ class OllamaClient:
     @property
     def client(self) -> httpx.Client:
         """Lazy initialization of HTTP client"""
+        if httpx is None:
+            raise ImportError("httpx is required for OllamaClient (install httpx or disable LLM)")
         if self._client is None:
             self._client = httpx.Client(timeout=self.timeout)
         return self._client

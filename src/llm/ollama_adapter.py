@@ -6,7 +6,10 @@ import json
 import time
 import logging
 from typing import Optional, Dict, Any, List
-import httpx
+try:
+    import httpx
+except ImportError:  # pragma: no cover
+    httpx = None
 
 from src.llm.llm_client import LLMClient, LLMRequest, LLMResponse
 
@@ -30,6 +33,8 @@ class OllamaLLMClient(LLMClient):
     @property
     def client(self) -> httpx.Client:
         if self._client is None:
+            if httpx is None:
+                raise ImportError("httpx is required for OllamaLLMClient (install httpx or disable LLM)")
             self._client = httpx.Client(timeout=self.timeout)
         return self._client
     
@@ -76,13 +81,28 @@ class OllamaLLMClient(LLMClient):
             raw_response=result,
         )
     
-    def generate_json(self, request: LLMRequest) -> Dict[str, Any]:
-        """JSON 생성"""
-        request.json_mode = True
-        response = self.generate(request)
-        
+    def generate_json(self, request: Any = None, **kwargs) -> Dict[str, Any]:
+        """
+        JSON 생성 (호환성: LLMRequest 또는 prompt/system_prompt 키워드 모두 허용)
+        """
+        if isinstance(request, LLMRequest):
+            req_obj = request
+        else:
+            prompt = kwargs.pop("prompt", None)
+            system_prompt = kwargs.pop("system_prompt", None)
+            if prompt is None:
+                raise ValueError("prompt is required for generate_json")
+            req_obj = LLMRequest(
+                prompt=prompt,
+                system_prompt=system_prompt,
+                json_mode=True,
+                **kwargs,
+            )
+        req_obj.json_mode = True
+        response = self.generate(req_obj)
+
         content = response.content.strip()
-        
+
         # ```json ... ``` 제거
         if "```json" in content:
             start = content.find("```json") + 7
@@ -92,7 +112,7 @@ class OllamaLLMClient(LLMClient):
             start = content.find("```") + 3
             end = content.find("```", start)
             content = content[start:end].strip()
-        
+
         return json.loads(content)
     
     def health_check(self) -> bool:

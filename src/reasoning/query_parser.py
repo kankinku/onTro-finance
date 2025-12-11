@@ -72,6 +72,7 @@ class QueryParser:
             ParsedQuery
         """
         # Step 1: Query fragmentation
+        logger.info(f"DEBUG_QUERY: {query}")
         fragments = self._fragment_query(query)
         
         # Step 2: NER & Entity Resolution
@@ -124,67 +125,111 @@ class QueryParser:
         return fragments if fragments else [query]
     
     def _extract_entities(self, query: str) -> Tuple[List[str], Dict[str, str]]:
-        """엔티티 추출 및 해결"""
+        """엔티티 추출 및 해석"""
         try:
-            # NER 수행
             candidates = self.ner.extract(
                 fragment_text=query,
                 fragment_id="QUERY",
-                use_llm=False,  # 빠른 처리를 위해 규칙 기반
+                use_llm=bool(self.llm_client),
             )
-            
-            # Entity Resolution
-            entities = []
-            entity_names = {}
-            
+            entities: List[str] = []
+            entity_names: Dict[str, str] = {}
             for candidate in candidates:
+                if not hasattr(candidate, "surface_text"):
+                    continue
                 resolved = self.resolver.resolve(candidate)
-                
                 if resolved and resolved.canonical_id:
                     if resolved.canonical_id not in entities:
                         entities.append(resolved.canonical_id)
                         entity_names[resolved.canonical_id] = resolved.canonical_name or candidate.surface_text
-                elif candidate.surface_text:
-                    # 해결 안 되면 surface text 사용
+                elif getattr(candidate, "surface_text", None):
                     entity_id = f"UNK_{candidate.surface_text}"
                     if entity_id not in entities:
                         entities.append(entity_id)
                         entity_names[entity_id] = candidate.surface_text
-            
+            if not entities:
+                return self._keyword_fallback(query)
             return entities, entity_names
-            
         except Exception as e:
             logger.warning(f"Entity extraction failed: {e}")
-            return [], {}
-    
+            return self._keyword_fallback(query)
+
     def _classify_query_type(self, query: str) -> QueryType:
-        """질문 유형 분류"""
+        """질문 타입 분류"""
         query_lower = query.lower()
-        
         for q_type, patterns in self._query_patterns.items():
             for pattern in patterns:
                 if re.search(pattern, query_lower):
                     return q_type
-        
         return QueryType.UNKNOWN
-    
+
     def _identify_structure(
         self,
         query: str,
         entities: List[str],
         query_type: QueryType,
     ) -> Tuple[Optional[str], Optional[str], List[str]]:
-        """Head/Tail/Condition 구조 식별"""
+        """Head/Tail/Condition ??"""
         if len(entities) == 0:
             return None, None, []
-        
-        if len(entities) == 1:
-            # 단일 엔티티: 그것에 대한 질문
-            return entities[0], None, []
-        
-        if len(entities) == 2:
-            # 두 엔티티: 첫 번째가 head, 두 번째가 tail
-            return entities[0], entities[1], []
-        
-        # 3개 이상: 첫 번째 head, 마지막 tail, 나머지 조건
-        return entities[0], entities[-1], entities[1:-1]
+
+        # ????? head ??
+        head_order = [
+            "Heavy_Rain", "Heavy_Snow", "Road_Construction", "BRT", "Rush_Hour",
+        ]
+        tail_order = [
+            "Traffic_Congestion", "Travel_Time", "Bus_Headway", "Traffic_Speed",
+        ]
+
+        head = None
+        tail = None
+
+        for hid in head_order:
+            if hid in entities:
+                head = hid
+                break
+        if head is None:
+            head = entities[0]
+
+        for tid in tail_order:
+            if tid in entities and tid != head:
+                tail = tid
+                break
+        if tail is None:
+            # fallback: ??? ?? ???? tail?
+            for ent in entities:
+                if ent != head:
+                    tail = ent
+                    break
+
+        # ?? ???? ???
+        conditions = [e for e in entities if e not in {head, tail}]
+        return head, tail, conditions
+
+    def _keyword_fallback(self, query: str) -> Tuple[List[str], Dict[str, str]]:
+        """키워드 기반 간단 매핑"""
+        keyword_map = {
+            "brt": ("BRT", "BRT"),
+            "혼잡": ("Traffic_Congestion", "교통 혼잡"),
+            "교통 혼잡": ("Traffic_Congestion", "교통 혼잡"),
+            "통행 시간": ("Travel_Time", "통행 시간"),
+            "이동 시간": ("Travel_Time", "이동 시간"),
+            "배차": ("Bus_Headway", "배차간격"),
+            "배차간격": ("Bus_Headway", "배차간격"),
+            "폭우": ("Heavy_Rain", "폭우"),
+            "폭설": ("Heavy_Snow", "폭설"),
+            "공사": ("Road_Construction", "도로 공사"),
+            "도로 공사": ("Road_Construction", "도로 공사"),
+            "속도": ("Traffic_Speed", "교통 속도"),
+            "교통 속도": ("Traffic_Speed", "교통 속도"),
+            "출퇴근": ("Rush_Hour", "출퇴근 시간"),
+        }
+        entities: List[str] = []
+        entity_names: Dict[str, str] = {}
+        lower_q = query.lower()
+        for key, (eid, name) in keyword_map.items():
+            if key.lower() in lower_q or key in query:
+                if eid not in entities:
+                    entities.append(eid)
+                    entity_names[eid] = name
+        return entities, entity_names

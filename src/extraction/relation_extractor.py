@@ -62,7 +62,7 @@ class RelationExtractor:
         rel_types = list(self._relation_types.get("relation_types", {}).keys())
         entity_info = [{"id": e.entity_id, "name": e.canonical_name, "surface": e.surface_text} for e in entities]
         
-        system_prompt = f"""금융 텍스트에서 엔티티 간 관계 추출. 관계 타입: {rel_types}.
+        system_prompt = f"""교통/날씨/세종시 도메인 텍스트에서 엔티티 간 관계 추출. 관계 타입: {rel_types}.
 JSON: {{"relations": [{{"head_id": "id", "tail_id": "id", "type": "type", "polarity": "+/-/neutral", "confidence": 0.8}}]}}"""
         
         prompt = f'텍스트: "{text}"\n엔티티: {entity_info}'

@@ -4,85 +4,66 @@
 relation_types:
   # 영향 관계
   Affect:
-    description: "A가 B에 영향을 미침"
-    has_polarity: true  # +/-/neutral 가능
+    description: "A가 B에 영향을 미침 (교퉁 흐름, 상태 등)"
+    has_polarity: true  # +/- (악화/개선, 증가/감소)
     examples:
-      - "금리 인상이 성장주에 부정적 영향"
-      - "달러 강세가 원자재에 하락 압력"
+      - "폭우가 교통 흐름에 부정적 영향"
+      - "도로공사가 정체를 유발"
     patterns:
       - "{head}이/가 {tail}에 영향"
-      - "{head} 상승 시 {tail} 하락"
+      - "{head}(으)로 {tail} 발생"
 
   # 인과 관계
   Cause:
-    description: "A가 B의 원인"
+    description: "A가 B의 직접적인 원인"
     has_polarity: true
     examples:
-      - "인플레이션 우려로 금리 인상"
-      - "유동성 공급이 자산 버블 유발"
+      - "사고로 인해 정체 발생"
+      - "결빙이 사고를 유발"
     patterns:
       - "{head} 때문에 {tail}"
       - "{head}(으)로 인해 {tail}"
+      - "{head} 원인으로 {tail}"
 
-  # 의존 관계
-  DependOn:
-    description: "A가 B에 의존"
+  # 위치/발생 장소
+  OccursAt:
+    description: "사건이나 상태가 특정 위치에서 발생"
     has_polarity: false
     examples:
-      - "성장주 밸류에이션은 금리에 의존"
-      - "수출주는 환율에 민감"
+      - "나성동에서 사고 발생"
+      - "1번 국도에서 정체"
     patterns:
-      - "{head}은/는 {tail}에 의존"
-      - "{head}은/는 {tail}에 민감"
+      - "{head}은/는 {tail}에서 발생"
+      - "{tail}의 {head}"
 
-  # 시간 순서
-  TemporalBefore:
-    description: "A가 B보다 시간적으로 먼저"
+  # 시간 관계
+  Temporal:
+    description: "시간적 선후 관계"
     has_polarity: false
     examples:
-      - "금리 인상 후 주가 조정"
-      - "QE 종료 전 테이퍼링"
+      - "눈 내린 후 결빙"
+      - "출근 시간 전 통제"
     patterns:
       - "{head} 후 {tail}"
-      - "{head} 이후 {tail}"
+      - "{head} 때 {tail}"
 
-  TemporalAfter:
-    description: "A가 B보다 시간적으로 나중"
+  # 상태/속성
+  StateOf:
+    description: "A가 B의 상태임"
     has_polarity: false
     examples:
-      - "주가 조정 전 금리 인상"
+      - "도로가 결빙 상태"
+      - "소통이 원활함"
     patterns:
-      - "{head} 전 {tail}"
-      - "{head} 이전 {tail}"
+      - "{tail}은/는 {head} 상태"
 
-  # 상관 관계
-  CorrelateWith:
-    description: "A와 B가 상관관계"
-    has_polarity: true  # 양의 상관/음의 상관
-    examples:
-      - "금과 달러는 역의 상관관계"
-      - "VIX와 주가는 음의 상관"
-    patterns:
-      - "{head}와/과 {tail}은/는 상관"
-      - "{head}와/과 {tail}은/는 역의 관계"
-
-  # 구성 관계
+  # 포함/구성
   PartOf:
-    description: "A가 B의 일부"
+    description: "A가 B의 일부 (구역 포함 등)"
     has_polarity: false
     examples:
-      - "AAPL은 S&P 500의 구성종목"
-      - "CPI는 인플레이션 지표의 일부"
+      - "나성동은 세종시에 포함"
+      - "한누리대로는 BRT 라인 포함"
     patterns:
+      - "{head}은/는 {tail}에 위치"
       - "{head}은/는 {tail}의 일부"
-      - "{head}은/는 {tail}에 포함"
-
-  # 조건부 관계
-  ConditionalOn:
-    description: "A가 B 조건 하에서만 성립"
-    has_polarity: false
-    examples:
-      - "유동성이 풍부할 때만 성장주 강세"
-    patterns:
-      - "{condition} 경우 {head}와 {tail}"
-      - "{condition} 때 {head}이/가 {tail}"

@@ -1,32 +1,56 @@
 [
   {
-    "doc_id": "SAMPLE_001",
-    "text": "금리가 인상되면 성장주는 약세를 보이고, 장기채는 반등하기 어렵다. 특히 Fed가 긴축 정책을 유지하면 유동성이 줄어들어 위험자산 전반에 부정적 영향을 미친다.",
-    "source": "sample",
-    "timestamp": "2025-01-10"
+    "doc_id": "SEJONG_001",
+    "text": "세종시 행복도시 BRT 도입으로 인해 출퇴근 시간대 교통 혼잡도가 30% 감소하였다.",
+    "source": "Sejong Traffic Report",
+    "timestamp": "2025-05-10"
   },
   {
-    "doc_id": "SAMPLE_002", 
-    "text": "인플레이션 우려로 인해 연준은 기준금리를 0.25%p 인상했다. 이로 인해 10년물 국채 수익률도 상승했으며, 나스닥은 2% 하락했다.",
-    "source": "sample",
-    "timestamp": "2025-01-11"
+    "doc_id": "SEJONG_002",
+    "text": "폭우 발생 시 1시간 강수량이 50mm를 초과하면 버스 배차 간격이 지연될 수 있다.",
+    "source": "Safety News",
+    "timestamp": "2025-01-15"
   },
   {
-    "doc_id": "SAMPLE_003",
-    "text": "VIX 지수가 20을 돌파하면서 시장 변동성이 확대되고 있다. 이는 투자자들의 리스크 회피 심리가 강해지고 있음을 의미한다.",
-    "source": "sample",
-    "timestamp": "2025-01-12"
+    "doc_id": "SEJONG_003",
+    "text": "오송역으로 가는 1번 국도변에서 도로 공사가 진행되어 통행 속도가 감속할 것으로 예상된다.",
+    "source": "Traffic Monitor",
+    "timestamp": "2025-07-22"
   },
   {
-    "doc_id": "SAMPLE_004",
-    "text": "달러 강세가 지속되면 원자재 가격에 하락 압력이 가해진다. 금과 원유는 달러와 역의 상관관계를 보이기 때문이다.",
-    "source": "sample",
-    "timestamp": "2025-01-13"
+    "doc_id": "SEJONG_004",
+    "text": "출-퇴근 시간인 평일 오전 8~9시 사이에는 교통량이 증가하여 이동 시간이 늘어난다.",
+    "source": "Daily Commute",
+    "timestamp": "2025-10-11"
   },
   {
-    "doc_id": "SAMPLE_005",
-    "text": "BOJ의 YCC 정책 수정 가능성이 제기되면서 엔화가 강세를 보이고 있다. 이는 캐리 트레이드 청산으로 이어질 수 있어 글로벌 증시에 영향을 줄 수 있다.",
-    "source": "sample",
-    "timestamp": "2025-01-14"
+    "doc_id": "SEJONG_005",
+    "text": "교차로 내 꼬리 물기 단속을 시행하여 교통 흐름이 다소 개선될 것으로 보인다.",
+    "source": "Construction Notice",
+    "timestamp": "2025-04-05"
+  },
+  {
+    "doc_id": "SEJONG_006",
+    "text": "겨울철 폭설 시 제설 작업 지연으로 인해 도로 미끄럼 사고 위험이 증가한다.",
+    "source": "Weather Alert",
+    "timestamp": "2025-12-20"
+  },
+  {
+    "doc_id": "SEJONG_007",
+    "text": "세종 BRT 전용 차로 도입 후 버스 이동 시간이 약 30% 단축되었다.",
+    "source": "Sejong BRT Study",
+    "timestamp": "2025-06-01"
+  },
+  {
+    "doc_id": "SEJONG_008",
+    "text": "안개로 인한 가시거리가 확보되지 않아 차량 운행 속도가 줄어들었다.",
+    "source": "Weather Ops",
+    "timestamp": "2025-07-15"
+  },
+  {
+    "doc_id": "SEJONG_009",
+    "text": "도로 파손 보수공사로 인해 일부 차로가 통제되어 정체가 빚어지고 있다.",
+    "source": "Road Maintenance Report",
+    "timestamp": "2025-08-20"
   }
 ]

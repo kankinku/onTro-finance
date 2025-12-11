@@ -47,13 +47,19 @@ class NERStudent:
         Alias dictionary에서 surface -> type 힌트 생성
         NER 정확도 향상용
         """
-        hints = {}
+        hints: Dict[str, str] = {}
         try:
             alias_config = self.settings.load_yaml_config("alias_dictionary")
+            # 기존 구조: aliases/synonyms
             for entry in alias_config.get("aliases", []):
                 entity_type = entry.get("type", "Unknown")
                 for alias in entry.get("synonyms", []):
                     hints[alias.lower()] = entity_type
+            # entities 블록도 힌트로 사용 (alias_dictionary.yaml의 실제 구조)
+            for _, data in alias_config.get("entities", {}).items():
+                entity_type = data.get("type", "Unknown")
+                for alias in data.get("aliases", []):
+                    hints[str(alias).lower()] = entity_type
         except FileNotFoundError:
             logger.warning("Alias dictionary not found")
         return hints
@@ -94,7 +100,7 @@ class NERStudent:
         type_list = ", ".join(self._entity_types.get("entity_types", {}).keys())
         
         system_prompt = (
-            "You are an expert Named Entity Recognition system for financial domain. "
+            "You are an expert Named Entity Recognition system for Traffic and Weather domain in Sejong City. "
             f"Extract entities of types: {type_list}. "
             "Output strictly in JSON format: "
             "{'entities': [{'surface_text': '...', 'type': '...', 'normalized_name': '...', 'confidence': 0.0-1.0}]}"

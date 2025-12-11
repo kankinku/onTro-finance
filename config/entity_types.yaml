@@ -2,84 +2,84 @@
 # 이 파일만 수정하면 코드 변경 없이 엔티티 타입 추가/수정 가능
 
 entity_types:
-  # 금융 상품/자산
-  Instrument:
-    description: "금융 상품 (주식, 채권, ETF, 선물 등)"
+  # 장소/위치
+  Location:
+    description: "지리적 위치, 구역, 도로명"
     examples:
-      - "AAPL"
-      - "US 10Y Treasury"
-      - "S&P 500"
-      - "비트코인"
+      - "세종시"
+      - "나성동"
+      - "조치원읍"
+      - "1번 국도"
+      - "한누리대로"
+      - "정부세종청사"
     subtypes:
-      - Stock
-      - Bond
-      - ETF
-      - Futures
-      - Cryptocurrency
+      - AdminArea     # 행정구역 (동, 읍, 면)
+      - Road          # 도로
+      - Landmark      # 주요 시설
+      - Intersection  # 교차로
 
-  # 경제 지표
-  Indicator:
-    description: "경제/시장 지표"
+  # 기상/환경 조건
+  Condition:
+    description: "날씨 및 도로 환경 상태"
     examples:
-      - "금리"
-      - "CPI"
-      - "실업률"
-      - "GDP"
-      - "VIX"
+      - "폭우"
+      - "폭설"
+      - "결빙"
+      - "안개"
+      - "블랙아이스"
     subtypes:
-      - MacroIndicator
-      - MarketIndicator
-      - TechnicalIndicator
+      - Weather
+      - RoadStatus
 
-  # 행위자
-  Agent:
-    description: "시장 참여자, 기관"
-    examples:
-      - "Fed"
-      - "BOJ"
-      - "헤지펀드"
-      - "개인투자자"
-    subtypes:
-      - CentralBank
-      - Government
-      - Institution
-      - Retail
-
-  # 이벤트
+  # 교통 이벤트
   Event:
-    description: "시장/경제에 영향을 주는 사건"
+    description: "교통 흐름에 영향을 주는 사건"
     examples:
-      - "금리 인상"
-      - "QE"
-      - "디폴트"
-      - "선거"
+      - "교통사고"
+      - "도로공사"
+      - "집회"
+      - "행사"
+      - "차량고장"
     subtypes:
-      - MonetaryPolicy
-      - FiscalPolicy
-      - CrisisEvent
-      - PoliticalEvent
+      - Accident
+      - Construction
+      - Control       # 통제
+      - Gathering     # 집회/행사
 
-  # 수량/측정값
+  # 교통 수단/시설
+  Infrastructure:
+    description: "교통 관련 시설 및 수단"
+    examples:
+      - "BRT"
+      - "지하차도"
+      - "교량"
+      - "터널"
+      - "버스정류장"
+    subtypes:
+      - TransitMode   # BRT, 버스
+      - Facility      # 시설물
+
+  # 수치/측정
   Quantity:
-    description: "수치, 측정값, 비율"
+    description: "교통량, 속도, 지연 시간 등 수치"
     examples:
-      - "2.5%"
-      - "3개월"
-      - "1조 달러"
+      - "30분 지연"
+      - "시속 10km"
+      - "교통량 20% 증가"
     subtypes:
-      - Percentage
-      - Duration
-      - Amount
+      - DelayTime
+      - Speed
+      - Volume
 
-  # 개념/추상
-  Concept:
-    description: "추상적 경제/금융 개념"
+  # 상태/현상 (추상적)
+  Phenomenon:
+    description: "교통 흐름 상태나 현상"
     examples:
-      - "유동성"
-      - "인플레이션"
-      - "경기침체"
-      - "리스크 오프"
+      - "정체"
+      - "서행"
+      - "원활"
+      - "병목현상"
+      - "출퇴근길"
     subtypes:
-      - MarketSentiment
-      - EconomicCycle
-      - RiskFactor
+      - FlowState     # 정체, 원활
+      - Pattern       # 출퇴근, 귀성길
