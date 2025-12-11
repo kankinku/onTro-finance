@@ -1,0 +1,23 @@
+# Storage Configuration
+storage:
+  backend: "inmemory"  # inmemory | neo4j
+  
+  neo4j:
+    uri: "bolt://localhost:7687"
+    user: "neo4j"
+    password: "password"
+    database: "neo4j"
+
+# LLM Configuration
+llm:
+  backend: "ollama"  # ollama | openai | mock
+  
+  ollama:
+    base_url: "http://localhost:11434"
+    model: "llama3.2"
+    timeout: 30
+  
+  openai:
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-4o-mini"
+    timeout: 60

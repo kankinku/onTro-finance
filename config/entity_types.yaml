@@ -1,0 +1,85 @@
+# Entity Types 정의
+# 이 파일만 수정하면 코드 변경 없이 엔티티 타입 추가/수정 가능
+
+entity_types:
+  # 금융 상품/자산
+  Instrument:
+    description: "금융 상품 (주식, 채권, ETF, 선물 등)"
+    examples:
+      - "AAPL"
+      - "US 10Y Treasury"
+      - "S&P 500"
+      - "비트코인"
+    subtypes:
+      - Stock
+      - Bond
+      - ETF
+      - Futures
+      - Cryptocurrency
+
+  # 경제 지표
+  Indicator:
+    description: "경제/시장 지표"
+    examples:
+      - "금리"
+      - "CPI"
+      - "실업률"
+      - "GDP"
+      - "VIX"
+    subtypes:
+      - MacroIndicator
+      - MarketIndicator
+      - TechnicalIndicator
+
+  # 행위자
+  Agent:
+    description: "시장 참여자, 기관"
+    examples:
+      - "Fed"
+      - "BOJ"
+      - "헤지펀드"
+      - "개인투자자"
+    subtypes:
+      - CentralBank
+      - Government
+      - Institution
+      - Retail
+
+  # 이벤트
+  Event:
+    description: "시장/경제에 영향을 주는 사건"
+    examples:
+      - "금리 인상"
+      - "QE"
+      - "디폴트"
+      - "선거"
+    subtypes:
+      - MonetaryPolicy
+      - FiscalPolicy
+      - CrisisEvent
+      - PoliticalEvent
+
+  # 수량/측정값
+  Quantity:
+    description: "수치, 측정값, 비율"
+    examples:
+      - "2.5%"
+      - "3개월"
+      - "1조 달러"
+    subtypes:
+      - Percentage
+      - Duration
+      - Amount
+
+  # 개념/추상
+  Concept:
+    description: "추상적 경제/금융 개념"
+    examples:
+      - "유동성"
+      - "인플레이션"
+      - "경기침체"
+      - "리스크 오프"
+    subtypes:
+      - MarketSentiment
+      - EconomicCycle
+      - RiskFactor

@@ -1,0 +1,103 @@
+# Validation Schema 정의
+# Entity Type × Relation Type 허용 매트릭스
+
+# allowed_combinations: 허용되는 (head_type, tail_type, relation_type) 조합
+# forbidden_combinations: 명시적으로 금지되는 조합
+
+validation_rules:
+  # 허용되는 조합 정의
+  allowed_combinations:
+    # Event -> 다른 타입
+    - head_type: Event
+      tail_type: Indicator
+      relations: [Affect, Cause]
+    - head_type: Event
+      tail_type: Instrument
+      relations: [Affect, Cause]
+    - head_type: Event
+      tail_type: Concept
+      relations: [Affect, Cause]
+    - head_type: Event
+      tail_type: Agent
+      relations: [Affect]
+    
+    # Indicator -> 다른 타입
+    - head_type: Indicator
+      tail_type: Instrument
+      relations: [Affect, Cause, CorrelateWith]
+    - head_type: Indicator
+      tail_type: Indicator
+      relations: [Affect, Cause, CorrelateWith, DependOn]
+    - head_type: Indicator
+      tail_type: Concept
+      relations: [Affect, Cause]
+    
+    # Agent -> 다른 타입
+    - head_type: Agent
+      tail_type: Event
+      relations: [Cause]
+    - head_type: Agent
+      tail_type: Indicator
+      relations: [Affect, Cause]
+    - head_type: Agent
+      tail_type: Instrument
+      relations: [Affect]
+    - head_type: Agent
+      tail_type: Quantity
+      relations: [Affect]
+    
+    # Concept -> 다른 타입
+    - head_type: Concept
+      tail_type: Indicator
+      relations: [Affect, Cause]
+    - head_type: Concept
+      tail_type: Instrument
+      relations: [Affect, Cause]
+    - head_type: Concept
+      tail_type: Concept
+      relations: [Affect, Cause, CorrelateWith]
+    
+    # Instrument -> 다른 타입
+    - head_type: Instrument
+      tail_type: Instrument
+      relations: [CorrelateWith, PartOf]
+    - head_type: Instrument
+      tail_type: Indicator
+      relations: [DependOn]
+    
+    # Quantity 관련
+    - head_type: Quantity
+      tail_type: Indicator
+      relations: [Affect]
+    - head_type: Quantity
+      tail_type: Concept
+      relations: [Affect]
+
+  # 명시적 금지 조합
+  forbidden_combinations:
+    - head_type: Quantity
+      tail_type: Agent
+      relations: [TemporalBefore, TemporalAfter, Cause]
+      reason: "수량이 행위자의 시간적/인과적 원인이 될 수 없음"
+    
+    - head_type: Instrument
+      tail_type: Event
+      relations: [Cause]
+      reason: "금융상품이 이벤트를 직접 야기할 수 없음"
+    
+    - head_type: Quantity
+      tail_type: Event
+      relations: [Cause, TemporalBefore]
+      reason: "수량이 이벤트의 인과적 원인이 될 수 없음"
+
+  # Threshold 설정
+  confidence_thresholds:
+    domain_candidate: 0.55
+    personal_candidate: 0.35
+    drop: 0.0
+  
+  # 가중치 설정
+  confidence_weights:
+    student_conf: 0.4
+    sign_score: 0.3
+    semantic_conf: 0.3

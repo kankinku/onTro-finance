@@ -1,0 +1,135 @@
+# Static Domain 규칙 정의
+# 절대 법칙: 이 규칙들은 경제/금융의 보편적 원리
+
+static_rules:
+  # 금리와 채권가격의 역관계 (절대 법칙)
+  - rule_id: STATIC_001
+    head: Federal_Funds_Rate
+    tail: US_10Y_Treasury
+    relation: Affect
+    polarity: "-"
+    certainty: 1.0
+    description: "금리 상승 → 채권가격 하락 (이자율-채권가격 역관계)"
+  
+  - rule_id: STATIC_002
+    head: Federal_Funds_Rate
+    tail: US_2Y_Treasury
+    relation: Affect
+    polarity: "-"
+    certainty: 1.0
+    description: "금리 상승 → 채권가격 하락"
+  
+  # 금리와 성장주의 역관계
+  - rule_id: STATIC_003
+    head: Federal_Funds_Rate
+    tail: Growth_Stocks
+    relation: Affect
+    polarity: "-"
+    certainty: 0.9
+    description: "금리 상승 → 성장주 밸류에이션 압박"
+  
+  # 금리와 가치주
+  - rule_id: STATIC_004
+    head: Federal_Funds_Rate
+    tail: Value_Stocks
+    relation: Affect
+    polarity: "+"
+    certainty: 0.7
+    description: "금리 상승 → 가치주 상대 강세 (일반적 경향)"
+  
+  # 인플레이션과 금리
+  - rule_id: STATIC_005
+    head: Inflation
+    tail: Federal_Funds_Rate
+    relation: Cause
+    polarity: "+"
+    certainty: 0.95
+    description: "인플레이션 상승 → 금리 인상 유발"
+  
+  # VIX와 주가
+  - rule_id: STATIC_006
+    head: VIX
+    tail: SP500
+    relation: CorrelateWith
+    polarity: "-"
+    certainty: 0.95
+    description: "VIX 상승 → 주가 하락 (역상관)"
+  
+  # 유동성과 자산가격
+  - rule_id: STATIC_007
+    head: Liquidity
+    tail: Growth_Stocks
+    relation: Affect
+    polarity: "+"
+    certainty: 0.85
+    description: "유동성 증가 → 성장주 강세"
+  
+  - rule_id: STATIC_008
+    head: Liquidity
+    tail: SP500
+    relation: Affect
+    polarity: "+"
+    certainty: 0.8
+    description: "유동성 증가 → 주가 상승"
+
+# Sign 추정 패턴
+sign_patterns:
+  positive:
+    - "상승"
+    - "증가"
+    - "강세"
+    - "호조"
+    - "개선"
+    - "확대"
+    - "상향"
+    - "올라"
+    - "높아"
+    - "지지"
+    - "긍정적"
+    - "반등"
+    - "회복"
+  
+  negative:
+    - "하락"
+    - "감소"
+    - "약세"
+    - "부진"
+    - "악화"
+    - "축소"
+    - "하향"
+    - "내려"
+    - "낮아"
+    - "압박"
+    - "부정적"
+    - "급락"
+    - "위축"
+  
+  inverse:
+    - "반대로"
+    - "역으로"
+    - "반비례"
+    - "역의 관계"
+    - "역상관"
+    - "거꾸로"
+
+# Semantic weak/spurious 패턴
+semantic_patterns:
+  exaggeration:
+    - "항상"
+    - "절대"
+    - "반드시"
+    - "무조건"
+    - "틀림없이"
+  
+  correlation_as_causation:
+    - "동반"
+    - "함께"
+    - "같이"
+    - "동시에"
+  
+  weak_evidence:
+    - "아마"
+    - "것 같다"
+    - "생각된다"
+    - "추측"
+    - "가능성"

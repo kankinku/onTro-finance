@@ -1,0 +1,61 @@
+# Policy Configuration v1
+# 학습/실험에 의해 바뀌는 추론/평가 정책
+# settings.py와 분리 관리
+
+version: "policy_v1"
+created_at: "2025-01-01"
+description: "기본 정책 설정"
+
+# EES (Edge Weight Fusion) 가중치
+ees_weights:
+  domain: 0.40          # Domain KG 기여도
+  personal: 0.20        # Personal KG 기여도
+  semantic: 0.15        # Semantic score 기여도
+  temporal: 0.10        # 시간 decay 기여도
+  validation: 0.10      # Validation score 기여도
+  graph: 0.05           # Graph 구조 기여도
+
+# PCS (Personal Confidence Score) 가중치
+pcs_weights:
+  domain_proximity: 0.25    # Domain과 일치도
+  semantic_strength: 0.30   # Semantic tag 강도
+  user_origin: 0.20         # 사용자 직접 입력 여부
+  consistency: 0.25         # 반복 패턴 일관성
+
+# Threshold 설정
+thresholds:
+  # Validation 목적지 결정
+  domain_candidate: 0.55    # 이상이면 Domain 후보
+  personal_candidate: 0.35  # 이상이면 Personal 후보
+  drop: 0.35                # 미만이면 Drop
+  
+  # Drift 감지
+  drift_signal: 0.60        # 이상이면 Drift 후보
+  promotion: 0.80           # Personal→Domain 승격 기준
+  
+  # Conflict 처리
+  conflict_override: 0.75   # 기존 관계 override 기준
+
+# Path Reasoning 설정
+path_reasoning:
+  max_path_length: 4
+  length_penalty: 0.10      # 경로 길이당 감쇠
+  min_path_weight: 0.01     # 최소 경로 가중치
+
+# Semantic Score 매핑
+semantic_scores:
+  sem_confident: 1.0
+  sem_weak: 0.7
+  sem_ambiguous: 0.4
+  sem_spurious: 0.2
+  sem_wrong: 0.1
+
+# Source별 Label 신뢰도
+source_confidence:
+  domain_static: 1.0
+  user_qa: 0.9
+  domain_dynamic: 0.8
+  teacher_llm: 0.7
+  validation_log: 0.6
+  drift_log: 0.6
+  personal: 0.4

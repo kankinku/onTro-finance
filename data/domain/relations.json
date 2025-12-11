@@ -1,0 +1,255 @@
+[
+    {
+        "head_id": "interest_rate",
+        "tail_id": "growth_stock",
+        "type": "affect",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.95,
+            "evidence_count": 500,
+            "description": "할인율 상승으로 미래 현금흐름 가치 하락"
+        }
+    },
+    {
+        "head_id": "interest_rate",
+        "tail_id": "value_stock",
+        "type": "affect",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.60,
+            "evidence_count": 150,
+            "description": "성장주보다는 덜하지만 유동성 축소 영향 받음"
+        }
+    },
+    {
+        "head_id": "interest_rate",
+        "tail_id": "us_treasury_10y",
+        "type": "correlate",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.98,
+            "evidence_count": 800,
+            "description": "기준금리는 시장금리의 바닥 역할"
+        }
+    },
+    {
+        "head_id": "interest_rate",
+        "tail_id": "usd_index",
+        "type": "cause",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.90,
+            "evidence_count": 300,
+            "description": "금리차 확대로 달러 수요 증가"
+        }
+    },
+    {
+        "head_id": "interest_rate",
+        "tail_id": "real_estate_commercial",
+        "type": "affect",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.95,
+            "evidence_count": 400,
+            "description": "조달 비용 상승으로 수익성 악화 및 밸류에이션 하락"
+        }
+    },
+    {
+        "head_id": "inflation_cpi",
+        "tail_id": "interest_rate",
+        "type": "cause",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.92,
+            "evidence_count": 600,
+            "description": "물가 안정을 위해 중앙은행 금리 인상 유도"
+        }
+    },
+    {
+        "head_id": "inflation_cpi",
+        "tail_id": "gold",
+        "type": "correlate",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.80,
+            "evidence_count": 200,
+            "description": "화폐 가치 하락 헤지 수요"
+        }
+    },
+    {
+        "head_id": "wage_growth",
+        "tail_id": "inflation_cpi",
+        "type": "cause",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.85,
+            "evidence_count": 180,
+            "description": "임금-물가 스파이럴 압력"
+        }
+    },
+    {
+        "head_id": "unemployment_rate",
+        "tail_id": "wage_growth",
+        "type": "affect",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.90,
+            "evidence_count": 250,
+            "description": "필립스 곡선: 실업률 하락 시 임금 상승"
+        }
+    },
+    {
+        "head_id": "gdp_growth",
+        "tail_id": "corporate_bond",
+        "type": "affect",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.70,
+            "evidence_count": 100,
+            "description": "경기 호조 시 부도 위험 감소로 채권 가격 안정 (금리는 변수 있음)"
+        }
+    },
+    {
+        "head_id": "gdp_growth",
+        "tail_id": "crude_oil",
+        "type": "cause",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.85,
+            "evidence_count": 350,
+            "description": "산업 활동 증가로 에너지 수요 확대"
+        }
+    },
+    {
+        "head_id": "usd_index",
+        "tail_id": "gold",
+        "type": "correlate",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.90,
+            "evidence_count": 450,
+            "description": "금은 달러로 거래되므로 역의 관계"
+        }
+    },
+    {
+        "head_id": "usd_index",
+        "tail_id": "crude_oil",
+        "type": "correlate",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.85,
+            "evidence_count": 300,
+            "description": "달러 강세 시 원자재 명목 가격 하락 압력"
+        }
+    },
+    {
+        "head_id": "usd_index",
+        "tail_id": "growth_stock",
+        "type": "affect",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.75,
+            "evidence_count": 150,
+            "description": "해외 매출 비중 높은 기술주 환차손 우려"
+        }
+    },
+    {
+        "head_id": "m2_supply",
+        "tail_id": "bitcoin",
+        "type": "correlate",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.88,
+            "evidence_count": 220,
+            "description": "유동성 팽창 시 희소 자산 선호"
+        }
+    },
+    {
+        "head_id": "m2_supply",
+        "tail_id": "growth_stock",
+        "type": "affect",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.85,
+            "evidence_count": 300,
+            "description": "시중 유동성은 위험 자산으로 유입"
+        }
+    },
+    {
+        "head_id": "fed_balance_sheet",
+        "tail_id": "m2_supply",
+        "type": "cause",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.99,
+            "evidence_count": 500,
+            "description": "양적완화(QE)는 통화 공급 직결"
+        }
+    },
+    {
+        "head_id": "vix_index",
+        "tail_id": "growth_stock",
+        "type": "correlate",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.85,
+            "evidence_count": 400,
+            "description": "공포감 상승(Risk Off) 시 주식 투매"
+        }
+    },
+    {
+        "head_id": "vix_index",
+        "tail_id": "credit_spread",
+        "type": "correlate",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.90,
+            "evidence_count": 250,
+            "description": "시장 불안 시 회사채 스프레드 확대"
+        }
+    },
+    {
+        "head_id": "credit_spread",
+        "tail_id": "high_yield_bond",
+        "type": "affect",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.95,
+            "evidence_count": 300,
+            "description": "스프레드 확대는 하이일드 채권 가격 급락(금리 급등) 의미"
+        }
+    },
+    {
+        "head_id": "yield_curve_spread",
+        "tail_id": "gdp_growth",
+        "type": "predict",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.80,
+            "evidence_count": 600,
+            "description": "장단기 금리차 역전(음수)은 경기 침체(성장 하락) 선행"
+        }
+    },
+    {
+        "head_id": "copper",
+        "tail_id": "gdp_growth",
+        "type": "correlate",
+        "props": {
+            "sign": "+",
+            "domain_conf": 0.85,
+            "evidence_count": 200,
+            "description": "산업 금속 수요는 경기 동행"
+        }
+    },
+    {
+        "head_id": "interest_rate",
+        "tail_id": "bitcoin",
+        "type": "affect",
+        "props": {
+            "sign": "-",
+            "domain_conf": 0.70,
+            "evidence_count": 180,
+            "description": "이자 없는 자산의 기회비용 상승"
+        }
+    }
+]

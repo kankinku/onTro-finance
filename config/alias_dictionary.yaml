@@ -1,0 +1,169 @@
+# Domain Dictionary (Alias Table)
+# Entity Resolution의 1순위 매핑 규칙
+# 코드 수정 없이 alias 추가/수정 가능
+
+# 형식: canonical_name -> [alias1, alias2, ...]
+# Entity Resolution에서 alias를 발견하면 canonical_name으로 매핑
+
+entities:
+  # 중앙은행
+  Federal_Reserve:
+    canonical_name: "Federal Reserve"
+    type: Agent
+    subtype: CentralBank
+    aliases:
+      - "연준"
+      - "Fed"
+      - "FRB"
+      - "미국 연방준비제도"
+      - "연방준비은행"
+      - "파월"  # 현 의장, 문맥에 따라
+
+  Bank_of_Japan:
+    canonical_name: "Bank of Japan"
+    type: Agent
+    subtype: CentralBank
+    aliases:
+      - "BOJ"
+      - "일본은행"
+      - "일은"
+
+  ECB:
+    canonical_name: "European Central Bank"
+    type: Agent
+    subtype: CentralBank
+    aliases:
+      - "ECB"
+      - "유럽중앙은행"
+
+  # 채권
+  US_10Y_Treasury:
+    canonical_name: "US 10Y Treasury"
+    type: Instrument
+    subtype: Bond
+    aliases:
+      - "10년물"
+      - "US10Y"
+      - "TNX"
+      - "미국채 10년"
+      - "10년 국채"
+      - "US 10-Year"
+
+  US_2Y_Treasury:
+    canonical_name: "US 2Y Treasury"
+    type: Instrument
+    subtype: Bond
+    aliases:
+      - "2년물"
+      - "US2Y"
+      - "미국채 2년"
+
+  # 지수
+  SP500:
+    canonical_name: "S&P 500"
+    type: Instrument
+    subtype: ETF
+    aliases:
+      - "S&P"
+      - "S&P500"
+      - "에스엔피"
+      - "SPX"
+      - "SPY"
+
+  Nasdaq:
+    canonical_name: "NASDAQ Composite"
+    type: Instrument
+    subtype: ETF
+    aliases:
+      - "나스닥"
+      - "IXIC"
+      - "QQQ"
+      - "나스닥 지수"
+
+  # 지표
+  Federal_Funds_Rate:
+    canonical_name: "Federal Funds Rate"
+    type: Indicator
+    subtype: MacroIndicator
+    aliases:
+      - "금리"
+      - "기준금리"
+      - "연방기금금리"
+      - "정책금리"
+      - "Fed 금리"
+
+  CPI:
+    canonical_name: "Consumer Price Index"
+    type: Indicator
+    subtype: MacroIndicator
+    aliases:
+      - "CPI"
+      - "소비자물가지수"
+      - "소비자물가"
+
+  VIX:
+    canonical_name: "CBOE Volatility Index"
+    type: Indicator
+    subtype: MarketIndicator
+    aliases:
+      - "VIX"
+      - "공포지수"
+      - "변동성 지수"
+
+  # 개념
+  Inflation:
+    canonical_name: "Inflation"
+    type: Concept
+    subtype: EconomicCycle
+    aliases:
+      - "인플레이션"
+      - "인플레"
+      - "물가상승"
+      - "물가 상승"
+
+  Liquidity:
+    canonical_name: "Liquidity"
+    type: Concept
+    subtype: RiskFactor
+    aliases:
+      - "유동성"
+      - "시중 자금"
+      - "유동자금"
+
+  Rate_Hike:
+    canonical_name: "Interest Rate Hike"
+    type: Event
+    subtype: MonetaryPolicy
+    aliases:
+      - "금리 인상"
+      - "금리인상"
+      - "기준금리 인상"
+      - "rate hike"
+
+  Rate_Cut:
+    canonical_name: "Interest Rate Cut"
+    type: Event
+    subtype: MonetaryPolicy
+    aliases:
+      - "금리 인하"
+      - "금리인하"
+      - "기준금리 인하"
+      - "rate cut"
+
+  Growth_Stocks:
+    canonical_name: "Growth Stocks"
+    type: Instrument
+    subtype: Stock
+    aliases:
+      - "성장주"
+      - "그로스주"
+      - "growth stock"
+
+  Value_Stocks:
+    canonical_name: "Value Stocks"
+    type: Instrument
+    subtype: Stock
+    aliases:
+      - "가치주"
+      - "밸류주"
+      - "value stock"

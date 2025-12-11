@@ -1,0 +1,194 @@
+[
+    {
+        "id": "interest_rate",
+        "props": {
+            "name": "기준금리",
+            "type": "indicator",
+            "description": "중앙은행이 결정하는 정책 금리"
+        }
+    },
+    {
+        "id": "us_treasury_10y",
+        "props": {
+            "name": "미국채10년물",
+            "type": "indicator",
+            "description": "시장 금리의 벤치마크"
+        }
+    },
+    {
+        "id": "us_treasury_2y",
+        "props": {
+            "name": "미국채2년물",
+            "type": "indicator",
+            "description": "통화정책 전망을 민감하게 반영"
+        }
+    },
+    {
+        "id": "inflation_cpi",
+        "props": {
+            "name": "소비자물가지수(CPI)",
+            "type": "indicator",
+            "description": "인플레이션 측정 지표"
+        }
+    },
+    {
+        "id": "inflation_pce",
+        "props": {
+            "name": "PCE물가",
+            "type": "indicator",
+            "description": "연준이 선호하는 물가 지표"
+        }
+    },
+    {
+        "id": "gdp_growth",
+        "props": {
+            "name": "GDP성장률",
+            "type": "indicator",
+            "description": "경제 성장 속도"
+        }
+    },
+    {
+        "id": "unemployment_rate",
+        "props": {
+            "name": "실업률",
+            "type": "indicator",
+            "description": "고용 시장의 건전성 지표"
+        }
+    },
+    {
+        "id": "wage_growth",
+        "props": {
+            "name": "임금상승률",
+            "type": "indicator",
+            "description": "서비스 물가 압력의 주요 원인"
+        }
+    },
+    {
+        "id": "m2_supply",
+        "props": {
+            "name": "M2통화량",
+            "type": "indicator",
+            "description": "시중 유동성 총량"
+        }
+    },
+    {
+        "id": "fed_balance_sheet",
+        "props": {
+            "name": "연준대차대조표",
+            "type": "indicator",
+            "description": "양적완화/긴축의 척도"
+        }
+    },
+    {
+        "id": "reverse_repo",
+        "props": {
+            "name": "역레포잔고",
+            "type": "indicator",
+            "description": "잉여 유동성 저장고"
+        }
+    },
+    {
+        "id": "growth_stock",
+        "props": {
+            "name": "성장주",
+            "type": "asset",
+            "description": "미래 현금흐름 비중이 큰 주식 (Tech 등)"
+        }
+    },
+    {
+        "id": "value_stock",
+        "props": {
+            "name": "가치주",
+            "type": "asset",
+            "description": "현재 현금흐름과 배당 중심 주식"
+        }
+    },
+    {
+        "id": "corporate_bond",
+        "props": {
+            "name": "회사채",
+            "type": "asset",
+            "description": "기업이 발행한 채권"
+        }
+    },
+    {
+        "id": "high_yield_bond",
+        "props": {
+            "name": "하이일드채권",
+            "type": "asset",
+            "description": "신용등급이 낮은 고수익 채권"
+        }
+    },
+    {
+        "id": "gold",
+        "props": {
+            "name": "금",
+            "type": "commodity",
+            "description": "안전 자산 및 인플레 헤지 수단"
+        }
+    },
+    {
+        "id": "crude_oil",
+        "props": {
+            "name": "원유(WTI)",
+            "type": "commodity",
+            "description": "에너지 가격 및 인플레 선행 지표"
+        }
+    },
+    {
+        "id": "copper",
+        "props": {
+            "name": "구리",
+            "type": "commodity",
+            "description": "닥터 쿠퍼, 경기 선행 원자재"
+        }
+    },
+    {
+        "id": "usd_index",
+        "props": {
+            "name": "달러인덱스",
+            "type": "currency",
+            "description": "미국 달러의 상대적 가치"
+        }
+    },
+    {
+        "id": "bitcoin",
+        "props": {
+            "name": "비트코인",
+            "type": "asset",
+            "description": "디지털 금, 유동성 민감 자산"
+        }
+    },
+    {
+        "id": "vix_index",
+        "props": {
+            "name": "VIX지수",
+            "type": "indicator",
+            "description": "공포 지수, S&P500 내재 변동성"
+        }
+    },
+    {
+        "id": "real_estate_commercial",
+        "props": {
+            "name": "상업용부동산",
+            "type": "asset",
+            "description": "오피스 등 상업용 건물 시장"
+        }
+    },
+    {
+        "id": "credit_spread",
+        "props": {
+            "name": "신용스프레드",
+            "type": "indicator",
+            "description": "회사채와 국채 금리 차이 (위험 프리미엄)"
+        }
+    },
+    {
+        "id": "yield_curve_spread",
+        "props": {
+            "name": "장단기금리차",
+            "type": "indicator",
+            "description": "10년물과 2년물의 차이 (경기침체 선행)"
+        }
+    }
+]
