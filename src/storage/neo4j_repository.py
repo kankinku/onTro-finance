@@ -18,6 +18,7 @@ class Neo4jGraphRepository(GraphRepository):
             from neo4j import GraphDatabase
             self._driver = GraphDatabase.driver(uri, auth=(user, password))
             self._database = database
+            self._driver.verify_connectivity()
             logger.info(f"Connected to Neo4j: {uri}")
         except ImportError:
             raise ImportError("neo4j package required. Install: pip install neo4j")

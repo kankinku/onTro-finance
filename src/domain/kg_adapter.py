@@ -34,7 +34,7 @@ class DomainKGAdapter:
         self,
         repository: GraphRepository,
         tx_manager: Optional[KGTransactionManager] = None,
-        read_only: bool = True,
+        read_only: bool = False,
     ):
         self._repo = repository
         self._tx_manager = tx_manager or KGTransactionManager(repository)

@@ -1,0 +1,69 @@
+# Relation Types 정의
+# 이 파일만 수정하면 코드 변경 없이 관계 타입 추가/수정 가능
+
+relation_types:
+  # 영향 관계
+  Affect:
+    description: "A가 B에 영향을 미침 (교퉁 흐름, 상태 등)"
+    has_polarity: true  # +/- (악화/개선, 증가/감소)
+    examples:
+      - "폭우가 교통 흐름에 부정적 영향"
+      - "도로공사가 정체를 유발"
+    patterns:
+      - "{head}이/가 {tail}에 영향"
+      - "{head}(으)로 {tail} 발생"
+
+  # 인과 관계
+  Cause:
+    description: "A가 B의 직접적인 원인"
+    has_polarity: true
+    examples:
+      - "사고로 인해 정체 발생"
+      - "결빙이 사고를 유발"
+    patterns:
+      - "{head} 때문에 {tail}"
+      - "{head}(으)로 인해 {tail}"
+      - "{head} 원인으로 {tail}"
+
+  # 위치/발생 장소
+  OccursAt:
+    description: "사건이나 상태가 특정 위치에서 발생"
+    has_polarity: false
+    examples:
+      - "나성동에서 사고 발생"
+      - "1번 국도에서 정체"
+    patterns:
+      - "{head}은/는 {tail}에서 발생"
+      - "{tail}의 {head}"
+
+  # 시간 관계
+  Temporal:
+    description: "시간적 선후 관계"
+    has_polarity: false
+    examples:
+      - "눈 내린 후 결빙"
+      - "출근 시간 전 통제"
+    patterns:
+      - "{head} 후 {tail}"
+      - "{head} 때 {tail}"
+
+  # 상태/속성
+  StateOf:
+    description: "A가 B의 상태임"
+    has_polarity: false
+    examples:
+      - "도로가 결빙 상태"
+      - "소통이 원활함"
+    patterns:
+      - "{tail}은/는 {head} 상태"
+
+  # 포함/구성
+  PartOf:
+    description: "A가 B의 일부 (구역 포함 등)"
+    has_polarity: false
+    examples:
+      - "나성동은 세종시에 포함"
+      - "한누리대로는 BRT 라인 포함"
+    patterns:
+      - "{head}은/는 {tail}에 위치"
+      - "{head}은/는 {tail}의 일부"

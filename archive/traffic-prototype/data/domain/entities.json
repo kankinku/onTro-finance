@@ -1,0 +1,58 @@
+[
+  {
+    "id": "BRT",
+    "props": {
+      "name": "BRT",
+      "type": "Infrastructure"
+    }
+  },
+  {
+    "id": "Traffic_Congestion",
+    "props": {
+      "name": "교통 혼잡",
+      "type": "Phenomenon"
+    }
+  },
+  {
+    "id": "Travel_Time",
+    "props": {
+      "name": "이동 시간",
+      "type": "Quantity"
+    }
+  },
+  {
+    "id": "Bus_Headway",
+    "props": {
+      "name": "버스 배차 간격",
+      "type": "Quantity"
+    }
+  },
+  {
+    "id": "Heavy_Rain",
+    "props": {
+      "name": "폭우",
+      "type": "Condition"
+    }
+  },
+  {
+    "id": "Road_Construction",
+    "props": {
+      "name": "도로 공사",
+      "type": "Event"
+    }
+  },
+  {
+    "id": "Traffic_Speed",
+    "props": {
+      "name": "교통 속도",
+      "type": "Quantity"
+    }
+  },
+  {
+    "id": "Rush_Hour",
+    "props": {
+      "name": "출퇴근 시간",
+      "type": "Pattern"
+    }
+  }
+]

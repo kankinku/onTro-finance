@@ -98,12 +98,17 @@ class NERStudent:
     ) -> List[EntityCandidate]:
         """LLM을 이용한 NER"""
         type_list = ", ".join(self._entity_types.get("entity_types", {}).keys())
+        domain_hint = (
+            "You are an expert Named Entity Recognition system for finance and macro research. "
+            "Identify macro indicators, asset groups, sectors, instruments, policy actors, events, and quantities. "
+        )
         
         system_prompt = (
-            "You are an expert Named Entity Recognition system for Traffic and Weather domain in Sejong City. "
-            f"Extract entities of types: {type_list}. "
-            "Output strictly in JSON format: "
-            "{'entities': [{'surface_text': '...', 'type': '...', 'normalized_name': '...', 'confidence': 0.0-1.0}]}"
+            domain_hint
+            + f"Extract entities of types: {type_list}. "
+            + "Output strictly in JSON format: "
+            + "{'entities': [{'surface_text': '...', 'type': '...', "
+            + "'normalized_name': '...', 'confidence': 0.0-1.0}]}"
         )
         
         prompt = f"Text: {fragment_text}"

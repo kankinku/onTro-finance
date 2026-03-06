@@ -102,8 +102,8 @@ class SemanticValidator:
     
     def _check_correlation_as_causation(self, text: str, edge: RawEdge) -> bool:
         """상관을 인과로 오해하는지 체크"""
-        # Cause 관계인데 상관 패턴이 있으면 spurious 가능성
-        if edge.relation_type != "Cause":
+        # Strong-causality relation인데 상관 패턴만 있으면 spurious 가능성
+        if edge.relation_type not in {"Cause", "leads_to"}:
             return False
         
         patterns = self._semantic_patterns.get("correlation_as_causation", [])

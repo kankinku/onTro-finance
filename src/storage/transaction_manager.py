@@ -11,6 +11,7 @@ KG Transaction Manager
 import logging
 import threading
 import uuid
+from copy import deepcopy
 from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -196,14 +197,16 @@ class KGTransactionManager:
     ) -> None:
         """엔티티 생성"""
         self._check_tx_active(tx)
-        
+        before = deepcopy(self._repo.get_entity(entity_id))
+
         # 실행
         self._repo.upsert_entity(entity_id, labels, props)
-        
+
         # 기록
         tx.changes.append(ChangeRecord(
-            operation=OperationType.CREATE_ENTITY,
+            operation=OperationType.UPDATE_ENTITY if before else OperationType.CREATE_ENTITY,
             entity_id=entity_id,
+            before_state=before,
             after_state={"labels": labels, "props": props},
         ))
     
@@ -218,7 +221,7 @@ class KGTransactionManager:
         self._check_tx_active(tx)
         
         # 이전 상태 저장
-        before = self._repo.get_entity(entity_id)
+        before = deepcopy(self._repo.get_entity(entity_id))
         
         # 실행
         self._repo.upsert_entity(entity_id, labels, props)
@@ -236,7 +239,7 @@ class KGTransactionManager:
         self._check_tx_active(tx)
         
         # 이전 상태 저장
-        before = self._repo.get_entity(entity_id)
+        before = deepcopy(self._repo.get_entity(entity_id))
         if not before:
             return False
         
@@ -262,16 +265,18 @@ class KGTransactionManager:
     ) -> None:
         """관계 생성"""
         self._check_tx_active(tx)
-        
+        before = deepcopy(self._repo.get_relation(src_id, rel_type, dst_id))
+
         # 실행
         self._repo.upsert_relation(src_id, rel_type, dst_id, props)
-        
+
         # 기록
         tx.changes.append(ChangeRecord(
-            operation=OperationType.CREATE_RELATION,
+            operation=OperationType.UPDATE_RELATION if before else OperationType.CREATE_RELATION,
             src_id=src_id,
             rel_type=rel_type,
             dst_id=dst_id,
+            before_state=before,
             after_state={"props": props},
         ))
     
@@ -287,7 +292,7 @@ class KGTransactionManager:
         self._check_tx_active(tx)
         
         # 이전 상태
-        before = self._repo.get_relation(src_id, rel_type, dst_id)
+        before = deepcopy(self._repo.get_relation(src_id, rel_type, dst_id))
         
         # 실행
         self._repo.upsert_relation(src_id, rel_type, dst_id, props)
@@ -313,7 +318,7 @@ class KGTransactionManager:
         self._check_tx_active(tx)
         
         # 이전 상태
-        before = self._repo.get_relation(src_id, rel_type, dst_id)
+        before = deepcopy(self._repo.get_relation(src_id, rel_type, dst_id))
         if not before:
             return False
         

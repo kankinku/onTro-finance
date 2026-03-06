@@ -1,0 +1,90 @@
+[
+  {
+    "head_id": "BRT",
+    "tail_id": "Traffic_Congestion",
+    "type": "Affect",
+    "props": {
+      "relation_id": "REL_BRT_CONG",
+      "sign": "-",
+      "domain_conf": 0.9,
+      "evidence_count": 3
+    }
+  },
+  {
+    "head_id": "BRT",
+    "tail_id": "Travel_Time",
+    "type": "Affect",
+    "props": {
+      "relation_id": "REL_BRT_TT",
+      "sign": "-",
+      "domain_conf": 0.9,
+      "evidence_count": 3
+    }
+  },
+  {
+    "head_id": "Heavy_Rain",
+    "tail_id": "Bus_Headway",
+    "type": "Affect",
+    "props": {
+      "relation_id": "REL_RAIN_HEADWAY",
+      "sign": "+",
+      "domain_conf": 0.85,
+      "evidence_count": 2
+    }
+  },
+  {
+    "head_id": "Heavy_Rain",
+    "tail_id": "Travel_Time",
+    "type": "Affect",
+    "props": {
+      "relation_id": "REL_RAIN_TT",
+      "sign": "+",
+      "domain_conf": 0.85,
+      "evidence_count": 2
+    }
+  },
+  {
+    "head_id": "Road_Construction",
+    "tail_id": "Travel_Time",
+    "type": "Affect",
+    "props": {
+      "relation_id": "REL_CONS_TT",
+      "sign": "+",
+      "domain_conf": 0.9,
+      "evidence_count": 2
+    }
+  },
+  {
+    "head_id": "Road_Construction",
+    "tail_id": "Traffic_Speed",
+    "type": "Affect",
+    "props": {
+      "relation_id": "REL_CONS_SPEED",
+      "sign": "-",
+      "domain_conf": 0.9,
+      "evidence_count": 2
+    }
+  },
+  {
+    "head_id": "Rush_Hour",
+    "tail_id": "Traffic_Congestion",
+    "type": "Affect",
+    "props": {
+      "relation_id": "REL_RUSH_CONG",
+      "sign": "+",
+      "domain_conf": 0.95,
+      "evidence_count": 2
+    }
+  },
+  {
+    "head_id": "Rush_Hour",
+    "tail_id": "Travel_Time",
+    "type": "Affect",
+    "props": {
+      "relation_id": "REL_RUSH_TT",
+      "sign": "+",
+      "domain_conf": 0.9,
+      "evidence_count": 2
+    }
+  }
+]

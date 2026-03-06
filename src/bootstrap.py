@@ -13,6 +13,7 @@ from src.storage.inmemory_repository import InMemoryGraphRepository
 from src.storage.transaction_manager import KGTransactionManager
 
 logger = logging.getLogger(__name__)
+_DEPRECATED_NEO4J_USER_ENV = "ONTRO_NEO4J_USERNAME"
 
 
 def load_config(config_path: Optional[str] = None) -> dict:
@@ -22,7 +23,7 @@ def load_config(config_path: Optional[str] = None) -> dict:
     
     if not os.path.exists(config_path):
         logger.warning(f"Config not found: {config_path}, using defaults")
-        return {"storage": {"backend": "inmemory"}, "llm": {"backend": "ollama"}}
+        return {"storage": {"backend": "neo4j"}, "llm": {"backend": "ollama"}}
     
     with open(config_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
@@ -54,7 +55,7 @@ def build_graph_repository(config: Optional[dict] = None) -> GraphRepository:
         config = load_config()
     
     storage_config = config.get("storage", {})
-    backend = storage_config.get("backend", "inmemory")
+    backend = os.environ.get("ONTRO_STORAGE_BACKEND") or storage_config.get("backend") or "neo4j"
     
     if backend == "inmemory":
         logger.info("Using InMemory GraphRepository")
@@ -63,12 +64,25 @@ def build_graph_repository(config: Optional[dict] = None) -> GraphRepository:
     elif backend == "neo4j":
         from src.storage.neo4j_repository import Neo4jGraphRepository
         neo4j_conf = storage_config.get("neo4j", {})
-        logger.info(f"Using Neo4j GraphRepository: {neo4j_conf.get('uri')}")
+        uri = os.environ.get("ONTRO_NEO4J_URI") or neo4j_conf.get("uri", "bolt://localhost:7687")
+        user = os.environ.get("ONTRO_NEO4J_USER")
+        if not user:
+            deprecated_user = os.environ.get(_DEPRECATED_NEO4J_USER_ENV)
+            if deprecated_user:
+                logger.warning(
+                    "%s is deprecated; use ONTRO_NEO4J_USER instead.",
+                    _DEPRECATED_NEO4J_USER_ENV,
+                )
+                user = deprecated_user
+        user = user or neo4j_conf.get("user", "neo4j")
+        password = os.environ.get("ONTRO_NEO4J_PASSWORD") or neo4j_conf.get("password", "")
+        database = os.environ.get("ONTRO_NEO4J_DATABASE") or neo4j_conf.get("database", "neo4j")
+        logger.info(f"Using Neo4j GraphRepository: {uri}")
         return Neo4jGraphRepository(
-            uri=neo4j_conf.get("uri", "bolt://localhost:7687"),
-            user=neo4j_conf.get("user", "neo4j"),
-            password=neo4j_conf.get("password", ""),
-            database=neo4j_conf.get("database", "neo4j"),
+            uri=uri,
+            user=user,
+            password=password,
+            database=database,
         )
     
     else:
@@ -85,6 +99,24 @@ def get_graph_repository() -> GraphRepository:
     if _graph_repo is None:
         _graph_repo = build_graph_repository()
     return _graph_repo
+
+
+def check_graph_repository_health(repository: Optional[GraphRepository] = None) -> dict:
+    """Return a small health payload for the active graph repository."""
+    repo = repository or get_graph_repository()
+    try:
+        return {
+            "ok": True,
+            "backend": repo.__class__.__name__,
+            "entity_count": repo.count_entities(),
+            "relation_count": repo.count_relations(),
+        }
+    except Exception as exc:
+        return {
+            "ok": False,
+            "backend": repo.__class__.__name__,
+            "error": str(exc),
+        }
 
 
 def get_transaction_manager() -> KGTransactionManager:
@@ -162,6 +194,7 @@ def get_llm_gateway() -> LLMGateway:
 
 _domain_adapter = None
 _personal_adapter = None
+_council_service = None
 
 
 def get_domain_kg_adapter():
@@ -190,6 +223,16 @@ def get_personal_kg_adapter():
     return _personal_adapter
 
 
+def get_council_service():
+    """Singleton council service for ambiguous relation adjudication."""
+    global _council_service
+    if _council_service is None:
+        from src.council.service import CouncilService
+
+        _council_service = CouncilService(domain_adapter=get_domain_kg_adapter())
+    return _council_service
+
+
 
 # ==============================================================================
 # Reset (테스트용)
@@ -197,12 +240,13 @@ def get_personal_kg_adapter():
 
 def reset_all() -> None:
     """모든 싱글톤 리셋"""
-    global _graph_repo, _tx_manager, _llm_gateway, _domain_adapter, _personal_adapter
+    global _graph_repo, _tx_manager, _llm_gateway, _domain_adapter, _personal_adapter, _council_service
     _graph_repo = None
     _tx_manager = None
     _llm_gateway = None
     _domain_adapter = None
     _personal_adapter = None
+    _council_service = None
 
 
 def reset_graph_repository() -> None:

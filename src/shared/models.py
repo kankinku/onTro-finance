@@ -5,7 +5,7 @@
 from enum import Enum
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 import uuid
 
 
@@ -60,8 +60,7 @@ class Fragment(BaseModel):
     source_start: Optional[int] = Field(default=None, description="원문에서의 시작 위치")
     source_end: Optional[int] = Field(default=None, description="원문에서의 끝 위치")
     
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 # ============================================================
@@ -152,8 +151,7 @@ class RawEdge(BaseModel):
     # 생성 시간
     created_at: datetime = Field(default_factory=datetime.now)
     
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 # ============================================================

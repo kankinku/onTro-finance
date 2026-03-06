@@ -1,0 +1,85 @@
+# Entity Types 정의
+# 이 파일만 수정하면 코드 변경 없이 엔티티 타입 추가/수정 가능
+
+entity_types:
+  # 장소/위치
+  Location:
+    description: "지리적 위치, 구역, 도로명"
+    examples:
+      - "세종시"
+      - "나성동"
+      - "조치원읍"
+      - "1번 국도"
+      - "한누리대로"
+      - "정부세종청사"
+    subtypes:
+      - AdminArea     # 행정구역 (동, 읍, 면)
+      - Road          # 도로
+      - Landmark      # 주요 시설
+      - Intersection  # 교차로
+
+  # 기상/환경 조건
+  Condition:
+    description: "날씨 및 도로 환경 상태"
+    examples:
+      - "폭우"
+      - "폭설"
+      - "결빙"
+      - "안개"
+      - "블랙아이스"
+    subtypes:
+      - Weather
+      - RoadStatus
+
+  # 교통 이벤트
+  Event:
+    description: "교통 흐름에 영향을 주는 사건"
+    examples:
+      - "교통사고"
+      - "도로공사"
+      - "집회"
+      - "행사"
+      - "차량고장"
+    subtypes:
+      - Accident
+      - Construction
+      - Control       # 통제
+      - Gathering     # 집회/행사
+
+  # 교통 수단/시설
+  Infrastructure:
+    description: "교통 관련 시설 및 수단"
+    examples:
+      - "BRT"
+      - "지하차도"
+      - "교량"
+      - "터널"
+      - "버스정류장"
+    subtypes:
+      - TransitMode   # BRT, 버스
+      - Facility      # 시설물
+
+  # 수치/측정
+  Quantity:
+    description: "교통량, 속도, 지연 시간 등 수치"
+    examples:
+      - "30분 지연"
+      - "시속 10km"
+      - "교통량 20% 증가"
+    subtypes:
+      - DelayTime
+      - Speed
+      - Volume
+
+  # 상태/현상 (추상적)
+  Phenomenon:
+    description: "교통 흐름 상태나 현상"
+    examples:
+      - "정체"
+      - "서행"
+      - "원활"
+      - "병목현상"
+      - "출퇴근길"
+    subtypes:
+      - FlowState     # 정체, 원활
+      - Pattern       # 출퇴근, 귀성길

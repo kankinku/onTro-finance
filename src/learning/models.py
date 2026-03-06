@@ -16,6 +16,7 @@ class DataSource(str, Enum):
     """데이터 출처"""
     DOMAIN_STATIC = "domain_static"       # Static Domain 기반 (신뢰도 1.0)
     DOMAIN_DYNAMIC = "domain_dynamic"     # Dynamic Domain 기반 (0.7~0.9)
+    COUNCIL_REVIEW = "council_review"     # Council-reviewed labels (0.95)
     PERSONAL = "personal"                 # Personal KG 기반 (0.4)
     VALIDATION_LOG = "validation_log"     # Validation 실패 로그 (0.6)
     DRIFT_LOG = "drift_log"               # Drift 로그 (0.6)

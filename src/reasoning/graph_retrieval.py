@@ -1,12 +1,9 @@
 """
-Graph Retrieval Module
-"Domain을 최우선으로, Personal을 보조로 가져와 reasoning에 필요한 관계들을 수집"
-
-Domain KG → Personal KG 순서로 검색
+Graph retrieval that preserves configured relation types.
 """
 import logging
-from typing import Optional, List, Dict, Set
 from collections import deque
+from typing import Dict, List, Optional, Set
 
 from src.reasoning.models import ParsedQuery, RetrievedPath, RetrievalResult
 from src.domain.dynamic_update import DynamicDomainUpdate
@@ -16,11 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class GraphRetrieval:
-    """
-    Graph Retrieval Module
-    Domain-first Retrieval
-    """
-    
+    """Retrieve direct and indirect domain/personal paths without hardcoded relation labels."""
+
     def __init__(
         self,
         domain: Optional[DynamicDomainUpdate] = None,
@@ -32,64 +26,25 @@ class GraphRetrieval:
         self.personal = personal
         self.max_path_length = max_path_length
         self.max_paths = max_paths
-    
+
     def retrieve(self, parsed_query: ParsedQuery) -> RetrievalResult:
-        """
-        그래프에서 관련 경로 검색
-        
-        Args:
-            parsed_query: 파싱된 질문
-        
-        Returns:
-            RetrievalResult
-        """
-        direct_paths = []
-        indirect_paths = []
+        direct_paths: List[RetrievedPath] = []
+        indirect_paths: List[RetrievedPath] = []
         domain_count = 0
         personal_count = 0
         total_edges = 0
-        
+
         head = parsed_query.head_entity
         tail = parsed_query.tail_entity
-        
         if not head:
-            return RetrievalResult(
-                query_id=parsed_query.query_id,
-                direct_paths=[],
-                indirect_paths=[],
-            )
-        
-        # Step 1: Direct Edges 검색 (Domain)
+            return RetrievalResult(query_id=parsed_query.query_id, direct_paths=[], indirect_paths=[])
+
         if self.domain and head and tail:
-            direct_edge = self.domain.get_relation_by_key(head, tail, "Affect")
-            if not direct_edge:
-                direct_edge = self.domain.get_relation_by_key(head, tail, "Cause")
-            
-            if direct_edge:
-                path = RetrievedPath(
-                    nodes=[head, tail],
-                    node_names=[
-                        parsed_query.entity_names.get(head, head),
-                        parsed_query.entity_names.get(tail, tail),
-                    ],
-                    edges=[{
-                        "relation_id": direct_edge.relation_id,
-                        "head": head,
-                        "tail": tail,
-                        "sign": direct_edge.sign,
-                        "domain_conf": direct_edge.domain_conf,
-                        "evidence_count": direct_edge.evidence_count,
-                        "source": "domain",
-                    }],
-                    source="domain",
-                    path_length=1,
-                )
-                direct_paths.append(path)
-                domain_count += 1
-                total_edges += 1
-        
-        # Step 2: Multi-step Path 검색 (Domain)
-        if self.domain and head and tail:
+            direct_domain_paths = self._collect_direct_domain_paths(head, tail, parsed_query.entity_names)
+            direct_paths.extend(direct_domain_paths)
+            domain_count += len(direct_domain_paths)
+            total_edges += len(direct_domain_paths)
+
             multi_paths = self._find_paths_bfs(
                 start=head,
                 end=tail,
@@ -97,63 +52,92 @@ class GraphRetrieval:
                 entity_names=parsed_query.entity_names,
                 source="domain",
             )
-            for p in multi_paths:
-                if p.path_length > 1:
-                    indirect_paths.append(p)
+            for path in multi_paths:
+                if path.path_length > 1:
+                    indirect_paths.append(path)
                     domain_count += 1
-                    total_edges += len(p.edges)
-        
-        # Step 3: Personal KG 검색 (보조)
+                    total_edges += len(path.edges)
+
         if self.personal and (len(direct_paths) + len(indirect_paths)) < 3:
-            personal_paths = self._search_personal(
-                head, tail, parsed_query.entity_names
-            )
-            for p in personal_paths:
-                if p.path_length == 1:
-                    direct_paths.append(p)
+            personal_paths = self._search_personal(head, tail, parsed_query.entity_names)
+            for path in personal_paths:
+                if path.path_length == 1:
+                    direct_paths.append(path)
                 else:
-                    indirect_paths.append(p)
+                    indirect_paths.append(path)
                 personal_count += 1
-                total_edges += len(p.edges)
-        
+                total_edges += len(path.edges)
+
         result = RetrievalResult(
             query_id=parsed_query.query_id,
             direct_paths=direct_paths,
-            indirect_paths=indirect_paths[:self.max_paths],
+            indirect_paths=indirect_paths[: self.max_paths],
             domain_paths_count=domain_count,
             personal_paths_count=personal_count,
             total_edges_retrieved=total_edges,
         )
-        
         logger.info(
-            f"Retrieved: {len(direct_paths)} direct, {len(indirect_paths)} indirect, "
-            f"domain={domain_count}, personal={personal_count}"
+            "Retrieved: %s direct, %s indirect, domain=%s, personal=%s",
+            len(direct_paths),
+            len(indirect_paths),
+            domain_count,
+            personal_count,
         )
-        
         return result
-    
+
+    def _collect_direct_domain_paths(
+        self,
+        head: str,
+        tail: str,
+        entity_names: Dict[str, str],
+    ) -> List[RetrievedPath]:
+        paths: List[RetrievedPath] = []
+        if not self.domain:
+            return paths
+
+        for relation in self.domain.get_all_relations().values():
+            if relation.head_id != head or relation.tail_id != tail:
+                continue
+            paths.append(
+                RetrievedPath(
+                    nodes=[head, tail],
+                    node_names=[entity_names.get(head, head), entity_names.get(tail, tail)],
+                    edges=[
+                        {
+                            "relation_id": relation.relation_id,
+                            "head": head,
+                            "tail": tail,
+                            "sign": relation.sign,
+                            "domain_conf": relation.domain_conf,
+                            "evidence_count": relation.evidence_count,
+                            "relation_type": relation.relation_type,
+                            "source": "domain",
+                        }
+                    ],
+                    source="domain",
+                    path_length=1,
+                )
+            )
+        return paths
+
     def _build_domain_graph(self) -> Dict[str, List[Dict]]:
-        """Domain 그래프 구조 생성"""
-        graph = {}
-        
+        graph: Dict[str, List[Dict]] = {}
         if not self.domain:
             return graph
-        
-        for rel in self.domain.get_all_relations().values():
-            if rel.head_id not in graph:
-                graph[rel.head_id] = []
-            
-            graph[rel.head_id].append({
-                "tail": rel.tail_id,
-                "relation_id": rel.relation_id,
-                "sign": rel.sign,
-                "domain_conf": rel.domain_conf,
-                "evidence_count": rel.evidence_count,
-                "relation_type": rel.relation_type,
-            })
-        
+
+        for relation in self.domain.get_all_relations().values():
+            graph.setdefault(relation.head_id, []).append(
+                {
+                    "tail": relation.tail_id,
+                    "relation_id": relation.relation_id,
+                    "sign": relation.sign,
+                    "domain_conf": relation.domain_conf,
+                    "evidence_count": relation.evidence_count,
+                    "relation_type": relation.relation_type,
+                }
+            )
         return graph
-    
+
     def _find_paths_bfs(
         self,
         start: str,
@@ -162,88 +146,88 @@ class GraphRetrieval:
         entity_names: Dict[str, str],
         source: str,
     ) -> List[RetrievedPath]:
-        """BFS로 경로 탐색"""
         if start == end:
             return []
-        
-        paths = []
-        queue = deque([(start, [start], [])])  # (node, path, edges)
+
+        paths: List[RetrievedPath] = []
+        queue = deque([(start, [start], [])])
         visited_paths: Set[tuple] = set()
-        
+
         while queue and len(paths) < self.max_paths:
-            current, path, edges = queue.popleft()
-            
-            if len(path) > self.max_path_length:
+            current, node_path, edge_path = queue.popleft()
+            if len(node_path) > self.max_path_length:
                 continue
-            
+
             for edge_info in graph.get(current, []):
                 next_node = edge_info["tail"]
-                
-                if next_node in path:  # 사이클 방지
+                if next_node in node_path:
                     continue
-                
-                new_path = path + [next_node]
-                new_edges = edges + [{
-                    "relation_id": edge_info["relation_id"],
-                    "head": current,
-                    "tail": next_node,
-                    "sign": edge_info["sign"],
-                    "domain_conf": edge_info["domain_conf"],
-                    "evidence_count": edge_info.get("evidence_count", 1),
-                    "source": source,
-                }]
-                
+
+                new_nodes = node_path + [next_node]
+                new_edges = edge_path + [
+                    {
+                        "relation_id": edge_info["relation_id"],
+                        "head": current,
+                        "tail": next_node,
+                        "sign": edge_info["sign"],
+                        "domain_conf": edge_info["domain_conf"],
+                        "evidence_count": edge_info.get("evidence_count", 1),
+                        "relation_type": edge_info.get("relation_type", "affects"),
+                        "source": source,
+                    }
+                ]
+
                 if next_node == end:
-                    path_key = tuple(new_path)
-                    if path_key not in visited_paths:
-                        visited_paths.add(path_key)
-                        retrieved = RetrievedPath(
-                            nodes=new_path,
-                            node_names=[entity_names.get(n, n) for n in new_path],
+                    path_key = tuple(new_nodes)
+                    if path_key in visited_paths:
+                        continue
+                    visited_paths.add(path_key)
+                    paths.append(
+                        RetrievedPath(
+                            nodes=new_nodes,
+                            node_names=[entity_names.get(node, node) for node in new_nodes],
                             edges=new_edges,
                             source=source,
-                            path_length=len(new_path) - 1,
+                            path_length=len(new_nodes) - 1,
                         )
-                        paths.append(retrieved)
+                    )
                 else:
-                    queue.append((next_node, new_path, new_edges))
-        
+                    queue.append((next_node, new_nodes, new_edges))
+
         return paths
-    
+
     def _search_personal(
         self,
         head: Optional[str],
         tail: Optional[str],
         entity_names: Dict[str, str],
     ) -> List[RetrievedPath]:
-        """Personal KG 검색"""
-        paths = []
-        
+        paths: List[RetrievedPath] = []
         if not self.personal or not head:
             return paths
-        
-        # Direct edge 검색
+
         if tail:
-            for rel in self.personal.get_all_relations().values():
-                if rel.head_id == head and rel.tail_id == tail:
-                    path = RetrievedPath(
-                        nodes=[head, tail],
-                        node_names=[
-                            entity_names.get(head, head),
-                            entity_names.get(tail, tail),
-                        ],
-                        edges=[{
-                            "relation_id": rel.relation_id,
-                            "head": head,
-                            "tail": tail,
-                            "sign": rel.sign,
-                            "pcs_score": rel.pcs_score,
-                            "personal_weight": rel.personal_weight,
-                            "source": "personal",
-                        }],
-                        source="personal",
-                        path_length=1,
+            for relation in self.personal.get_all_relations().values():
+                if relation.head_id == head and relation.tail_id == tail:
+                    paths.append(
+                        RetrievedPath(
+                            nodes=[head, tail],
+                            node_names=[entity_names.get(head, head), entity_names.get(tail, tail)],
+                            edges=[
+                                {
+                                    "relation_id": relation.relation_id,
+                                    "head": head,
+                                    "tail": tail,
+                                    "sign": relation.sign,
+                                    "pcs_score": relation.pcs_score,
+                                    "personal_weight": relation.personal_weight,
+                                    "relation_type": relation.relation_type,
+                                    "source": "personal",
+                                }
+                            ],
+                            source="personal",
+                            path_length=1,
+                        )
                     )
-                    paths.append(path)
-        
-        return paths[:self.max_paths]
+
+        return paths[: self.max_paths]

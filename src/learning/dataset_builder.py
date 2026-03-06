@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 SOURCE_CONFIDENCE = {
     DataSource.DOMAIN_STATIC: 1.0,
     DataSource.DOMAIN_DYNAMIC: 0.8,
+    DataSource.COUNCIL_REVIEW: 0.95,
     DataSource.USER_QA: 0.9,
     DataSource.TEACHER_LLM: 0.7,
     DataSource.VALIDATION_LOG: 0.6,
@@ -48,6 +49,7 @@ class TrainingDatasetBuilder:
         self._validation_logs: List[Dict] = []
         self._drift_logs: List[Dict] = []
         self._query_logs: List[Dict] = []
+        self._council_logs: List[Dict] = []
         self._user_qa_logs: List[Dict] = []
         
         # 데이터셋 스냅샷 저장
@@ -67,6 +69,11 @@ class TrainingDatasetBuilder:
         """Query Reasoning 로그 추가"""
         log["logged_at"] = datetime.now()
         self._query_logs.append(log)
+
+    def add_council_log(self, log: Dict):
+        """Council-reviewed candidate log."""
+        log["logged_at"] = datetime.now()
+        self._council_logs.append(log)
     
     def add_user_qa(self, sample: Dict):
         """User QA 피드백 추가"""
@@ -80,6 +87,7 @@ class TrainingDatasetBuilder:
         include_domain: bool = True,
         include_personal: bool = True,
         include_logs: bool = True,
+        include_council: bool = True,
         include_user_qa: bool = True,
     ) -> DatasetSnapshot:
         """
@@ -113,6 +121,11 @@ class TrainingDatasetBuilder:
             log_samples = self._build_from_logs(task_type)
             samples.extend(log_samples)
             source_counts["logs"] = len(log_samples)
+
+        if include_council:
+            council_samples = self._build_from_council(task_type)
+            samples.extend(council_samples)
+            source_counts["council"] = len(council_samples)
         
         # User QA에서 샘플 생성
         if include_user_qa:
@@ -228,6 +241,40 @@ class TrainingDatasetBuilder:
                 samples.append(sample)
         
         return samples
+
+    def _build_from_council(self, task_type: TaskType) -> List[TrainingSample]:
+        """Build high-confidence relation labels from council logs."""
+        samples = []
+
+        if task_type != TaskType.RELATION:
+            return samples
+
+        for log in self._council_logs:
+            if log.get("status") not in {"COUNCIL_APPROVED", "AUTO_APPROVED"}:
+                continue
+            if not log.get("final_relation_type"):
+                continue
+
+            sample = TrainingSample(
+                text=log.get("citation_text", ""),
+                fragment_id=log.get("chunk_id"),
+                task_type=task_type,
+                labels={
+                    "head": log.get("head_entity_id"),
+                    "tail": log.get("tail_entity_id"),
+                    "relation_type": log.get("final_relation_type"),
+                    "sign": log.get("final_polarity"),
+                    "status": log.get("status"),
+                    "council_reviewed": True,
+                },
+                source=DataSource.COUNCIL_REVIEW,
+                label_confidence=float(log.get("final_confidence", 0.0))
+                * SOURCE_CONFIDENCE[DataSource.COUNCIL_REVIEW],
+                source_relation_id=log.get("candidate_id"),
+            )
+            samples.append(sample)
+
+        return samples
     
     def _build_from_user_qa(self, task_type: TaskType) -> List[TrainingSample]:
         """User QA에서 샘플 생성"""
@@ -270,5 +317,6 @@ class TrainingDatasetBuilder:
             "validation_logs": len(self._validation_logs),
             "drift_logs": len(self._drift_logs),
             "query_logs": len(self._query_logs),
+            "council_logs": len(self._council_logs),
             "user_qa_logs": len(self._user_qa_logs),
         }

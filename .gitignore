@@ -1,0 +1,9 @@
+venv/
+.omx/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.pyo
+.coverage
+.mypy_cache/
+.ruff_cache/

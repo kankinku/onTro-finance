@@ -201,7 +201,7 @@ class DomainProcessResult(BaseModel):
     raw_edge_id: str
     
     # 최종 결정
-    final_destination: str  # "domain", "personal", "log"
+    final_destination: str  # "domain", "personal", "log", "council"
     
     # 각 단계 결과
     intake_result: Optional[DomainCandidate] = None
@@ -212,3 +212,5 @@ class DomainProcessResult(BaseModel):
     
     # 최종 관계 ID (Domain에 저장된 경우)
     domain_relation_id: Optional[str] = None
+    council_candidate_id: Optional[str] = None
+    council_case_id: Optional[str] = None

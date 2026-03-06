@@ -5,6 +5,7 @@ from .trainer import StudentValidatorTrainer
 from .policy_learner import PolicyWeightLearner
 from .deployment import ReviewDeploymentManager
 from .dashboard import LearningDashboard
+from .event_store import LearningEventStore
 
 __all__ = [
     "TrainingDatasetBuilder",
@@ -13,4 +14,5 @@ __all__ = [
     "PolicyWeightLearner",
     "ReviewDeploymentManager",
     "LearningDashboard",
+    "LearningEventStore",
 ]

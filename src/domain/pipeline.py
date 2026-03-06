@@ -4,7 +4,8 @@ Domain Pipeline - Refactored for Transaction
 import logging
 from typing import List, Optional, Dict, Any
 
-from src.bootstrap import get_transaction_manager
+from src.bootstrap import get_council_service, get_transaction_manager
+from src.council.models import CandidateStatus
 from src.storage.transaction_manager import Transaction
 from src.shared.models import RawEdge, ResolvedEntity
 from src.validation.models import ValidationResult, ValidationDestination
@@ -45,6 +46,7 @@ class DomainPipeline:
         self.drift_detector = DomainDriftDetector(self.dynamic_update)
         
         self.tx_manager = get_transaction_manager()
+        self.council = get_council_service()
         
         # 통계
         self._stats = {
@@ -57,6 +59,7 @@ class DomainPipeline:
             "new_relations": 0,
             "updated_relations": 0,
             "conflicts_resolved": 0,
+            "council_pending": 0,
         }
         
         # Personal 후보 저장
@@ -100,7 +103,27 @@ class DomainPipeline:
         
         if static_result.action == DomainAction.STRENGTHEN_STATIC:
             self._stats["static_matched"] += 1
-        
+
+        council_candidate = self.council.submit_candidate(
+            edge=edge,
+            validation_result=validation_result,
+            resolved_entities=resolved_entities,
+            source_document_id=edge.fragment_id,
+            chunk_id=edge.fragment_id,
+        )
+
+        if council_candidate.status == CandidateStatus.COUNCIL_PENDING:
+            self._stats["council_pending"] += 1
+            return DomainProcessResult(
+                candidate_id=candidate.candidate_id,
+                raw_edge_id=edge.raw_edge_id,
+                final_destination="council",
+                intake_result=candidate,
+                static_result=static_result,
+                council_candidate_id=council_candidate.candidate_id,
+                council_case_id=council_candidate.council_case_id,
+            )
+
         # Step 3: Dynamic Update (with TX)
         dynamic_result = self.dynamic_update.update(candidate, tx=tx)
         

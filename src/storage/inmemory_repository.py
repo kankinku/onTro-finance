@@ -32,10 +32,9 @@ class InMemoryGraphRepository(GraphRepository):
         props: Dict[str, Any],
     ) -> None:
         if entity_id in self._entities:
-            # 기존 props 병합
             existing = self._entities[entity_id]
             existing["labels"] = labels
-            existing["props"].update(props)
+            existing["props"] = props.copy()
         else:
             self._entities[entity_id] = {
                 "id": entity_id,
@@ -53,8 +52,7 @@ class InMemoryGraphRepository(GraphRepository):
         key = (src_id, rel_type, dst_id)
         
         if key in self._relations:
-            # 기존 props 병합
-            self._relations[key].update(props)
+            self._relations[key] = props.copy()
         else:
             self._relations[key] = props.copy()
             self._edges_out[src_id].append((rel_type, dst_id))

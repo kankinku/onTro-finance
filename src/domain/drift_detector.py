@@ -68,13 +68,11 @@ class DomainDriftDetector:
             relation_id=relation.relation_id,
             drift_signal=drift_signal,
             is_drift=is_drift,
+            conflict_score=conflict_score,
+            opposite_rate=opposite_rate,
+            decay_score=decay_score,
+            semantic_score=semantic_score,
             needs_qa=needs_qa,
-            details={
-                "conflict": conflict_score,
-                "opposite": opposite_rate,
-                "decay": decay_score,
-                "semantic": semantic_score,
-            }
         )
         
         if is_drift:

@@ -1,0 +1,25 @@
+thresholds:
+  auto_approve: 0.75
+  auto_reject: 0.40
+  council_min: 0.60
+
+limits:
+  max_turns: 7
+  max_repeated_defers: 2
+
+high_impact_entities:
+  - Policy_Rate
+  - CPI
+  - Real_Yields
+  - Credit_Spreads
+  - Liquidity
+  - US_Dollar
+  - Crude_Oil
+  - Growth_Stocks
+  - Government_Bonds
+  - Gold
+  - Energy_Sector
+  - Airlines_Sector
+  - Risk_Aversion
+
+default_source_type: research_note

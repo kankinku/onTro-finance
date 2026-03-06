@@ -1,0 +1,176 @@
+# Domain Dictionary (Alias Table)
+# Entity Resolution의 1순위 매핑 규칙 (세종시 교통 도메인)
+
+entities:
+  # 주요 지역
+  Sejong_City:
+    canonical_name: "세종시"
+    type: Location
+    subtype: AdminArea
+    aliases:
+      - "세종특별자치시"
+      - "행복도시"
+      - "행정중심복합도시"
+
+  Naseong_Dong:
+    canonical_name: "나성동"
+    type: Location
+    subtype: AdminArea
+    aliases:
+      - "나성"
+      - "국세청 인근"
+      - "2-4생활권"
+
+  Jochiwon:
+    canonical_name: "조치원읍"
+    type: Location
+    subtype: AdminArea
+    aliases:
+      - "조치원"
+      - "조치원역"
+      - "구도심"
+
+  Gov_Complex:
+    canonical_name: "정부세종청사"
+    type: Location
+    subtype: Landmark
+    aliases:
+      - "청사"
+      - "정부청사"
+      - "어진동 청사"
+
+  # 주요 도로
+  Route_1:
+    canonical_name: "1번 국도"
+    type: Location
+    subtype: Road
+    aliases:
+      - "국도 1호선"
+      - "조치원로" # (구간에 따라)
+
+  Hannuri_Blvd:
+    canonical_name: "한누리대로"
+    type: Location
+    subtype: Road
+    aliases:
+      - "BRT 도로"
+      - "내부순환도로" # (일부)
+
+  # 교통 수단
+  BRT:
+    canonical_name: "BRT"
+    type: Infrastructure
+    subtype: TransitMode
+    aliases:
+      - "간선급행버스"
+      - "바로타"
+      - "비알티"
+
+  # 날씨/환경
+  Heavy_Rain:
+    canonical_name: "폭우"
+    type: Condition
+    subtype: Weather
+    aliases:
+      - "호우"
+      - "많은 비"
+      - "장마"
+      - "집중호우"
+
+  Heavy_Snow:
+    canonical_name: "폭설"
+    type: Condition
+    subtype: Weather
+    aliases:
+      - "대설"
+      - "많은 눈"
+      - "눈폭탄"
+
+  Icy_Road:
+    canonical_name: "결빙"
+    type: Condition
+    subtype: RoadStatus
+    aliases:
+      - "빙판길"
+      - "도로 살얼음"
+      - "블랙아이스"
+      - "미끄러운 도로"
+
+  Fog:
+    canonical_name: "안개"
+    type: Condition
+    subtype: Weather
+    aliases:
+      - "짙은 안개"
+      - "박무"
+      - "연무"
+
+  # 교통 상태/현상
+  Congestion:
+    canonical_name: "정체"
+    type: Phenomenon
+    subtype: FlowState
+    aliases:
+      - "혼잡"
+      - "밀림"
+      - "거북이 걸음"
+      - "차량 꼬리"
+      - "지체"
+
+  Accident:
+    canonical_name: "교통사고"
+    type: Event
+    subtype: Accident
+    aliases:
+      - "사고"
+      - "추돌"
+      - "접촉사고"
+
+  Construction:
+    canonical_name: "도로공사"
+    type: Event
+    subtype: Construction
+    aliases:
+      - "보수공사"
+      - "공사"
+      - "차선 통제 공사"
+
+  Rush_Hour:
+    canonical_name: "출퇴근 시간"
+    type: Phenomenon
+    subtype: Pattern
+    aliases:
+      - "러시아워"
+      - "출근길"
+      - "퇴근길"
+
+
+  Traffic_Speed:
+    canonical_name: "교통속도"
+    type: Quantity
+    subtype: Speed
+    aliases:
+      - "평균 속도"
+      - "평균 주행속도"
+      - "선호 속도"
+      - "교통 속도"
+
+  Travel_Time:
+    canonical_name: "통행 시간"
+    type: Quantity
+    subtype: DelayTime
+    aliases:
+      - "이동 시간"
+      - "도착 시간"
+      - "지연 시간"
+      - "여정 시간"
+
+  Bus_Headway:
+    canonical_name: "버스 배차간격"
+    type: Quantity
+    subtype: DelayTime
+    aliases:
+      - "배차 간격"
+      - "운행 간격"
+      - "버스 간격"
+      - "배차 시간"

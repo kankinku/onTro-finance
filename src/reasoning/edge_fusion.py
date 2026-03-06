@@ -132,7 +132,7 @@ class EdgeWeightFusion:
             edge_id=edge.get("relation_id", ""),
             head_id=edge.get("head", ""),
             tail_id=edge.get("tail", ""),
-            relation_type=edge.get("relation_type", "Affect"),
+            relation_type=edge.get("relation_type", "affects"),
             sign=edge.get("sign", "+"),
             domain_weight=domain_weight,
             personal_weight=personal_weight,
