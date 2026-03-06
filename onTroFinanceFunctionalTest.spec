@@ -11,7 +11,7 @@ a = Analysis(
     ['functional_test_runner.py'],
     pathex=[],
     binaries=[],
-    datas=[('README.md', '.'), ('config', 'config'), ('data', 'data'), ('docs', 'docs'), ('tests', 'tests')],
+    datas=[('.env.example', '.'), ('README.md', '.'), ('config', 'config'), ('data', 'data'), ('docs', 'docs'), ('tests', 'tests')],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},

@@ -79,7 +79,7 @@
  [],
  False,
  False,
- 1772802531,
+ 1772803164,
  [('run.exe',
    'C:\\Users\\hanji\\AppData\\Local\\Temp\\ontro-finance-build-venv\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
    'EXECUTABLE')],

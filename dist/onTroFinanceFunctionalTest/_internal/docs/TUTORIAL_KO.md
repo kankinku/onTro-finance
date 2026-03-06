@@ -15,6 +15,36 @@ python -m venv "$env:TEMP\ontro-finance-venv"
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" -m pip install -r requirements.txt
 ```
 
+### `.env` 파일 하나로 관리
+
+프로젝트 루트에서 `.env.example`을 복사해 `.env`를 만들고 여기에 모든 환경변수를 모아두면 된다.
+
+```powershell
+Copy-Item .env.example .env
+```
+
+예시:
+
+```dotenv
+ONTRO_STORAGE_BACKEND=neo4j
+ONTRO_NEO4J_URI=bolt://localhost:7687
+ONTRO_NEO4J_USER=neo4j
+ONTRO_NEO4J_PASSWORD=password
+ONTRO_NEO4J_DATABASE=neo4j
+ONTRO_LOAD_SAMPLE_DATA=false
+ONTRO_COUNCIL_AUTO_ENABLED=true
+ONTRO_COUNCIL_POLL_SECONDS=5
+ONTRO_ENABLE_CALLBACKS=false
+ONTRO_CALLBACK_ALLOWED_HOSTS=example.com,api.example.com
+ONTRO_CALLBACK_ALLOWED_SCHEMES=https
+OPENAI_API_KEY=
+GITHUB_COPILOT_ACCESS_TOKEN=
+GITHUB_COPILOT_CLIENT_ID=
+GITHUB_COPILOT_CLIENT_SECRET=
+```
+
+애플리케이션과 스크립트는 시작 시 `.env`를 자동으로 읽는다. 이미 셸에 같은 이름의 환경변수가 있으면 셸 값이 우선한다.
+
 ## 2. Neo4j 준비
 
 기본 백엔드는 `neo4j`입니다. 접속 정보가 없거나 health check가 실패하면 서버는 startup에서 실패합니다.

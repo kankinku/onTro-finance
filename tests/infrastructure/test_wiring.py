@@ -1,10 +1,12 @@
 """Wiring Integration 테스트 - 인프라와 도메인 연결 검증"""
+import os
 import pytest
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from config.settings import load_project_env
 from src.bootstrap import (
     build_graph_repository,
     get_graph_repository,
@@ -73,6 +75,39 @@ class TestBootstrapWiring:
         )
 
         assert captured["user"] == "legacy-user"
+
+    def test_dotenv_file_can_supply_runtime_env(self, monkeypatch, tmp_path):
+        env_file = tmp_path / ".env"
+        env_file.write_text(
+            "\n".join(
+                [
+                    "ONTRO_STORAGE_BACKEND=inmemory",
+                    "ONTRO_NEO4J_URI=bolt://from-env:7687",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("ONTRO_STORAGE_BACKEND", raising=False)
+        monkeypatch.delenv("ONTRO_NEO4J_URI", raising=False)
+
+        loaded = load_project_env(force=True)
+
+        assert loaded == env_file.resolve()
+        assert os.environ["ONTRO_NEO4J_URI"] == "bolt://from-env:7687"
+        assert build_graph_repository({"storage": {"backend": "neo4j"}}).__class__.__name__ == "InMemoryGraphRepository"
+
+    def test_dotenv_does_not_override_existing_shell_env(self, monkeypatch, tmp_path):
+        env_file = tmp_path / ".env"
+        env_file.write_text("ONTRO_STORAGE_BACKEND=neo4j\n", encoding="utf-8")
+
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("ONTRO_STORAGE_BACKEND", "inmemory")
+
+        load_project_env(force=True)
+
+        assert os.environ["ONTRO_STORAGE_BACKEND"] == "inmemory"
     
     def test_get_transaction_manager(self):
         tx_mgr = get_transaction_manager()

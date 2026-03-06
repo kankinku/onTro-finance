@@ -22,6 +22,7 @@ try {
         --collect-submodules src `
         --collect-submodules tests `
         --collect-submodules config `
+        --add-data ".env.example;." `
         --add-data "README.md;." `
         --add-data "config;config" `
         --add-data "data;data" `

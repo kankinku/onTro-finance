@@ -21,6 +21,33 @@
 - 별도 가상환경
 - Neo4j 접속 정보 설정
 
+## `.env`로 한 번에 관리
+
+환경변수는 개별 `$env:` 명령으로 넣지 말고 프로젝트 루트의 `.env` 파일 하나로 관리하면 된다.
+
+```powershell
+Copy-Item .env.example .env
+```
+
+대표 예시:
+
+```dotenv
+ONTRO_STORAGE_BACKEND=neo4j
+ONTRO_NEO4J_URI=bolt://localhost:7687
+ONTRO_NEO4J_USER=neo4j
+ONTRO_NEO4J_PASSWORD=password
+ONTRO_NEO4J_DATABASE=neo4j
+ONTRO_LOAD_SAMPLE_DATA=false
+ONTRO_COUNCIL_AUTO_ENABLED=true
+ONTRO_ENABLE_CALLBACKS=false
+OPENAI_API_KEY=
+GITHUB_COPILOT_ACCESS_TOKEN=
+GITHUB_COPILOT_CLIENT_ID=
+GITHUB_COPILOT_CLIENT_SECRET=
+```
+
+애플리케이션은 시작 시 `.env`를 자동 로드한다. 운영체제 환경변수에 이미 값이 있으면 그 값이 우선한다.
+
 ```powershell
 python -m venv "$env:TEMP\ontro-finance-venv"
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" -m pip install -r requirements.txt

@@ -4,9 +4,74 @@ Centralized application settings.
 from functools import lru_cache
 import os
 from pathlib import Path
+import sys
 
 from pydantic import BaseModel, ConfigDict, Field
 import yaml
+
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_ENV_LOADED = False
+
+
+def _parse_env_value(raw_value: str) -> str:
+    value = raw_value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+        value = value[1:-1]
+    return value
+
+
+def _iter_env_paths() -> list[Path]:
+    candidates: list[Path] = []
+
+    if getattr(sys, "frozen", False):
+        candidates.append(Path(sys.executable).resolve().parent / ".env")
+
+    candidates.append(Path.cwd() / ".env")
+    candidates.append(_PROJECT_ROOT / ".env")
+
+    ordered: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if resolved not in seen:
+            seen.add(resolved)
+            ordered.append(resolved)
+    return ordered
+
+
+def load_project_env(force: bool = False) -> Path | None:
+    global _ENV_LOADED
+
+    if _ENV_LOADED and not force:
+        for env_path in _iter_env_paths():
+            if env_path.exists():
+                return env_path
+        return None
+
+    loaded_path: Path | None = None
+    for env_path in _iter_env_paths():
+        if not env_path.exists():
+            continue
+
+        for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, raw_value = line.split("=", 1)
+            key = key.strip()
+            if not key:
+                continue
+            os.environ.setdefault(key, _parse_env_value(raw_value))
+
+        loaded_path = env_path
+        break
+
+    _ENV_LOADED = True
+    return loaded_path
+
+
+load_project_env()
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -69,7 +134,7 @@ class CallbackSettings(BaseModel):
 class Settings(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    project_root: Path = Field(default_factory=lambda: Path(__file__).resolve().parent.parent)
+    project_root: Path = Field(default_factory=lambda: _PROJECT_ROOT)
 
     ollama: OllamaSettings = Field(default_factory=OllamaSettings)
     extraction: ExtractionSettings = Field(default_factory=ExtractionSettings)

@@ -8,12 +8,15 @@ import logging
 from typing import Optional
 from pathlib import Path
 
+from config.settings import load_project_env
 from src.storage.graph_repository import GraphRepository
 from src.storage.inmemory_repository import InMemoryGraphRepository
 from src.storage.transaction_manager import KGTransactionManager
 
 logger = logging.getLogger(__name__)
 _DEPRECATED_NEO4J_USER_ENV = "ONTRO_NEO4J_USERNAME"
+
+load_project_env()
 
 
 def load_config(config_path: Optional[str] = None) -> dict:
