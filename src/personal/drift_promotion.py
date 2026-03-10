@@ -253,6 +253,7 @@ class PersonalDriftAnalyzer:
         })
         
         # 후보 목록에서 제거
+        self.pkg.flush()
         if relation_id in self._promotion_candidates:
             self._promotion_candidates.remove(relation_id)
         

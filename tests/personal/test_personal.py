@@ -244,6 +244,41 @@ class TestPersonalKGUpdate:
         assert relation.occurrence_count == 2
         assert len(relation.history) == 2  # 히스토리 유지
 
+    def test_persists_relations_to_disk_across_instances(self, tmp_path):
+        """Personal relation을 파일에 저장하고 다시 불러온다"""
+        storage_path = tmp_path / "personal" / "test_user.json"
+        pkg = PersonalKGUpdate(storage_path=storage_path)
+
+        from src.personal.models import PersonalCandidate, PCSResult
+
+        candidate = PersonalCandidate(
+            raw_edge_id="R001",
+            head_canonical_id="A", head_canonical_name="A",
+            tail_canonical_id="B", tail_canonical_name="B",
+            relation_type="Affect", polarity="+",
+            semantic_tag="sem_weak",
+            student_conf=0.6, combined_conf=0.5,
+        )
+
+        pcs_result = PCSResult(
+            candidate_id=candidate.candidate_id,
+            pcs_score=0.5,
+            personal_label=PersonalLabel.WEAK_BELIEF,
+        )
+
+        relation_id, is_new = pkg.update(candidate, pcs_result)
+
+        assert is_new is True
+        assert storage_path.exists() is True
+
+        reloaded_pkg = PersonalKGUpdate(storage_path=storage_path)
+        relation = reloaded_pkg.get_relation(relation_id)
+
+        assert relation is not None
+        assert relation.head_id == "A"
+        assert relation.tail_id == "B"
+        assert relation.occurrence_count == 1
+
 
 class TestPersonalDriftAnalyzer:
     """Personal Drift Analyzer 테스트"""

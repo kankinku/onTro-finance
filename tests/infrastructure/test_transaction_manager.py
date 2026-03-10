@@ -1,4 +1,5 @@
 """Transaction manager regression tests for rollback safety."""
+
 import pytest
 import sys
 from pathlib import Path
@@ -78,3 +79,32 @@ class TestKGTransactionManager:
         assert repo.get_entity("Gold") is None
         assert repo.get_entity("CPI") is None
         assert repo.get_relation("Gold", "domain:correlates_with", "CPI") is None
+
+    def test_rollback_restores_relations_deleted_with_entity(self):
+        repo = InMemoryGraphRepository()
+        tx_manager = KGTransactionManager(repo)
+
+        repo.upsert_entity("Policy_Rate", ["DomainEntity"], {"name": "policy rate"})
+        repo.upsert_entity("Growth_Stocks", ["DomainEntity"], {"name": "growth stocks"})
+        repo.upsert_entity("Dollar", ["DomainEntity"], {"name": "dollar"})
+        repo.upsert_relation(
+            "Policy_Rate",
+            "domain:pressures",
+            "Growth_Stocks",
+            {"relation_id": "rel_1", "evidence_count": 1},
+        )
+        repo.upsert_relation(
+            "Dollar",
+            "domain:supports",
+            "Policy_Rate",
+            {"relation_id": "rel_2", "evidence_count": 2},
+        )
+
+        with pytest.raises(RuntimeError):
+            with tx_manager.transaction() as tx:
+                tx_manager.delete_entity(tx, "Policy_Rate")
+                raise RuntimeError("force rollback")
+
+        assert repo.get_entity("Policy_Rate") is not None
+        assert repo.get_relation("Policy_Rate", "domain:pressures", "Growth_Stocks") is not None
+        assert repo.get_relation("Dollar", "domain:supports", "Policy_Rate") is not None

@@ -3,6 +3,7 @@ Personal Pipeline
 전체 Personal Sector 워크플로우를 통합
 """
 import logging
+from pathlib import Path
 from typing import List, Optional, Dict
 
 from src.shared.models import RawEdge, ResolvedEntity
@@ -36,12 +37,13 @@ class PersonalPipeline:
         user_id: str = "default_user",
         static_guard: Optional[StaticDomainGuard] = None,
         dynamic_domain: Optional[DynamicDomainUpdate] = None,
+        storage_path: Optional[str | Path] = None,
     ):
         self.user_id = user_id
         
         # 모듈 초기화
         self.intake = PersonalCandidateIntake(user_id=user_id)
-        self.pkg = PersonalKGUpdate()
+        self.pkg = PersonalKGUpdate(storage_path=storage_path)
         self.pcs = PCSClassifier(domain=dynamic_domain)
         self.drift_analyzer = PersonalDriftAnalyzer(
             pkg=self.pkg,

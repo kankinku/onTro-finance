@@ -1,4 +1,5 @@
 """Registry for multi-provider council members."""
+from collections import defaultdict
 from typing import Dict, List, Mapping, Optional
 
 from pydantic import BaseModel, Field
@@ -17,10 +18,20 @@ class CouncilMemberDefinition(BaseModel):
     member_id: str
     role: CouncilRole
     provider: ProviderKind
-    model_name: str
+    model_name: Optional[str] = None
     auth: ProviderAuthConfig
     enabled: bool = True
     metadata: Dict[str, str] = Field(default_factory=dict)
+    resolved_model_name: Optional[str] = None
+    available_models: List[str] = Field(default_factory=list)
+
+    @property
+    def effective_model_name(self) -> Optional[str]:
+        configured_model = (self.model_name or "").strip()
+        if configured_model:
+            return configured_model
+        resolved_model = (self.resolved_model_name or "").strip()
+        return resolved_model or None
 
 
 class CouncilMemberRegistry:
@@ -41,7 +52,7 @@ class CouncilMemberRegistry:
                 member_id=item["member_id"],
                 role=CouncilRole(item["role"]),
                 provider=provider,
-                model_name=item["model_name"],
+                model_name=item.get("model_name"),
                 enabled=item.get("enabled", True),
                 metadata=item.get("metadata", {}),
                 auth=ProviderAuthConfig(
@@ -59,6 +70,37 @@ class CouncilMemberRegistry:
         if enabled_only:
             members = [member for member in members if member.enabled]
         return members
+
+    def assign_models(self, connection_results: Mapping[str, ProviderConnectionResult], enabled_only: bool = True) -> None:
+        usage_by_provider: Dict[ProviderKind, Dict[str, int]] = defaultdict(dict)
+        members = self.list_members(enabled_only=enabled_only)
+
+        for member in members:
+            result = connection_results.get(member.member_id)
+            member.available_models = list(result.available_models) if result else []
+            member.resolved_model_name = None
+
+        for member in members:
+            configured_model = (member.model_name or "").strip()
+            if not configured_model:
+                continue
+            provider_usage = usage_by_provider[member.provider]
+            provider_usage[configured_model] = provider_usage.get(configured_model, 0) + 1
+
+        for member in members:
+            if member.effective_model_name:
+                continue
+            if not member.available_models:
+                continue
+
+            provider_usage = usage_by_provider[member.provider]
+            ranked_models = sorted(
+                enumerate(member.available_models),
+                key=lambda item: (provider_usage.get(item[1], 0), item[0]),
+            )
+            chosen_model = ranked_models[0][1]
+            member.resolved_model_name = chosen_model
+            provider_usage[chosen_model] = provider_usage.get(chosen_model, 0) + 1
 
     def test_member_connection(
         self,

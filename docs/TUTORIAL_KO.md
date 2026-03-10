@@ -6,9 +6,10 @@
 
 권장 기준:
 
-- Python 3.11 이상
+- Python 3.11 또는 3.12
+- Python 3.14는 현재 고정된 백엔드 의존성(`pydantic==2.7.4`) 때문에 지원하지 않음
 - 별도 가상환경 사용
-- 로컬 또는 원격 Neo4j 준비
+- 로컬 체험은 Neo4j 없이 시작 가능
 
 ```powershell
 python -m venv "$env:TEMP\ontro-finance-venv"
@@ -23,7 +24,19 @@ python -m venv "$env:TEMP\ontro-finance-venv"
 Copy-Item .env.example .env
 ```
 
-예시:
+가장 쉬운 로컬 시작용 예시:
+
+```dotenv
+ONTRO_STORAGE_BACKEND=inmemory
+ONTRO_COUNCIL_AUTO_ENABLED=false
+ONTRO_ENABLE_CALLBACKS=false
+OPENAI_API_KEY=
+GITHUB_COPILOT_ACCESS_TOKEN=
+GITHUB_COPILOT_CLIENT_ID=
+GITHUB_COPILOT_CLIENT_SECRET=
+```
+
+Neo4j 기반 운영 경로 예시:
 
 ```dotenv
 ONTRO_STORAGE_BACKEND=neo4j
@@ -45,7 +58,22 @@ GITHUB_COPILOT_CLIENT_SECRET=
 
 애플리케이션과 스크립트는 시작 시 `.env`를 자동으로 읽는다. 이미 셸에 같은 이름의 환경변수가 있으면 셸 값이 우선한다.
 
-## 2. Neo4j 준비
+## 2. 권장 로컬 시작
+
+```powershell
+& "$env:TEMP\ontro-finance-venv\Scripts\python.exe" onTroFinanceStarter.py
+```
+
+`onTroFinanceStarter.py`는 기본적으로 아래 동작을 수행합니다.
+
+- `ONTRO_STORAGE_BACKEND=inmemory`
+- operations console과 API를 같은 프로세스에서 실행
+- `frontend/dist`가 있으면 정적 SPA를 함께 서비스
+- 브라우저 자동 오픈
+
+EXE 빌드나 starter 상세는 `docs/OPS_CONSOLE_STARTER.md`를 참고하세요.
+
+## 3. Neo4j 준비
 
 기본 백엔드는 `neo4j`입니다. 접속 정보가 없거나 health check가 실패하면 서버는 startup에서 실패합니다.
 
@@ -75,7 +103,7 @@ docker run --name ontro-neo4j `
 $env:ONTRO_STORAGE_BACKEND = "inmemory"
 ```
 
-## 3. 서버 실행
+## 4. Neo4j 기반 서버 실행
 
 ```powershell
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" main.py
@@ -89,7 +117,7 @@ $env:ONTRO_STORAGE_BACKEND = "inmemory"
 - `ONTRO_COUNCIL_AUTO_ENABLED=true`일 때 council auto worker 시작
 - sample seed는 기본 비활성화
 
-## 4. 샘플 seed
+## 5. 샘플 seed
 
 샘플 문서를 startup 시 적재하려면 명시적으로 켭니다.
 
@@ -98,7 +126,7 @@ $env:ONTRO_LOAD_SAMPLE_DATA = "true"
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" main.py
 ```
 
-## 5. callback 보안
+## 6. callback 보안
 
 `callback_url`은 기본 비활성화입니다. 사용하려면 아래 값을 함께 설정합니다.
 
@@ -114,7 +142,7 @@ $env:ONTRO_CALLBACK_ALLOWED_HOSTS = "example.com,api.example.com"
 - loopback, private IP, 내부망 해석 주소는 거부
 - URL 내 사용자명과 비밀번호는 거부
 
-## 6. ingest와 council
+## 7. ingest와 council
 
 공식 ingest API:
 
@@ -146,7 +174,7 @@ council 관련 확인 키:
 - `destinations.council`
 - `council_case_ids`
 
-## 7. 상태 확인
+## 8. 상태 확인
 
 `/status`는 아래 공식 카운터를 제공합니다.
 
@@ -173,16 +201,28 @@ council 관련 확인 키:
 
 `/healthz`는 readiness와 함께 storage, council worker 준비 상태를 반환합니다.
 
-## 8. Council provider 설정
+## 9. Council provider 설정
 
 `config/council_members.yaml` 기준 지원 범위:
 
 - `ollama`: `/api/generate`
 - non-ollama provider: OpenAI-compatible `/chat/completions`
 
+각 멤버는 `model_name`으로 원하는 모델을 직접 지정할 수 있습니다.
+`model_name`을 생략하면 healthcheck 응답(`/models`, `/api/tags`)에서 찾은 목록으로 같은 provider 내 모델이 겹치지 않도록 자동 배정합니다.
+
 즉 `healthcheck_path=/models`가 통과해도 실제 추론 응답이 OpenAI-compatible 형식이 아니면 council worker 추론은 실패합니다.
 
-## 9. Offline learning
+설정과 배정 상태를 CLI로 확인할 수 있습니다:
+
+```powershell
+python -m src.council.cli --help
+python -m src.council.cli members
+python -m src.council.cli health
+python -m src.council.cli models
+```
+
+## 10. Offline learning
 
 ```powershell
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" -m src.learning.offline_runner export-dataset
@@ -192,7 +232,7 @@ council 관련 확인 키:
 
 offline runner는 adapter를 붙일 수 없는 예상 가능한 오류만 degrade 처리하고, 그 외 예외는 그대로 드러냅니다.
 
-## 10. 테스트 재현
+## 11. 테스트 재현
 
 ```powershell
 python -m venv "$env:TEMP\ontro-finance-venv"

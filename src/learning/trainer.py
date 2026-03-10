@@ -2,10 +2,12 @@
 L3. Student & Validator Trainer
 Deterministic offline training metadata and evaluation.
 """
+
 import logging
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from src.learning.evaluation import evaluate_dataset_against_goldset
 from src.learning.models import (
     DatasetSnapshot,
     GoldSet,
@@ -58,57 +60,22 @@ class StudentValidatorTrainer:
         run_id: str,
         dataset: DatasetSnapshot,
         goldset: GoldSet,
+        candidate_dataset: Optional[DatasetSnapshot] = None,
     ) -> TrainingRun:
         run = self._runs.get(run_id)
         if not run:
             raise ValueError(f"Run not found: {run_id}")
 
         run.metrics_before = self._evaluate(dataset, goldset)
-        logger.info("Training %s with %s samples", run.target, len(dataset.samples))
-        run.metrics_after = self._evaluate(dataset, goldset)
+        trained_dataset = candidate_dataset or dataset
+        logger.info("Training %s with %s samples", run.target, len(trained_dataset.samples))
+        run.metrics_after = self._evaluate(trained_dataset, goldset)
         run.completed_at = datetime.now()
         run.status = RunStatus.PROPOSED
         return run
 
     def _evaluate(self, dataset: DatasetSnapshot, goldset: GoldSet) -> TrainingMetrics:
-        dataset_labels = {
-            (sample.text.strip(), sample.task_type.value): sample.labels
-            for sample in dataset.samples
-        }
-
-        true_positive = 0
-        false_negative = 0
-        false_positive = 0
-
-        for gold_sample in goldset.samples:
-            key = (gold_sample.text.strip(), gold_sample.task_type.value)
-            predicted = dataset_labels.get(key)
-            if predicted is None:
-                false_negative += 1
-                continue
-
-            if all(predicted.get(label_key) == label_value for label_key, label_value in gold_sample.gold_labels.items()):
-                true_positive += 1
-            else:
-                false_negative += 1
-                false_positive += 1
-
-        matched_keys = {(sample.text.strip(), sample.task_type.value) for sample in goldset.samples}
-        false_positive += len([key for key in dataset_labels if key not in matched_keys])
-
-        precision = true_positive / max(true_positive + false_positive, 1)
-        recall = true_positive / max(true_positive + false_negative, 1)
-        f1 = (2 * precision * recall) / max(precision + recall, 1e-9)
-        accuracy = true_positive / max(goldset.sample_count, 1)
-
-        return TrainingMetrics(
-            precision=precision,
-            recall=recall,
-            f1=f1,
-            accuracy=accuracy,
-            static_conflict_count=false_positive,
-            drift_detection_rate=recall,
-        )
+        return evaluate_dataset_against_goldset(dataset, goldset)
 
     def get_run(self, run_id: str) -> Optional[TrainingRun]:
         return self._runs.get(run_id)
@@ -152,10 +119,22 @@ class StudentValidatorTrainer:
             "run_id": run_id,
             "target": run.target,
             "metrics": {
-                "precision": {"before": before.precision, "after": after.precision, "delta": after.precision - before.precision},
-                "recall": {"before": before.recall, "after": after.recall, "delta": after.recall - before.recall},
+                "precision": {
+                    "before": before.precision,
+                    "after": after.precision,
+                    "delta": after.precision - before.precision,
+                },
+                "recall": {
+                    "before": before.recall,
+                    "after": after.recall,
+                    "delta": after.recall - before.recall,
+                },
                 "f1": {"before": before.f1, "after": after.f1, "delta": after.f1 - before.f1},
-                "accuracy": {"before": before.accuracy, "after": after.accuracy, "delta": after.accuracy - before.accuracy},
+                "accuracy": {
+                    "before": before.accuracy,
+                    "after": after.accuracy,
+                    "delta": after.accuracy - before.accuracy,
+                },
                 "static_conflict": {
                     "before": before.static_conflict_count,
                     "after": after.static_conflict_count,

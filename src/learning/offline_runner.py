@@ -1,16 +1,16 @@
 """Offline dataset export, evaluation, and bundle creation for the learning loop."""
+
 from __future__ import annotations
 
 import argparse
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Tuple
-
 from config.settings import get_settings
 from src.bootstrap import get_domain_kg_adapter, get_personal_kg_adapter, reset_all
 from src.learning.dataset_builder import TrainingDatasetBuilder
 from src.learning.deployment import ReviewDeploymentManager
+from src.learning.evaluation import evaluate_dataset_against_goldset
 from src.learning.event_store import LearningEventStore, dump_json, load_json
 from src.learning.models import DatasetSnapshot, GoldSet, TaskType, TrainingMetrics
 
@@ -43,6 +43,8 @@ def _build_dataset(task_type: TaskType) -> DatasetSnapshot:
 
     for item in store.read("validation"):
         builder.add_validation_log(item)
+    for item in store.read("council_candidate"):
+        builder.add_council_log(item)
     for item in store.read("council_final"):
         builder.add_council_log(item)
     for item in store.read("query"):
@@ -52,41 +54,7 @@ def _build_dataset(task_type: TaskType) -> DatasetSnapshot:
 
 
 def _evaluate_dataset(dataset: DatasetSnapshot, goldset: GoldSet) -> TrainingMetrics:
-    matches: Dict[Tuple[str, str], Dict] = {
-        (sample.text.strip(), sample.task_type.value): sample.labels
-        for sample in dataset.samples
-    }
-
-    true_positive = 0
-    false_negative = 0
-    false_positive = 0
-
-    for gold in goldset.samples:
-        key = (gold.text.strip(), gold.task_type.value)
-        predicted = matches.get(key)
-        if predicted is None:
-            false_negative += 1
-            continue
-        if all(predicted.get(label_key) == label_value for label_key, label_value in gold.gold_labels.items()):
-            true_positive += 1
-        else:
-            false_negative += 1
-            false_positive += 1
-
-    matched_keys = {(gold.text.strip(), gold.task_type.value) for gold in goldset.samples}
-    false_positive += len([key for key in matches if key not in matched_keys])
-
-    precision = true_positive / max(true_positive + false_positive, 1)
-    recall = true_positive / max(true_positive + false_negative, 1)
-    f1 = (2 * precision * recall) / max(precision + recall, 1e-9)
-    accuracy = true_positive / max(goldset.sample_count, 1)
-
-    return TrainingMetrics(
-        precision=precision,
-        recall=recall,
-        f1=f1,
-        accuracy=accuracy,
-    )
+    return evaluate_dataset_against_goldset(dataset, goldset)
 
 
 def export_dataset(task_type: TaskType, output: str | None) -> Path:
@@ -112,20 +80,31 @@ def evaluate_dataset(snapshot_path: str, goldset_path: str) -> Path:
             "dataset_version": snapshot.version,
             "goldset_id": goldset.goldset_id,
             "goldset_version": goldset.version,
+            "dataset_summary": {
+                "sample_count": snapshot.sample_count,
+                "source_distribution": snapshot.source_distribution,
+                "provenance_summary": snapshot.provenance_summary,
+            },
             "metrics": metrics.model_dump(mode="json"),
         },
     )
     return path
 
 
-def create_bundle(student1: str, student2: str, sign_validator: str, semantic_validator: str, policy: str) -> Path:
+def create_bundle(
+    student1: str, student2: str, sign_validator: str, semantic_validator: str, policy: str
+) -> Path:
     manager = ReviewDeploymentManager()
     bundle = manager.create_bundle(student1, student2, sign_validator, semantic_validator, policy)
     manager.review_bundle(bundle.version, approved=True, notes="Created by offline runner")
 
     store = _get_event_store()
     path = store.bundle_path(f"{bundle.version}.json")
-    dump_json(path, manager.get_active_bundle().model_dump(mode="json") if manager.get_active_bundle() else bundle.model_dump(mode="json"))
+    active_bundle = manager.get_active_bundle()
+    dump_json(
+        path,
+        active_bundle.model_dump(mode="json") if active_bundle else bundle.model_dump(mode="json"),
+    )
     return path
 
 
@@ -134,7 +113,9 @@ def main() -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     export_parser = subparsers.add_parser("export-dataset")
-    export_parser.add_argument("--task", default=TaskType.RELATION.value, choices=[item.value for item in TaskType])
+    export_parser.add_argument(
+        "--task", default=TaskType.RELATION.value, choices=[item.value for item in TaskType]
+    )
     export_parser.add_argument("--output", default=None)
 
     evaluate_parser = subparsers.add_parser("evaluate")

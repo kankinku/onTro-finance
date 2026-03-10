@@ -1,7 +1,7 @@
 """Provider authentication and connection testing for multi-model council members."""
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 from pydantic import BaseModel, Field
 try:
@@ -42,6 +42,8 @@ class ProviderConnectionResult(BaseModel):
     message: str = ""
     checked_url: Optional[str] = None
     missing_env: List[str] = Field(default_factory=list)
+    available_models: List[str] = Field(default_factory=list)
+    response_json: Optional[Dict[str, Any]] = None
 
 
 class ConnectionTransport(ABC):
@@ -77,12 +79,22 @@ class HttpxConnectionTransport(ConnectionTransport):
 
         try:
             response = httpx.request(method=method, url=url, headers=headers, timeout=timeout_seconds)
+            response_json: Optional[Dict[str, Any]] = None
+            with_exception = False
+            try:
+                payload = response.json()
+                if isinstance(payload, dict):
+                    response_json = payload
+            except Exception:
+                with_exception = True
+
             return ProviderConnectionResult(
                 provider=ProviderKind.OLLAMA,
                 success=response.status_code < 400,
                 status_code=response.status_code,
                 message="ok" if response.status_code < 400 else response.text[:200],
                 checked_url=url,
+                response_json=response_json if not with_exception else None,
             )
         except Exception as exc:  # pragma: no cover - exercised only in live environments
             return ProviderConnectionResult(
@@ -96,6 +108,37 @@ class HttpxConnectionTransport(ConnectionTransport):
 
 class ProviderAuthManager:
     """Validate auth config, resolve credentials, and test provider connectivity."""
+
+    @staticmethod
+    def extract_available_models(config: ProviderAuthConfig, payload: Optional[Dict[str, Any]]) -> List[str]:
+        if not isinstance(payload, dict):
+            return []
+
+        if config.provider == ProviderKind.OLLAMA:
+            candidates = payload.get("models", [])
+        else:
+            candidates = payload.get("data", [])
+            if not isinstance(candidates, list) or not candidates:
+                candidates = payload.get("models", [])
+
+        model_names: List[str] = []
+        for item in candidates if isinstance(candidates, list) else []:
+            if isinstance(item, str):
+                model_name = item.strip()
+            elif isinstance(item, dict):
+                model_name = str(
+                    item.get("id")
+                    or item.get("name")
+                    or item.get("model")
+                    or ""
+                ).strip()
+            else:
+                model_name = ""
+
+            if model_name and model_name not in model_names:
+                model_names.append(model_name)
+
+        return model_names
 
     def validate_config(self, config: ProviderAuthConfig) -> List[str]:
         errors: List[str] = []
@@ -188,4 +231,5 @@ class ProviderAuthManager:
         )
         result.provider = config.provider
         result.checked_url = url
+        result.available_models = self.extract_available_models(config, result.response_json)
         return result

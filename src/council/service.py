@@ -1,4 +1,5 @@
 """Council service for ambiguous finance relation adjudication."""
+
 import logging
 from collections import defaultdict
 from typing import Dict, List, Optional, Any
@@ -32,7 +33,12 @@ logger = logging.getLogger(__name__)
 class CouncilService:
     """In-memory council queue and adjudication workflow."""
 
-    def __init__(self, domain_adapter=None, member_registry: Optional[CouncilMemberRegistry] = None, event_store=None):
+    def __init__(
+        self,
+        domain_adapter=None,
+        member_registry: Optional[CouncilMemberRegistry] = None,
+        event_store=None,
+    ):
         if domain_adapter is None:
             from src.bootstrap import get_domain_kg_adapter
 
@@ -85,7 +91,9 @@ class CouncilService:
             if rel.head_id == head_id and rel.tail_id == tail_id
         ]
 
-    def _to_entity_ref(self, entity: Optional[ResolvedEntity], fallback_id: str, fallback_name: Optional[str]) -> CandidateEntityRef:
+    def _to_entity_ref(
+        self, entity: Optional[ResolvedEntity], fallback_id: str, fallback_name: Optional[str]
+    ) -> CandidateEntityRef:
         if entity is None:
             return CandidateEntityRef(
                 entity_id=fallback_id,
@@ -111,8 +119,12 @@ class CouncilService:
     ) -> RelationCandidate:
         """Build a relation candidate and decide whether council review is required."""
         entity_map = {entity.entity_id: entity for entity in resolved_entities}
-        head = self._to_entity_ref(entity_map.get(edge.head_entity_id), edge.head_entity_id, edge.head_canonical_name)
-        tail = self._to_entity_ref(entity_map.get(edge.tail_entity_id), edge.tail_entity_id, edge.tail_canonical_name)
+        head = self._to_entity_ref(
+            entity_map.get(edge.head_entity_id), edge.head_entity_id, edge.head_canonical_name
+        )
+        tail = self._to_entity_ref(
+            entity_map.get(edge.tail_entity_id), edge.tail_entity_id, edge.tail_canonical_name
+        )
 
         baseline_relations = self._baseline_relations(head.entity_id, tail.entity_id)
         baseline_conflict = BaselineConflict.NONE
@@ -123,10 +135,14 @@ class CouncilService:
             baseline_relation_type = baseline_relations[0].relation_type
             baseline_polarity = self._normalize_polarity(baseline_relations[0].sign)
 
-            same_type = next((rel for rel in baseline_relations if rel.relation_type == edge.relation_type), None)
+            same_type = next(
+                (rel for rel in baseline_relations if rel.relation_type == edge.relation_type), None
+            )
             if same_type:
                 if self._normalize_polarity(same_type.sign) != self._normalize_polarity(
-                    validation_result.sign_result.polarity_final if validation_result.sign_result else edge.polarity_guess
+                    validation_result.sign_result.polarity_final
+                    if validation_result.sign_result
+                    else edge.polarity_guess
                 ):
                     baseline_conflict = BaselineConflict.POLARITY_CONFLICT
             else:
@@ -135,27 +151,38 @@ class CouncilService:
         confidence = validation_result.combined_conf
         triggers: List[CouncilTriggerReason] = []
 
-        if validation_result.validation_passed and validation_result.destination == ValidationDestination.DOMAIN_CANDIDATE:
+        if (
+            validation_result.validation_passed
+            and validation_result.destination == ValidationDestination.DOMAIN_CANDIDATE
+        ):
             if confidence < self._config["thresholds"]["auto_approve"]:
                 triggers.append(CouncilTriggerReason.LOW_CONFIDENCE)
 
             if baseline_conflict != BaselineConflict.NONE:
                 triggers.append(CouncilTriggerReason.BASELINE_CONTRADICTION)
 
-            if validation_result.sign_result and validation_result.sign_result.sign_tag == SignTag.AMBIGUOUS:
+            if (
+                validation_result.sign_result
+                and validation_result.sign_result.sign_tag == SignTag.AMBIGUOUS
+            ):
                 triggers.append(CouncilTriggerReason.POLARITY_AMBIGUITY)
 
-            if validation_result.semantic_result and validation_result.semantic_result.semantic_tag == SemanticTag.SEM_AMBIGUOUS:
+            if (
+                validation_result.semantic_result
+                and validation_result.semantic_result.semantic_tag == SemanticTag.SEM_AMBIGUOUS
+            ):
                 triggers.append(CouncilTriggerReason.TEMPORAL_UNCERTAINTY)
 
             high_impact_entities = set(self._config.get("high_impact_entities", []))
             if (
-                (head.entity_id in high_impact_entities or tail.entity_id in high_impact_entities)
-                and confidence < self._config["thresholds"]["auto_approve"]
-            ):
+                head.entity_id in high_impact_entities or tail.entity_id in high_impact_entities
+            ) and confidence < self._config["thresholds"]["auto_approve"]:
                 triggers.append(CouncilTriggerReason.HIGH_IMPACT_RELATION)
 
-        if not validation_result.validation_passed or validation_result.destination != ValidationDestination.DOMAIN_CANDIDATE:
+        if (
+            not validation_result.validation_passed
+            or validation_result.destination != ValidationDestination.DOMAIN_CANDIDATE
+        ):
             auto_decision = CouncilAutoDecision.AUTO_REJECT
             status = CandidateStatus.AUTO_REJECTED
             decision_reason = validation_result.rejection_reason or "not_eligible_for_domain"
@@ -169,7 +196,9 @@ class CouncilService:
             decision_reason = "high_confidence_and_no_conflict"
 
         polarity = self._normalize_polarity(
-            validation_result.sign_result.polarity_final if validation_result.sign_result else edge.polarity_guess
+            validation_result.sign_result.polarity_final
+            if validation_result.sign_result
+            else edge.polarity_guess
         )
 
         candidate = RelationCandidate(
@@ -182,10 +211,12 @@ class CouncilService:
             tail_entity=tail,
             entity_pair_key=f"{head.entity_id}__{tail.entity_id}",
             relation_type_candidate=edge.relation_type,
-            relation_type_alternatives=[RelationTypeScore(type=edge.relation_type, score=confidence)],
+            relation_type_alternatives=[
+                RelationTypeScore(type=edge.relation_type, score=confidence)
+            ],
             polarity_candidate=polarity,
             strength_candidate=confidence,
-            time_scope_candidate="unknown",
+            time_scope_candidate=edge.time_scope,
             confidence=confidence,
             extraction_confidence=edge.student_conf or 0.0,
             validation_score=confidence,
@@ -200,13 +231,19 @@ class CouncilService:
             council_required=auto_decision == CouncilAutoDecision.SEND_TO_COUNCIL,
             council_trigger_reasons=triggers,
             status=status,
-            final_relation_type=edge.relation_type if status == CandidateStatus.AUTO_APPROVED else None,
+            final_relation_type=edge.relation_type
+            if status == CandidateStatus.AUTO_APPROVED
+            else None,
             final_polarity=polarity if status == CandidateStatus.AUTO_APPROVED else None,
             final_strength=confidence if status == CandidateStatus.AUTO_APPROVED else None,
             final_confidence=confidence if status == CandidateStatus.AUTO_APPROVED else None,
             decision_reason=decision_reason,
         )
-        candidate.status = CandidateStatus.AUTO_EVALUATED if status in {CandidateStatus.AUTO_APPROVED, CandidateStatus.AUTO_REJECTED} else status
+        candidate.status = (
+            CandidateStatus.AUTO_EVALUATED
+            if status in {CandidateStatus.AUTO_APPROVED, CandidateStatus.AUTO_REJECTED}
+            else status
+        )
         if auto_decision == CouncilAutoDecision.AUTO_APPROVE:
             candidate.status = CandidateStatus.AUTO_APPROVED
         elif auto_decision == CouncilAutoDecision.AUTO_REJECT:
@@ -335,10 +372,14 @@ class CouncilService:
             candidate.final_relation_type = candidate.relation_type_candidate
             candidate.final_polarity = candidate.polarity_candidate
             candidate.final_strength = candidate.strength_candidate
-            candidate.final_confidence = max((vote.confidence for vote in case.votes), default=candidate.confidence)
+            candidate.final_confidence = max(
+                (vote.confidence for vote in case.votes), default=candidate.confidence
+            )
         elif final_decision == CouncilDecision.REJECT:
             candidate.status = CandidateStatus.COUNCIL_REJECTED
-            candidate.final_confidence = max((vote.confidence for vote in case.votes), default=candidate.confidence)
+            candidate.final_confidence = max(
+                (vote.confidence for vote in case.votes), default=candidate.confidence
+            )
         else:
             case.defer_count += 1
             defer_limit = max(int(self._config["limits"].get("max_repeated_defers", 0)), 0)
@@ -350,7 +391,9 @@ class CouncilService:
                 )
             else:
                 candidate.status = CandidateStatus.COUNCIL_DEFERRED
-            candidate.final_confidence = max((vote.confidence for vote in case.votes), default=candidate.confidence)
+            candidate.final_confidence = max(
+                (vote.confidence for vote in case.votes), default=candidate.confidence
+            )
 
         case.summary = summary
         candidate.council_summary = summary
@@ -431,13 +474,17 @@ class CouncilService:
                 sign=self._denormalize_polarity(candidate.final_polarity),
                 domain_conf=candidate.final_confidence or candidate.confidence,
                 evidence_count=1,
+                time_scope=candidate.time_scope_candidate,
                 origin="council",
                 semantic_tags=["council_reviewed"],
             )
         else:
             relation.sign = self._denormalize_polarity(candidate.final_polarity)
-            relation.domain_conf = max(relation.domain_conf, candidate.final_confidence or candidate.confidence)
+            relation.domain_conf = max(
+                relation.domain_conf, candidate.final_confidence or candidate.confidence
+            )
             relation.evidence_count += 1
+            relation.time_scope = candidate.time_scope_candidate or relation.time_scope
             if "council_reviewed" not in relation.semantic_tags:
                 relation.semantic_tags.append("council_reviewed")
 
@@ -449,29 +496,30 @@ class CouncilService:
             "candidates": len(self._candidates),
             "cases": len(self._cases),
             "pending_cases": len(self._queue),
-            "closed_cases": len([case for case in self._cases.values() if case.status == CouncilCaseStatus.CLOSED]),
+            "closed_cases": len(
+                [case for case in self._cases.values() if case.status == CouncilCaseStatus.CLOSED]
+            ),
             "configured_members": len(self.member_registry.list_members(enabled_only=False)),
             "available_members": len(self.get_available_members()),
         }
 
-    def refresh_member_availability(self, env: Optional[Dict[str, str]] = None, transport=None) -> Dict[str, ProviderConnectionResult]:
+    def refresh_member_availability(
+        self, env: Optional[Dict[str, str]] = None, transport=None
+    ) -> Dict[str, ProviderConnectionResult]:
         connection_transport = transport or HttpxConnectionTransport()
         self._member_statuses = self.member_registry.test_all_connections(
             transport=connection_transport,
             env=env,
             enabled_only=True,
         )
+        self.member_registry.assign_models(self._member_statuses, enabled_only=True)
         return self._member_statuses.copy()
 
     def get_member_statuses(self) -> Dict[str, ProviderConnectionResult]:
         return self._member_statuses.copy()
 
     def get_available_members(self) -> List[str]:
-        return [
-            member_id
-            for member_id, result in self._member_statuses.items()
-            if result.success
-        ]
+        return [member_id for member_id, result in self._member_statuses.items() if result.success]
 
     def _log_event(self, event_type: str, payload: Dict[str, Any]) -> None:
         if self.event_store is None:

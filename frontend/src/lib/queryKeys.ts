@@ -1,0 +1,15 @@
+export const queryKeys = {
+  dashboardSummary: ["dashboard-summary"] as const,
+  trustSummary: ["trust-summary"] as const,
+  learningProducts: ["learning-products"] as const,
+  aiRuntime: ["ai-runtime"] as const,
+  ingests: ["ingests"] as const,
+  ingestDetail: (docId: string) => ["ingest-detail", docId] as const,
+  documents: ["documents"] as const,
+  documentDetail: (docId: string) => ["document-detail", docId] as const,
+  documentGraph: (docId: string) => ["document-graph", docId] as const,
+  documentStructure: (docId: string) => ["document-structure", docId] as const,
+  entities: (searchTerm: string) => ["entities", searchTerm] as const,
+  graph: (entityId: string, depth: number) => ["graph", entityId, depth] as const,
+  councilCases: ["council-cases"] as const,
+};
