@@ -17,9 +17,10 @@
 
 권장 환경:
 
-- Python 3.11 이상
+- Python 3.11 또는 3.12
+- Python 3.14는 현재 고정된 백엔드 의존성(`pydantic==2.7.4`) 때문에 지원하지 않음
 - 별도 가상환경
-- Neo4j 접속 정보 설정
+- 로컬 체험은 Neo4j 없이도 가능
 
 ## `.env`로 한 번에 관리
 
@@ -29,7 +30,19 @@
 Copy-Item .env.example .env
 ```
 
-대표 예시:
+가장 쉬운 로컬 시작용 예시:
+
+```dotenv
+ONTRO_STORAGE_BACKEND=inmemory
+ONTRO_COUNCIL_AUTO_ENABLED=false
+ONTRO_ENABLE_CALLBACKS=false
+OPENAI_API_KEY=
+GITHUB_COPILOT_ACCESS_TOKEN=
+GITHUB_COPILOT_CLIENT_ID=
+GITHUB_COPILOT_CLIENT_SECRET=
+```
+
+Neo4j 기반 운영 경로 예시:
 
 ```dotenv
 ONTRO_STORAGE_BACKEND=neo4j
@@ -53,7 +66,20 @@ python -m venv "$env:TEMP\ontro-finance-venv"
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" -m pip install -r requirements.txt
 ```
 
-필수 Neo4j 환경 변수 예시:
+권장 로컬 시작:
+
+```powershell
+& "$env:TEMP\ontro-finance-venv\Scripts\python.exe" onTroFinanceStarter.py
+```
+
+`onTroFinanceStarter.py`는 다음을 자동으로 처리합니다.
+
+- `ONTRO_STORAGE_BACKEND=inmemory` 기본 적용
+- FastAPI와 operations console을 한 프로세스에서 실행
+- `frontend/dist`가 있으면 같은 서버에서 SPA 제공
+- 브라우저 자동 오픈
+
+Neo4j 기반 `main.py` 경로를 쓰려면 아래 환경 변수가 필요합니다.
 
 ```powershell
 $env:ONTRO_STORAGE_BACKEND = "neo4j"
@@ -64,11 +90,13 @@ $env:ONTRO_NEO4J_PASSWORD = "password"
 
 `ONTRO_NEO4J_USERNAME`은 하위호환 alias로만 유지되며 deprecated입니다. 새 설정은 `ONTRO_NEO4J_USER`를 사용해야 합니다.
 
-서버 실행:
+Neo4j 기반 서버 실행:
 
 ```powershell
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" main.py
 ```
+
+starter 전용 실행 방법과 EXE 빌드는 `docs/OPS_CONSOLE_STARTER.md`를 참고하면 됩니다.
 
 ## 로컬 Neo4j 예시
 
@@ -116,7 +144,19 @@ council member provider는 현재 두 계열만 지원합니다.
 - `ollama`: `/api/generate`
 - 그 외 provider: OpenAI-compatible `/chat/completions`
 
+각 council member는 `config/council_members.yaml`의 `model_name`으로 사용할 모델을 직접 지정할 수 있습니다.
+`model_name`을 비워두거나 생략하면 `/models` 또는 `/api/tags` 응답에서 찾은 목록으로 provider별 중복을 최소화하도록 자동 배정합니다.
+
 즉 `config/council_members.yaml`에서 `ollama`가 아닌 provider를 쓰려면 `/models` health check뿐 아니라 실제 추론 시 `/chat/completions` 응답 형식을 제공해야 합니다.
+
+운영 확인용 CLI:
+
+```powershell
+python -m src.council.cli --help
+python -m src.council.cli members
+python -m src.council.cli health
+python -m src.council.cli models --json
+```
 
 ## Offline learning 명령
 
@@ -132,10 +172,10 @@ council member provider는 현재 두 계열만 지원합니다.
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" -m pytest tests -q
 ```
 
-2026-03-06 기준 최근 검증 결과:
+2026-03-07 기준 최근 검증 결과:
 
 ```text
-112 passed, 2 skipped
+140 passed, 2 skipped
 ```
 
 ## 문서

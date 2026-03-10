@@ -1,16 +1,18 @@
 """
 Centralized application settings.
 """
-from functools import lru_cache
 import os
-from pathlib import Path
 import sys
+from functools import lru_cache
+from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field
 import yaml
+from pydantic import BaseModel, ConfigDict, Field
 
-
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_RESOURCE_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent)).resolve()
+_APP_HOME = Path(os.getenv("ONTRO_APP_HOME", "")).expanduser().resolve() if os.getenv("ONTRO_APP_HOME") else (
+    Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else _RESOURCE_ROOT
+)
 _ENV_LOADED = False
 
 
@@ -28,7 +30,8 @@ def _iter_env_paths() -> list[Path]:
         candidates.append(Path(sys.executable).resolve().parent / ".env")
 
     candidates.append(Path.cwd() / ".env")
-    candidates.append(_PROJECT_ROOT / ".env")
+    candidates.append(_APP_HOME / ".env")
+    candidates.append(_RESOURCE_ROOT / ".env")
 
     ordered: list[Path] = []
     seen: set[Path] = set()
@@ -134,7 +137,8 @@ class CallbackSettings(BaseModel):
 class Settings(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    project_root: Path = Field(default_factory=lambda: _PROJECT_ROOT)
+    project_root: Path = Field(default_factory=lambda: _RESOURCE_ROOT)
+    app_home: Path = Field(default_factory=lambda: _APP_HOME)
 
     ollama: OllamaSettings = Field(default_factory=OllamaSettings)
     extraction: ExtractionSettings = Field(default_factory=ExtractionSettings)
@@ -168,29 +172,29 @@ class Settings(BaseModel):
         if not config_path.exists():
             raise FileNotFoundError(f"Config file not found: {config_path}")
 
-        with open(config_path, "r", encoding="utf-8") as handle:
+        with open(config_path, encoding="utf-8") as handle:
             return yaml.safe_load(handle) or {}
 
     def normalize_paths(self) -> "Settings":
         if not Path(self.store.graph_db_path).is_absolute():
-            self.store.graph_db_path = str(self.project_root / self.store.graph_db_path)
+            self.store.graph_db_path = str(self.app_home / self.store.graph_db_path)
         if not Path(self.store.document_db_path).is_absolute():
-            self.store.document_db_path = str(self.project_root / self.store.document_db_path)
+            self.store.document_db_path = str(self.app_home / self.store.document_db_path)
         if not Path(self.store.vector_db_path).is_absolute():
-            self.store.vector_db_path = str(self.project_root / self.store.vector_db_path)
+            self.store.vector_db_path = str(self.app_home / self.store.vector_db_path)
 
         if not self.store.domain_data_path.is_absolute():
             self.store.domain_data_path = self.project_root / self.store.domain_data_path
         if not self.store.raw_data_path.is_absolute():
-            self.store.raw_data_path = self.project_root / self.store.raw_data_path
+            self.store.raw_data_path = self.app_home / self.store.raw_data_path
         if not self.store.personal_data_path.is_absolute():
-            self.store.personal_data_path = self.project_root / self.store.personal_data_path
+            self.store.personal_data_path = self.app_home / self.store.personal_data_path
         if not self.store.learning_data_path.is_absolute():
-            self.store.learning_data_path = self.project_root / self.store.learning_data_path
+            self.store.learning_data_path = self.app_home / self.store.learning_data_path
 
         return self
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     return Settings().normalize_paths()

@@ -120,6 +120,13 @@ class TestLearningEventStore:
         assert store.count("validation") == 1
         assert store.counts()["query"] == 1
 
+    def test_counts_include_ingest_events(self, tmp_path):
+        store = LearningEventStore(tmp_path)
+        store.append("ingest", {"doc_id": "doc_001"})
+
+        assert store.count("ingest") == 1
+        assert store.counts()["ingest"] == 1
+
 
 class TestOfflineEvaluation:
     def test_evaluate_dataset_matches_goldset(self):

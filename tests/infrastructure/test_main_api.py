@@ -1,17 +1,18 @@
 """Main API runtime and policy tests."""
 import asyncio
+import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
 
-import sys
-from pathlib import Path
-
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import main as app_main
 from config.settings import get_settings
+from src.learning.event_store import LearningEventStore
+from src.storage.inmemory_repository import InMemoryGraphRepository
 
 
 class _DummyCouncil:
@@ -259,6 +260,33 @@ class TestStatusAndFallback:
         assert result["council_worker_active"] is True
         assert result["learning_event_backlog"] == {"validation": 3}
 
+    def test_status_fails_soft_when_storage_backend_is_unavailable(self, monkeypatch):
+        monkeypatch.setitem(app_main.app_state, "ready", False)
+        monkeypatch.setitem(app_main.app_state, "storage_health", {"ok": False, "backend": "Neo4jGraphRepository"})
+        monkeypatch.setattr(app_main, "get_graph_repository", lambda: (_ for _ in ()).throw(ConnectionError("neo4j offline")))
+
+        result = asyncio.run(app_main.status())
+
+        assert result["storage_backend"] == "Neo4jGraphRepository"
+        assert result["storage_ok"] is False
+        assert "neo4j offline" in result["storage_error"]
+        assert result["entity_count"] == 0
+        assert result["relation_count"] == 0
+        assert result["tx_committed"] == 0
+        assert result["tx_rolled_back"] == 0
+        assert result["tx_active"] == 0
+
+    def test_status_is_degraded_when_app_is_ready_but_storage_is_not(self, monkeypatch):
+        monkeypatch.setitem(app_main.app_state, "ready", True)
+        monkeypatch.setitem(app_main.app_state, "storage_health", {"ok": True, "backend": "Neo4jGraphRepository"})
+        monkeypatch.setattr(app_main, "get_graph_repository", lambda: (_ for _ in ()).throw(ConnectionError("neo4j offline")))
+
+        result = asyncio.run(app_main.status())
+
+        assert result["ready"] is True
+        assert result["storage_ok"] is False
+        assert result["status"] == "degraded"
+
     def test_council_admin_endpoints(self, monkeypatch):
         monkeypatch.setitem(app_main.app_state, "council", _DummyCouncil())
         monkeypatch.setitem(app_main.app_state, "council_worker", _DummyWorker())
@@ -271,6 +299,109 @@ class TestStatusAndFallback:
 
         retry_payload = asyncio.run(app_main.retry_council_case("case_1"))
         assert retry_payload["result"]["finalized"] == 1
+
+    def test_dashboard_summary_exposes_recent_ingests(self, monkeypatch, tmp_path):
+        store = LearningEventStore(tmp_path)
+        store.append(
+            "ingest",
+            {
+                "doc_id": "doc_001",
+                "input_type": "text",
+                "metadata": {"source": "ui"},
+                "edge_count": 3,
+                "destinations": {"domain": 1, "personal": 1, "council": 1},
+                "council_case_ids": ["case_1"],
+            },
+        )
+        monkeypatch.setitem(app_main.app_state, "domain", SimpleNamespace(get_dynamic_domain=lambda: _DummyDynamicDomain(4)))
+        monkeypatch.setitem(app_main.app_state, "personal", SimpleNamespace(get_pkg=lambda: _DummyPersonalGraph(2)))
+        monkeypatch.setitem(app_main.app_state, "council", _DummyCouncil())
+        monkeypatch.setitem(app_main.app_state, "council_worker", _DummyWorker())
+        monkeypatch.setitem(app_main.app_state, "learning_event_store", store)
+        monkeypatch.setitem(app_main.app_state, "ready", True)
+        monkeypatch.setitem(app_main.app_state, "llm_client", object())
+        monkeypatch.setitem(app_main.app_state, "ingested_docs", 7)
+        monkeypatch.setitem(app_main.app_state, "ingested_edge_count", 15)
+        monkeypatch.setitem(app_main.app_state, "ingested_pdf_doc_count", 3)
+        monkeypatch.setattr(
+            app_main,
+            "get_graph_repository",
+            lambda: SimpleNamespace(count_entities=lambda: 9, count_relations=lambda: 12),
+        )
+        monkeypatch.setattr(app_main, "get_transaction_manager", lambda: SimpleNamespace(get_stats=lambda: {"total_committed": 2, "total_rolled_back": 1, "active_transactions": 0}))
+        monkeypatch.setattr(app_main, "check_graph_repository_health", lambda repo: {"ok": True, "backend": "SimpleNamespace"})
+
+        result = asyncio.run(app_main.dashboard_summary())
+
+        assert result["totals"]["entities"] == 9
+        assert result["totals"]["ingests"] == 1
+        assert result["recent_ingests"][0]["doc_id"] == "doc_001"
+        assert result["recent_ingests"][0]["council_case_ids"] == ["case_1"]
+
+    def test_ingest_history_endpoints_return_list_and_detail(self, monkeypatch, tmp_path):
+        store = LearningEventStore(tmp_path)
+        store.append(
+            "ingest",
+            {
+                "doc_id": "doc_001",
+                "input_type": "text",
+                "metadata": {"source": "ui", "doc_title": "Macro note"},
+                "edge_count": 2,
+                "destinations": {"domain": 1, "personal": 0, "council": 1},
+                "council_case_ids": ["case_1"],
+            },
+        )
+        monkeypatch.setitem(app_main.app_state, "learning_event_store", store)
+
+        listing = asyncio.run(app_main.list_ingests())
+        detail = asyncio.run(app_main.get_ingest_detail("doc_001"))
+
+        assert listing["items"][0]["doc_id"] == "doc_001"
+        assert detail["doc_id"] == "doc_001"
+        assert detail["metadata"]["doc_title"] == "Macro note"
+        assert detail["destinations"]["council"] == 1
+
+    def test_entity_and_graph_endpoints_return_console_shapes(self, monkeypatch):
+        repo = InMemoryGraphRepository()
+        repo.upsert_entity("Policy_Rate", ["DomainEntity"], {"name": "policy rate", "type": "MacroIndicator"})
+        repo.upsert_entity("Growth_Stocks", ["DomainEntity"], {"name": "growth stocks", "type": "AssetGroup"})
+        repo.upsert_relation(
+            "Policy_Rate",
+            "domain:pressures",
+            "Growth_Stocks",
+            {"relation_id": "rel_1", "sign": "-", "domain_conf": 0.82, "origin": "council"},
+        )
+        monkeypatch.setattr(app_main, "get_graph_repository", lambda: repo)
+
+        entities = asyncio.run(app_main.list_entities(q="policy", entity_type=None, limit=10))
+        entity_detail = asyncio.run(app_main.get_entity_detail("Policy_Rate"))
+        graph = asyncio.run(app_main.get_graph(root_entity_id="Policy_Rate", depth=1, limit=20))
+
+        assert entities["items"][0]["id"] == "Policy_Rate"
+        assert entities["items"][0]["label"] == "policy rate"
+        assert entity_detail["entity"]["id"] == "Policy_Rate"
+        assert entity_detail["neighbors"][0]["relation_type"] == "pressures"
+        assert graph["nodes"][0]["id"] == "Policy_Rate"
+        assert graph["edges"][0]["type"] == "pressures"
+        assert graph["edges"][0]["sign"] == "-"
+
+    def test_console_routes_fallback_to_built_spa(self, monkeypatch, tmp_path):
+        dist_dir = tmp_path / "dist"
+        assets_dir = dist_dir / "assets"
+        assets_dir.mkdir(parents=True)
+        index_path = dist_dir / "index.html"
+        asset_path = assets_dir / "app.js"
+        index_path.write_text("<html>ops console</html>", encoding="utf-8")
+        asset_path.write_text("console.log('ok')", encoding="utf-8")
+        monkeypatch.setenv("ONTRO_CONSOLE_DIST_DIR", str(dist_dir))
+
+        root_response = asyncio.run(app_main.serve_console_root())
+        route_response = asyncio.run(app_main.serve_console("graph/explorer"))
+        asset_response = asyncio.run(app_main.serve_console("assets/app.js"))
+
+        assert Path(root_response.path) == index_path
+        assert Path(route_response.path) == index_path
+        assert Path(asset_response.path) == asset_path
 
     def test_ask_fallback_uses_finance_prompt(self, monkeypatch):
         llm = _DummyLLM()
@@ -290,3 +421,28 @@ class TestStatusAndFallback:
         assert response.reasoning_used is False
         assert "[AI 답변]" in response.answer
         assert "금융 문서와 관계형 지식 그래프" in llm.last_prompt
+
+    def test_text_ingest_generates_unique_doc_ids(self, monkeypatch):
+        monkeypatch.setitem(app_main.app_state, "ready", True)
+        monkeypatch.setattr(
+            app_main,
+            "ingest_text_into_ontology",
+            lambda text, doc_id, metadata=None: {
+                "doc_id": doc_id,
+                "edge_count": 0,
+                "chunks_created": 0,
+                "total_chunks": 0,
+                "domain_relations": 0,
+                "personal_relations": 0,
+                "council_relations": 0,
+                "council_case_ids": [],
+            },
+        )
+
+        with TestClient(app_main.app) as client:
+            first = client.post("/api/text/add-to-vectordb", json={"text": "policy rates pressure growth stocks"})
+            second = client.post("/api/text/add-to-vectordb", json={"text": "policy rates pressure growth stocks"})
+
+        assert first.status_code == 200
+        assert second.status_code == 200
+        assert first.json()["doc_id"] != second.json()["doc_id"]

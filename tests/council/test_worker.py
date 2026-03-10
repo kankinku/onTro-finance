@@ -23,7 +23,11 @@ from src.validation.models import (
 
 
 class _FakeInferenceManager:
+    def __init__(self):
+        self.requests = []
+
     def infer(self, config, request, transport=None, env=None):
+        self.requests.append(request)
         payload = {
             "claim": f"{request.model_name} approves the candidate",
             "decision": "APPROVE",
@@ -82,7 +86,6 @@ class TestCouncilAutomationWorker:
                     member_id=member_id,
                     role=role,
                     provider=ProviderKind.OLLAMA,
-                    model_name=member_id,
                     auth=ProviderAuthConfig(
                         provider=ProviderKind.OLLAMA,
                         auth_type=AuthType.NONE,
@@ -93,9 +96,15 @@ class TestCouncilAutomationWorker:
 
         service = CouncilService(domain_adapter=get_domain_kg_adapter(), member_registry=registry)
         service._member_statuses = {
-            member.member_id: ProviderConnectionResult(provider=member.provider, success=True, message="ok")
+            member.member_id: ProviderConnectionResult(
+                provider=member.provider,
+                success=True,
+                message="ok",
+                available_models=["llama3.2", "qwen2.5", "mistral-nemo"],
+            )
             for member in registry.list_members(enabled_only=True)
         }
+        registry.assign_models(service._member_statuses)
 
         candidate = service.submit_candidate(
             edge=RawEdge(
@@ -134,10 +143,12 @@ class TestCouncilAutomationWorker:
             source_document_id="doc-200",
         )
 
-        worker = CouncilAutomationWorker(service=service, inference_manager=_FakeInferenceManager())
+        inference_manager = _FakeInferenceManager()
+        worker = CouncilAutomationWorker(service=service, inference_manager=inference_manager)
         result = worker.process_case(candidate.council_case_id, env={})
 
         assert result.status == CandidateStatus.COUNCIL_APPROVED
+        assert [request.model_name for request in inference_manager.requests] == ["llama3.2", "qwen2.5", "mistral-nemo"]
         relation = service.domain_adapter.get_relation("Policy_Rate", "Growth_Stocks", "pressures")
         assert relation is not None
         assert relation.evidence_count >= 1

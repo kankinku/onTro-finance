@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: onTro-finance
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint with ruff
+        run: ruff check . && ruff format --check .
+
+      - name: Run tests with coverage
+        run: pytest --cov=src --cov-report=term-missing --cov-fail-under=50
+        env:
+          ONTRO_STORAGE_BACKEND: memory
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: onTro-finance
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t ontro-finance:${{ github.sha }} .
+
+      - name: Smoke test /healthz
+        run: |
+          docker run -d --name ontro-test \
+            -p 8000:8000 \
+            -e ONTRO_STORAGE_BACKEND=memory \
+            -e ONTRO_LOAD_SAMPLE_DATA=false \
+            ontro-finance:${{ github.sha }}
+          sleep 15
+          curl -f http://localhost:8000/healthz || (docker logs ontro-test && exit 1)
+          docker stop ontro-test

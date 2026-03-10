@@ -76,13 +76,19 @@ class CouncilAutomationWorker:
             return None
 
         transport = transport or HttpxInferenceTransport()
+        votes_cast = 0
         for member_id, member in available_members.items():
+            model_name = member.effective_model_name
+            if not model_name:
+                logger.warning("Council worker skipped member %s: no model assigned", member_id)
+                continue
+
             role = member.role
             prompt = self._build_prompt(role=role.value, candidate=candidate.model_dump())
             response = self.inference_manager.infer(
                 config=member.auth,
                 request=ProviderInferenceRequest(
-                    model_name=member.model_name,
+                    model_name=model_name,
                     system_prompt=prompt["system"],
                     user_prompt=prompt["user"],
                 ),
@@ -112,6 +118,12 @@ class CouncilAutomationWorker:
                 confidence=confidence,
                 rationale=rationale,
             )
+            votes_cast += 1
+
+        if votes_cast == 0:
+            self.last_error = "no_assigned_models"
+            logger.warning("Council worker skipped case %s: no members had an assigned model", case_id)
+            return None
 
         return self.service.finalize_case(case_id=case_id, adjudicator_id="auto-adjudicator", apply_to_domain=True)
 

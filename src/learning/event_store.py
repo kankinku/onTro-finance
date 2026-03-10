@@ -44,6 +44,7 @@ class LearningEventStore:
 
     def counts(self) -> Dict[str, int]:
         return {
+            "ingest": self.count("ingest"),
             "validation": self.count("validation"),
             "council_candidate": self.count("council_candidate"),
             "council_final": self.count("council_final"),

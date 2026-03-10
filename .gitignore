@@ -8,3 +8,5 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .env
+ops/symphony/runs/*
+!ops/symphony/runs/.gitkeep

@@ -461,6 +461,7 @@ class CouncilService:
             env=env,
             enabled_only=True,
         )
+        self.member_registry.assign_models(self._member_statuses, enabled_only=True)
         return self._member_statuses.copy()
 
     def get_member_statuses(self) -> Dict[str, ProviderConnectionResult]:

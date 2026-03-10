@@ -1,27 +1,25 @@
-import logging
-import asyncio
 import base64
 import ipaddress
+import json
+import logging
 import os
 import socket
-from io import BytesIO
-from typing import Dict, Any, List, Optional
+import uuid
 from contextlib import asynccontextmanager
-from pathlib import Path
-import json
+from dataclasses import dataclass, field
 from datetime import datetime
+from io import BytesIO
+from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
 import httpx
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from src.extraction import ExtractionPipeline
-from src.validation import ValidationPipeline
-from src.validation.models import ValidationDestination
-from src.domain import DomainPipeline
-from src.personal import PersonalPipeline
-from src.reasoning import ReasoningPipeline
+from config.settings import get_settings
 from src.bootstrap import (
     build_llm_client,
     check_graph_repository_health,
@@ -30,8 +28,32 @@ from src.bootstrap import (
     get_transaction_manager,
 )
 from src.council.worker import CouncilAutomationWorker
+from src.domain import DomainPipeline
+from src.extraction import ExtractionPipeline
 from src.learning.event_store import LearningEventStore
-from config.settings import get_settings
+from src.personal import PersonalPipeline
+from src.reasoning import ReasoningPipeline
+from src.validation import ValidationPipeline
+from src.validation.models import ValidationDestination
+from src.web.console_assets import resolve_console_asset_path
+from src.web.operations_console import (
+    build_dashboard_summary,
+)
+from src.web.operations_console import (
+    get_entity_detail as build_entity_detail,
+)
+from src.web.operations_console import (
+    get_graph as build_graph_response,
+)
+from src.web.operations_console import (
+    get_ingest_detail as build_ingest_detail,
+)
+from src.web.operations_console import (
+    list_entities as build_entity_listing,
+)
+from src.web.operations_console import (
+    list_ingests as build_ingest_listing,
+)
 
 # Logging setup
 logging.basicConfig(
@@ -40,50 +62,46 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@dataclass
+class AppState:
+    llm_client: Any = None
+    extraction: Any = None
+    validation: Any = None
+    domain: Any = None
+    personal: Any = None
+    council: Any = None
+    reasoning: Any = None
+    council_worker: Any = None
+    learning_event_store: Any = None
+    ready: bool = False
+    storage_health: dict[str, Any] = field(default_factory=lambda: {"ok": False, "backend": "unknown"})
+    ingested_docs: int = 0
+    ingested_edge_count: int = 0
+    ingested_pdf_doc_count: int = 0
+    # Deprecated aliases kept for one release while callers migrate.
+    ingested_chunks: int = 0
+    ingested_pdf_docs: int = 0
+
+    def get(self, key: str, default: Any = None) -> Any:
+        return getattr(self, key, default)
+
+    def __getitem__(self, key: str) -> Any:
+        return getattr(self, key)
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        setattr(self, key, value)
+
+
 # Global state
-app_state = {
-    "llm_client": None,
-    "extraction": None,
-    "validation": None,
-    "domain": None,
-    "personal": None,
-    "council": None,
-    "reasoning": None,
-    "council_worker": None,
-    "learning_event_store": None,
-    "ready": False,
-    "storage_health": {"ok": False, "backend": "unknown"},
-    "ingested_docs": 0,
-    "ingested_edge_count": 0,
-    "ingested_pdf_doc_count": 0,
-    "ingested_chunks": 0,
-    "ingested_pdf_docs": 0,
-}
+app_state = AppState()
+
 
 def reset_app_state() -> None:
-    app_state.update(
-        {
-            "llm_client": None,
-            "extraction": None,
-            "validation": None,
-            "domain": None,
-            "personal": None,
-            "council": None,
-            "reasoning": None,
-            "council_worker": None,
-            "learning_event_store": None,
-            "ready": False,
-            "storage_health": {"ok": False, "backend": "unknown"},
-            "ingested_docs": 0,
-            "ingested_edge_count": 0,
-            "ingested_pdf_doc_count": 0,
-            "ingested_chunks": 0,
-            "ingested_pdf_docs": 0,
-        }
-    )
+    global app_state
+    app_state = AppState()
 
 
-def _metric_value(primary_key: str, legacy_key: Optional[str] = None) -> int:
+def _metric_value(primary_key: str, legacy_key: str | None = None) -> int:
     value = app_state.get(primary_key)
     if value is None and legacy_key:
         value = app_state.get(legacy_key)
@@ -91,15 +109,19 @@ def _metric_value(primary_key: str, legacy_key: Optional[str] = None) -> int:
 
 
 def _increment_ingest_counters(*, docs: int = 0, edges: int = 0, pdf_docs: int = 0) -> None:
-    app_state["ingested_docs"] = _metric_value("ingested_docs") + docs
-    app_state["ingested_edge_count"] = _metric_value("ingested_edge_count", "ingested_chunks") + edges
-    app_state["ingested_pdf_doc_count"] = _metric_value("ingested_pdf_doc_count", "ingested_pdf_docs") + pdf_docs
+    app_state.ingested_docs = _metric_value("ingested_docs") + docs
+    app_state.ingested_edge_count = _metric_value("ingested_edge_count", "ingested_chunks") + edges
+    app_state.ingested_pdf_doc_count = _metric_value("ingested_pdf_doc_count", "ingested_pdf_docs") + pdf_docs
     # Deprecated aliases kept for one release while callers migrate to the clearer keys.
-    app_state["ingested_chunks"] = app_state["ingested_edge_count"]
-    app_state["ingested_pdf_docs"] = app_state["ingested_pdf_doc_count"]
+    app_state.ingested_chunks = app_state.ingested_edge_count
+    app_state.ingested_pdf_docs = app_state.ingested_pdf_doc_count
 
 
-def load_sample_data() -> Dict[str, int]:
+def _generate_doc_id(prefix: str) -> str:
+    return f"{prefix}_{uuid.uuid4().hex[:12]}"
+
+
+def load_sample_data() -> dict[str, int]:
     loaded_docs = 0
     loaded_chunks = 0
     try:
@@ -108,9 +130,9 @@ def load_sample_data() -> Dict[str, int]:
             logger.warning("Sample data not found. Skipping initial load.")
             return {"docs_loaded": 0, "chunks_loaded": 0}
 
-        with open(sample_path, "r", encoding="utf-8") as f:
+        with open(sample_path, encoding="utf-8") as f:
             documents = json.load(f)
-        
+
         logger.info(f"Loading {len(documents)} sample documents...")
 
         for doc in documents:
@@ -118,7 +140,7 @@ def load_sample_data() -> Dict[str, int]:
             text = doc.get("text", "")
             metadata = dict(doc.get("metadata", {}))
             metadata.setdefault("source", "sample_seed")
-            
+
             # PDF Processing Support
             if text.lower().endswith('.pdf'):
                 metadata["document_format"] = "pdf"
@@ -149,18 +171,18 @@ def load_sample_data() -> Dict[str, int]:
 
         logger.info(f"Sample data loaded: docs={loaded_docs}, chunks={loaded_chunks}")
         return {"docs_loaded": loaded_docs, "chunks_loaded": loaded_chunks}
-        
+
     except Exception as e:
         logger.error(f"Error loading sample data: {e}")
         return {"docs_loaded": loaded_docs, "chunks_loaded": loaded_chunks}
 
 
-def _normalized_allowed_hosts() -> List[str]:
+def _normalized_allowed_hosts() -> list[str]:
     settings = get_settings()
     return [host.strip().lower().rstrip(".") for host in settings.callbacks.allowed_hosts if host.strip()]
 
 
-def _resolved_host_ips(hostname: str) -> List[str]:
+def _resolved_host_ips(hostname: str) -> list[str]:
     try:
         infos = socket.getaddrinfo(hostname, None, type=socket.SOCK_STREAM)
     except socket.gaierror as exc:
@@ -263,7 +285,7 @@ def _log_validation_event(edge, validation_result) -> None:
     )
 
 
-def _log_query_event(question: str, conclusion=None, error: Optional[str] = None) -> None:
+def _log_query_event(question: str, conclusion=None, error: str | None = None) -> None:
     event_store = app_state.get("learning_event_store")
     if event_store is None:
         return
@@ -283,18 +305,48 @@ def _log_query_event(question: str, conclusion=None, error: Optional[str] = None
     event_store.append("query", payload)
 
 
+def _log_ingest_event(
+    *,
+    doc_id: str,
+    input_type: str,
+    metadata: dict[str, Any] | None,
+    edge_count: int,
+    destinations: dict[str, int],
+    council_case_ids: list[str],
+    filename: str | None = None,
+    text_preview: str | None = None,
+) -> None:
+    event_store = app_state.get("learning_event_store")
+    if event_store is None:
+        return
+
+    event_store.append(
+        "ingest",
+        {
+            "doc_id": doc_id,
+            "input_type": input_type,
+            "filename": filename,
+            "metadata": metadata or {},
+            "edge_count": edge_count,
+            "destinations": destinations,
+            "council_case_ids": council_case_ids,
+            "text_preview": text_preview,
+        },
+    )
+
+
 def ingest_text_into_ontology(
     text: str,
     doc_id: str,
-    metadata: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     if not text or not text.strip():
         raise ValueError("No text provided for ingestion")
 
-    extraction = app_state["extraction"]
-    validation = app_state["validation"]
-    domain = app_state["domain"]
-    personal = app_state["personal"]
+    extraction = app_state.extraction
+    validation = app_state.validation
+    domain = app_state.domain
+    personal = app_state.personal
 
     if not all([extraction, validation, domain, personal]):
         raise RuntimeError("Ontology pipelines are not ready")
@@ -334,7 +386,7 @@ def ingest_text_into_ontology(
 
     domain_results = []
     personal_results = []
-    council_case_ids: List[str] = []
+    council_case_ids: list[str] = []
 
     domain_edges = [
         edge
@@ -377,7 +429,7 @@ def ingest_text_into_ontology(
     }
 
 
-def queue_callback(background_tasks: BackgroundTasks, callback_url: str, payload: Dict[str, Any]):
+def queue_callback(background_tasks: BackgroundTasks, callback_url: str, payload: dict[str, Any]):
     def _dispatch():
         try:
             httpx.post(callback_url, json=payload, timeout=10)
@@ -396,9 +448,9 @@ async def lifespan(app: FastAPI):
     storage_health = check_graph_repository_health(repo)
     if not storage_health["ok"]:
         raise RuntimeError(f"Storage backend unavailable: {storage_health}")
-    app_state["storage_health"] = storage_health
+    app_state.storage_health = storage_health
     event_store = LearningEventStore(settings.store.learning_data_path)
-    
+
     # Initialize LLM
     llm_client = build_llm_client()
     use_llm = False
@@ -406,7 +458,7 @@ async def lifespan(app: FastAPI):
         if llm_client:
             use_llm = llm_client.health_check()
     except Exception as e:
-        logger.error(f"LLM health check failed: {e}")
+        logger.error("LLM health check failed", exc_info=e)
 
     if use_llm:
         logger.info(f"[OK] Ollama connected: {settings.ollama.model_name}")
@@ -414,7 +466,7 @@ async def lifespan(app: FastAPI):
         logger.warning("[FAIL] Ollama not available, using rule-based mode")
         llm_client = None
 
-    app_state["llm_client"] = llm_client
+    app_state.llm_client = llm_client
 
     # Initialize Pipelines
     extraction = ExtractionPipeline(llm_client=llm_client, use_llm=use_llm)
@@ -433,25 +485,25 @@ async def lifespan(app: FastAPI):
         resolver=extraction.entity_resolver,
     )
 
-    app_state["extraction"] = extraction
-    app_state["validation"] = validation
-    app_state["domain"] = domain
-    app_state["personal"] = personal
-    app_state["reasoning"] = reasoning
-    app_state["council"] = get_council_service()
-    app_state["learning_event_store"] = event_store
-    app_state["council"].event_store = event_store
+    app_state.extraction = extraction
+    app_state.validation = validation
+    app_state.domain = domain
+    app_state.personal = personal
+    app_state.reasoning = reasoning
+    app_state.council = get_council_service()
+    app_state.learning_event_store = event_store
+    app_state.council.event_store = event_store
 
     try:
-        app_state["council"].refresh_member_availability(env=os.environ)
+        app_state.council.refresh_member_availability(env=os.environ)
     except Exception as exc:
-        logger.warning(f"Council member availability refresh failed: {exc}")
+        logger.warning("Council member availability refresh failed", exc_info=exc)
 
     council_worker = CouncilAutomationWorker(
-        service=app_state["council"],
+        service=app_state.council,
         poll_interval_seconds=settings.council_runtime.poll_interval_seconds,
     )
-    app_state["council_worker"] = council_worker
+    app_state.council_worker = council_worker
     if settings.council_runtime.auto_process_enabled:
         await council_worker.start()
 
@@ -460,41 +512,53 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("Startup sample ingestion disabled. Set ONTRO_LOAD_SAMPLE_DATA=true to enable it.")
 
-    app_state["ready"] = True
+    app_state.ready = True
     logger.info("Ontology System v11 initialized successfully.")
-    
+
     yield
-    
+
     # Shutdown
-    if app_state.get("council_worker"):
-        await app_state["council_worker"].stop()
-    if app_state["llm_client"]:
-        if hasattr(app_state["llm_client"], 'close'):
-            app_state["llm_client"].close()
+    if app_state.council_worker:
+        await app_state.council_worker.stop()
+    if app_state.llm_client:
+        if hasattr(app_state.llm_client, 'close'):
+            app_state.llm_client.close()
     reset_app_state()
     logger.info("Ontology System v11 shutdown.")
 
 app = FastAPI(title="Ontology System v11", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Models
 class TextIngestRequest(BaseModel):
     text: str
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-    callback_url: Optional[str] = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    callback_url: str | None = None
 
 
 class PDFIngestRequest(BaseModel):
     pdf_data: str
-    filename: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-    callback_url: Optional[str] = None
+    filename: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    callback_url: str | None = None
 
 
 class PDFNotifyRequest(BaseModel):
     filename: str
-    file_path: Optional[str] = None
-    timestamp: Optional[str] = None
-    source: Optional[str] = None
+    file_path: str | None = None
+    timestamp: str | None = None
+    source: str | None = None
 
 
 class IngestResponse(BaseModel):
@@ -503,9 +567,9 @@ class IngestResponse(BaseModel):
     edge_count: int = 0
     chunks_created: int = 0
     total_chunks: int = 0
-    doc_id: Optional[str] = None
-    destinations: Dict[str, int] = Field(default_factory=dict)
-    council_case_ids: List[str] = Field(default_factory=list)
+    doc_id: str | None = None
+    destinations: dict[str, int] = Field(default_factory=dict)
+    council_case_ids: list[str] = Field(default_factory=list)
 
 
 class AskRequest(BaseModel):
@@ -516,27 +580,27 @@ class AskRequest(BaseModel):
 class AskResponse(BaseModel):
     answer: str
     confidence: float
-    sources: List[Dict[str, Any]] = []
+    sources: list[dict[str, Any]] = []
     reasoning_used: bool = False
-    reasoning_trace: List[str] = []
-    action_suggested: Optional[str] = None
-    metrics: Dict[str, Any] = {}
+    reasoning_trace: list[str] = []
+    action_suggested: str | None = None
+    metrics: dict[str, Any] = {}
     timestamp: str
 
 class BatchRequest(BaseModel):
-    items: List[Dict[str, Any]]
+    items: list[dict[str, Any]]
     mode: str = "accuracy"
 
 class BatchResponse(BaseModel):
-    results: List[Dict[str, Any]]
+    results: list[dict[str, Any]]
     config_hash: str = "default"
 
 @app.post("/api/text/add-to-vectordb", response_model=IngestResponse)
 async def add_text_to_ontology(request: TextIngestRequest, background_tasks: BackgroundTasks):
-    if not app_state["ready"]:
+    if not app_state.ready:
         raise HTTPException(status_code=503, detail="System not ready")
 
-    doc_id = request.metadata.get("doc_id") or f"text_{int(datetime.now().timestamp())}"
+    doc_id = request.metadata.get("doc_id") or _generate_doc_id("text")
 
     try:
         result = ingest_text_into_ontology(
@@ -571,12 +635,22 @@ async def add_text_to_ontology(request: TextIngestRequest, background_tasks: Bac
             raise HTTPException(status_code=400, detail=str(exc))
         queue_callback(background_tasks, callback_url, payload)
 
+    _log_ingest_event(
+        doc_id=doc_id,
+        input_type="text",
+        metadata=request.metadata,
+        edge_count=result["edge_count"],
+        destinations=payload["destinations"],
+        council_case_ids=result["council_case_ids"],
+        text_preview=request.text[:200],
+    )
+
     return IngestResponse(**payload)
 
 
 @app.post("/api/pdf/extract-and-embed", response_model=IngestResponse)
 async def extract_and_embed_pdf(request: PDFIngestRequest, background_tasks: BackgroundTasks):
-    if not app_state["ready"]:
+    if not app_state.ready:
         raise HTTPException(status_code=503, detail="System not ready")
 
     try:
@@ -584,7 +658,7 @@ async def extract_and_embed_pdf(request: PDFIngestRequest, background_tasks: Bac
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    doc_id = request.metadata.get("doc_id") or request.filename or f"pdf_{int(datetime.now().timestamp())}"
+    doc_id = request.metadata.get("doc_id") or request.filename or _generate_doc_id("pdf")
     meta = dict(request.metadata)
     meta.setdefault("source", "pdf_upload")
     if request.filename:
@@ -619,6 +693,17 @@ async def extract_and_embed_pdf(request: PDFIngestRequest, background_tasks: Bac
             raise HTTPException(status_code=400, detail=str(exc))
         queue_callback(background_tasks, callback_url, payload)
 
+    _log_ingest_event(
+        doc_id=doc_id,
+        input_type="pdf",
+        metadata=meta,
+        edge_count=result["edge_count"],
+        destinations=payload["destinations"],
+        council_case_ids=result["council_case_ids"],
+        filename=request.filename,
+        text_preview=text[:200] if text else None,
+    )
+
     return IngestResponse(**payload)
 
 
@@ -636,7 +721,7 @@ async def notify_pdf_upload(request: PDFNotifyRequest):
 async def healthz():
     storage_health = app_state.get("storage_health", {"ok": False})
     council_worker = app_state.get("council_worker")
-    if app_state["ready"] and storage_health.get("ok"):
+    if app_state.ready and storage_health.get("ok"):
         return {
             "status": "ok",
             "ready": True,
@@ -652,15 +737,34 @@ async def healthz():
 
 @app.get("/status")
 async def status():
-    domain = app_state["domain"]
-    personal = app_state["personal"]
-    council = app_state["council"]
-    council_worker = app_state.get("council_worker")
-    event_store = app_state.get("learning_event_store")
-    repo = get_graph_repository()
-    tx_stats = get_transaction_manager().get_stats()
-    storage_health = check_graph_repository_health(repo)
-    app_state["storage_health"] = storage_health
+    domain = app_state.domain
+    personal = app_state.personal
+    council = app_state.council
+    council_worker = app_state.council_worker
+    event_store = app_state.learning_event_store
+    repo = None
+    storage_health = app_state.storage_health
+    storage_backend = storage_health.get("backend", "unknown")
+    entity_count = 0
+    relation_count = 0
+    tx_stats = {"total_committed": 0, "total_rolled_back": 0, "active_transactions": 0}
+
+    try:
+        repo = get_graph_repository()
+        storage_backend = repo.__class__.__name__
+        storage_health = check_graph_repository_health(repo)
+        if storage_health.get("ok"):
+            entity_count = repo.count_entities()
+            relation_count = repo.count_relations()
+            tx_stats = get_transaction_manager().get_stats()
+    except Exception as exc:
+        storage_health = {
+            "ok": False,
+            "backend": storage_backend,
+            "error": str(exc),
+        }
+
+    app_state.storage_health = storage_health
 
     domain_relation_count = 0
     personal_relation_count = 0
@@ -678,25 +782,25 @@ async def status():
     pdf_doc_count = _metric_value("ingested_pdf_doc_count", "ingested_pdf_docs")
 
     return {
-        "status": "healthy" if app_state["ready"] else "initializing",
-        "ready": app_state["ready"],
+        "status": "healthy" if app_state.ready and storage_health.get("ok") else ("degraded" if app_state.ready else "initializing"),
+        "ready": app_state.ready,
         "version": "11.0.0",
         "metrics_schema_version": 2,
-        "storage_backend": repo.__class__.__name__,
+        "storage_backend": storage_health.get("backend", storage_backend),
         "storage_ok": storage_health.get("ok", False),
         "storage_error": storage_health.get("error"),
-        "entity_count": repo.count_entities(),
-        "relation_count": repo.count_relations(),
+        "entity_count": entity_count,
+        "relation_count": relation_count,
         "domain_relation_count": domain_relation_count,
         "personal_relation_count": personal_relation_count,
         "edge_count": edge_count,
         "pdf_doc_count": pdf_doc_count,
         "vector_count": edge_count,
-        "llm_available": app_state["llm_client"] is not None,
+        "llm_available": app_state.llm_client is not None,
         "reasoning_enabled": True,
         "action_enabled": True,
         "callback_delivery_enabled": get_settings().callbacks.enabled,
-        "ingested_docs": app_state.get("ingested_docs", 0),
+        "ingested_docs": app_state.ingested_docs,
         "pdf_docs": pdf_doc_count,
         "total_pdfs": pdf_doc_count,
         "total_chunks": edge_count,
@@ -720,9 +824,49 @@ async def status():
     }
 
 
+@app.get("/api/dashboard/summary")
+async def dashboard_summary():
+    status_payload = await status()
+    return build_dashboard_summary(status_payload, app_state.get("learning_event_store"))
+
+
+@app.get("/api/ingests")
+async def list_ingests(limit: int = 20):
+    return build_ingest_listing(app_state.get("learning_event_store"), limit=limit)
+
+
+@app.get("/api/ingests/{doc_id}")
+async def get_ingest_detail(doc_id: str):
+    detail = build_ingest_detail(app_state.get("learning_event_store"), doc_id)
+    if detail is None:
+        raise HTTPException(status_code=404, detail="Ingest record not found")
+    return detail
+
+
+@app.get("/api/entities")
+async def list_entities(q: str | None = None, entity_type: str | None = None, limit: int = 20):
+    return build_entity_listing(get_graph_repository(), q=q, entity_type=entity_type, limit=limit)
+
+
+@app.get("/api/entities/{entity_id}")
+async def get_entity_detail(entity_id: str):
+    detail = build_entity_detail(get_graph_repository(), entity_id)
+    if detail is None:
+        raise HTTPException(status_code=404, detail="Entity not found")
+    return detail
+
+
+@app.get("/api/graph")
+async def get_graph(root_entity_id: str, depth: int = 1, limit: int = 50):
+    graph = build_graph_response(get_graph_repository(), root_entity_id=root_entity_id, depth=depth, limit=limit)
+    if not graph["nodes"]:
+        raise HTTPException(status_code=404, detail="Root entity not found")
+    return graph
+
+
 @app.get("/api/council/cases")
-async def list_council_cases(status: Optional[str] = None):
-    council = app_state["council"]
+async def list_council_cases(status: str | None = None):
+    council = app_state.council
     if not council:
         raise HTTPException(status_code=503, detail="Council service not ready")
     cases = council.list_cases(status=status)
@@ -731,7 +875,7 @@ async def list_council_cases(status: Optional[str] = None):
 
 @app.get("/api/council/cases/{case_id}")
 async def get_council_case(case_id: str):
-    council = app_state["council"]
+    council = app_state.council
     if not council:
         raise HTTPException(status_code=503, detail="Council service not ready")
     case = council.get_case(case_id)
@@ -748,8 +892,8 @@ async def get_council_case(case_id: str):
 
 @app.post("/api/council/cases/{case_id}/retry")
 async def retry_council_case(case_id: str):
-    council = app_state["council"]
-    worker = app_state.get("council_worker")
+    council = app_state.council
+    worker = app_state.council_worker
     if not council or not worker:
         raise HTTPException(status_code=503, detail="Council automation not ready")
     case = council.retry_case(case_id)
@@ -759,24 +903,24 @@ async def retry_council_case(case_id: str):
 
 @app.post("/api/council/process-pending")
 async def process_pending_council_cases():
-    worker = app_state.get("council_worker")
+    worker = app_state.council_worker
     if not worker:
         raise HTTPException(status_code=503, detail="Council automation worker not ready")
     return await worker.process_pending_once(env=os.environ)
 
 @app.post("/api/ask", response_model=AskResponse)
 async def ask(request: AskRequest):
-    if not app_state["ready"]:
+    if not app_state.ready:
         raise HTTPException(status_code=503, detail="System not ready")
-        
-    reasoning = app_state["reasoning"]
-    
+
+    reasoning = app_state.reasoning
+
     try:
         conclusion = reasoning.reason(request.question)
-        
+
         # Fallback: If reasoning fails (low confidence or no path) and LLM is available, use LLM
-        if (conclusion.confidence < 0.2 or "unknown" in conclusion.conclusion_text.lower()) and app_state["llm_client"]:
-            llm_client = app_state["llm_client"]
+        if (conclusion.confidence < 0.2 or "unknown" in conclusion.conclusion_text.lower()) and app_state.llm_client:
+            llm_client = app_state.llm_client
             try:
                 from src.llm.llm_client import LLMRequest
                 prompt = f"""당신은 금융 문서와 관계형 지식 그래프를 보조하는 AI 분석가입니다.
@@ -805,19 +949,19 @@ async def ask(request: AskRequest):
             except Exception as llm_e:
                 logger.error(f"LLM fallback failed: {llm_e}")
                 # If LLM also fails, return the original low confidence reasoning result
-        
+
         sources = []
         if conclusion.evidence_summary:
              sources.append({
-                 "entity_name": "Evidence", 
-                 "text": conclusion.evidence_summary, 
+                 "entity_name": "Evidence",
+                 "text": conclusion.evidence_summary,
                  "confidence": conclusion.confidence
              })
-        
+
         trace = []
         if conclusion.strongest_path_description:
             trace.append(f"Strongest Path: {conclusion.strongest_path_description}")
-        
+
         _log_query_event(request.question, conclusion=conclusion)
         return AskResponse(
             answer=conclusion.conclusion_text,
@@ -831,11 +975,11 @@ async def ask(request: AskRequest):
         )
     except Exception as e:
         logger.error(f"Error processing query: {e}")
-        
+
         # Last Resort Fallback: Direct LLM call if reasoning crashes
-        if app_state["llm_client"]:
+        if app_state.llm_client:
             try:
-                llm_client = app_state["llm_client"]
+                llm_client = app_state.llm_client
                 from src.llm.llm_client import LLMRequest
                 prompt = f"""금융 온톨로지 보조 분석가로서 다음 질문에 답변해주세요.
 질문: {request.question}
@@ -856,21 +1000,21 @@ async def ask(request: AskRequest):
                 )
             except Exception as llm_e:
                 logger.error(f"Last resort LLM fallback failed: {llm_e}")
-        
+
         _log_query_event(request.question, error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/qa/batch", response_model=BatchResponse)
 async def batch_ask(request: BatchRequest):
     results = []
-    reasoning = app_state["reasoning"]
-    
+    reasoning = app_state.reasoning
+
     for item in request.items:
         q = item.get("question")
-        if not q: 
+        if not q:
             results.append({"error": "No question provided"})
             continue
-            
+
         try:
             conclusion = reasoning.reason(q)
             results.append({
@@ -881,7 +1025,7 @@ async def batch_ask(request: BatchRequest):
             })
         except Exception as e:
             results.append({"question": q, "error": str(e)})
-            
+
     return BatchResponse(results=results)
 
 @app.get("/metrics")
@@ -890,6 +1034,44 @@ async def metrics():
     if reasoning:
         return {"metrics": str(reasoning.get_stats())}
     return {"metrics": ""}
+
+
+_RESERVED_NON_CONSOLE_PREFIXES = (
+    "api/",
+    "docs",
+    "redoc",
+    "openapi.json",
+    "healthz",
+    "status",
+    "metrics",
+)
+
+
+def _serve_console_path(request_path: str) -> FileResponse:
+    resolved_path = resolve_console_asset_path(request_path, get_settings().project_root)
+    if resolved_path is None:
+        raise HTTPException(status_code=404, detail="Operations console bundle not found")
+    return FileResponse(resolved_path)
+
+
+@app.get("/", include_in_schema=False)
+async def serve_console_root():
+    return _serve_console_path("")
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def serve_console(full_path: str):
+    normalized_path = full_path.strip("/")
+    if any(
+        normalized_path == prefix or normalized_path.startswith(prefix)
+        for prefix in _RESERVED_NON_CONSOLE_PREFIXES
+    ):
+        raise HTTPException(status_code=404, detail="Not found")
+
+    try:
+        return _serve_console_path(normalized_path)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 if __name__ == "__main__":
     import uvicorn

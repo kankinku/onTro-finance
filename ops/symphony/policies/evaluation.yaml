@@ -1,0 +1,17 @@
+task_defaults:
+  kind: evaluation_regression
+  priority: high
+  source: offline_evaluation
+  verification:
+    - backend
+    - frontend
+
+thresholds:
+  evaluation:
+    f1: 0.85
+    precision: 0.8
+    recall: 0.8
+    accuracy: 0.8
+  status:
+    council_pending_max: 3
+    storage_ok: true

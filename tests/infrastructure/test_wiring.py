@@ -1,34 +1,35 @@
 """Wiring Integration 테스트 - 인프라와 도메인 연결 검증"""
 import os
-import pytest
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from config.settings import load_project_env
+from config.settings import Settings, StoreSettings, load_project_env
 from src.bootstrap import (
     build_graph_repository,
-    get_graph_repository,
-    get_transaction_manager,
-    get_llm_gateway,
     get_domain_kg_adapter,
+    get_graph_repository,
+    get_llm_gateway,
     get_personal_kg_adapter,
+    get_transaction_manager,
     reset_all,
 )
-from src.domain.models import DomainCandidate, DynamicRelation
-from src.personal.models import PersonalRelation, PersonalLabel, SourceType
+from src.domain.models import DynamicRelation
+from src.personal.models import PersonalLabel, PersonalRelation, SourceType
 
 
 class TestBootstrapWiring:
     """Bootstrap이 모든 컴포넌트를 올바르게 연결하는지 확인"""
-    
+
     def setup_method(self):
         reset_all()
-    
+
     def teardown_method(self):
         reset_all()
-    
+
     def test_get_graph_repository(self):
         repo = get_graph_repository()
         assert repo is not None
@@ -108,19 +109,39 @@ class TestBootstrapWiring:
         load_project_env(force=True)
 
         assert os.environ["ONTRO_STORAGE_BACKEND"] == "inmemory"
-    
+
+    def test_packaged_runtime_keeps_read_only_domain_data_under_resource_root(self):
+        settings = Settings(
+            project_root=Path("/bundle/resources"),
+            app_home=Path("/bundle/runtime"),
+            store=StoreSettings(
+                graph_db_path="data/graph.db",
+                document_db_path="data/documents.db",
+                vector_db_path="data/vectors",
+                domain_data_path=Path("data/domain"),
+                raw_data_path=Path("data/raw"),
+                personal_data_path=Path("data/personal"),
+                learning_data_path=Path("data/learning"),
+            ),
+        ).normalize_paths()
+
+        assert settings.store.domain_data_path == Path("/bundle/resources/data/domain")
+        assert settings.store.raw_data_path == Path("/bundle/runtime/data/raw")
+        assert settings.store.personal_data_path == Path("/bundle/runtime/data/personal")
+        assert settings.store.learning_data_path == Path("/bundle/runtime/data/learning")
+
     def test_get_transaction_manager(self):
         tx_mgr = get_transaction_manager()
         assert tx_mgr is not None
         # repo 공유 확인
         assert tx_mgr._repo is get_graph_repository()
-    
+
     def test_get_llm_gateway(self):
         gateway = get_llm_gateway()
         assert gateway is not None
         # 싱글톤 확인
         assert get_llm_gateway() is gateway
-    
+
     def test_get_domain_kg_adapter(self):
         adapter = get_domain_kg_adapter()
         assert adapter is not None
@@ -130,16 +151,16 @@ class TestBootstrapWiring:
 
 class TestDomainKGAdapter:
     """Domain KG Adapter가 GraphRepository를 통해 올바르게 동작하는지 확인"""
-    
+
     def setup_method(self):
         reset_all()
-    
+
     def teardown_method(self):
         reset_all()
-    
+
     def test_upsert_and_get_relation(self):
         adapter = get_domain_kg_adapter()
-        
+
         relation = DynamicRelation(
             head_id="gold",
             head_name="Gold",
@@ -150,19 +171,19 @@ class TestDomainKGAdapter:
             domain_conf=0.8,
             evidence_count=5,
         )
-        
+
         adapter.upsert_relation(relation)
-        
+
         # 조회
         fetched = adapter.get_relation("gold", "inflation", "Affect")
         assert fetched is not None
         assert fetched.sign == "+"
         assert fetched.domain_conf == 0.8
-    
+
     def test_get_all_relations(self):
         adapter = get_domain_kg_adapter()
         before_count = len(adapter.get_all_relations())
-        
+
         r1 = DynamicRelation(
             head_id="A", head_name="A", tail_id="B", tail_name="B",
             relation_type="supports", sign="+",
@@ -171,19 +192,19 @@ class TestDomainKGAdapter:
             head_id="C", head_name="C", tail_id="D", tail_name="D",
             relation_type="pressures", sign="-",
         )
-        
+
         adapter.upsert_relation(r1)
         adapter.upsert_relation(r2)
-        
+
         all_rels = adapter.get_all_relations()
         assert len(all_rels) == before_count + 2
         assert any(rel.head_id == "A" and rel.tail_id == "B" for rel in all_rels.values())
         assert any(rel.head_id == "C" and rel.tail_id == "D" for rel in all_rels.values())
-    
+
     def test_with_transaction(self):
         adapter = get_domain_kg_adapter()
         tx_mgr = get_transaction_manager()
-        
+
         # 트랜잭션 내에서 저장
         with tx_mgr.transaction() as tx:
             relation = DynamicRelation(
@@ -191,7 +212,7 @@ class TestDomainKGAdapter:
                 relation_type="Affect", sign="+",
             )
             adapter.upsert_relation(relation, tx=tx)
-        
+
         # 커밋 후 조회 가능
         fetched = adapter.get_relation("X", "Y", "Affect")
         assert fetched is not None
@@ -199,16 +220,16 @@ class TestDomainKGAdapter:
 
 class TestPersonalKGAdapter:
     """Personal KG Adapter 테스트"""
-    
+
     def setup_method(self):
         reset_all()
-    
+
     def teardown_method(self):
         reset_all()
-    
+
     def test_upsert_and_get_relation(self):
         adapter = get_personal_kg_adapter()
-        
+
         relation = PersonalRelation(
             head_id="user_pref",
             head_name="UserPref",
@@ -223,17 +244,17 @@ class TestPersonalKGAdapter:
             source_type=SourceType.USER_WRITTEN,
         )
 
-        
+
         adapter.upsert_relation(relation)
-        
+
         fetched = adapter.get_relation("user_pref", "gold", "Prefer")
         assert fetched is not None
         assert fetched.pcs_score == 0.7
         assert fetched.personal_label == PersonalLabel.STRONG_BELIEF
-    
+
     def test_get_stats(self):
         adapter = get_personal_kg_adapter()
-        
+
         r1 = PersonalRelation(
             head_id="A", head_name="A", tail_id="B", tail_name="B",
             relation_type="R1", sign="+",
@@ -248,10 +269,10 @@ class TestPersonalKGAdapter:
             personal_label=PersonalLabel.WEAK_BELIEF,
             source_type=SourceType.LLM_INFERRED,
         )
-        
+
         adapter.upsert_relation(r1)
         adapter.upsert_relation(r2)
-        
+
         stats = adapter.get_stats()
         assert stats["total_relations"] == 2
         assert stats["labels"]["strong"] == 1
@@ -260,20 +281,20 @@ class TestPersonalKGAdapter:
 
 class TestLLMGatewayIntegration:
     """LLM Gateway 통합 테스트 (Mock 사용)"""
-    
+
     def setup_method(self):
         reset_all()
-    
+
     def test_generate_with_mock(self):
-        from src.llm.ollama_adapter import MockLLMClient
         from src.llm.gateway import LLMGateway
-        
+        from src.llm.ollama_adapter import MockLLMClient
+
         mock = MockLLMClient("Test response")
         gateway = LLMGateway(mock)
-        
+
         response = gateway.generate("Test prompt")
         assert response.content == "Test response"
-        
+
         stats = gateway.get_stats()
         assert stats["total_requests"] == 1
         assert stats["primary_success"] == 1
