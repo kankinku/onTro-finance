@@ -1,0 +1,778 @@
+c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:9:53 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:11:5 - warning: Type of "storage_config" is partially unknown
+    Type of "storage_config" is "Any | dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:11:51 - warning: Unnecessary isinstance call; "dict[str, Any]" is always an instance of "dict[Unknown, Unknown]" (reportUnnecessaryIsInstance)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:12:5 - warning: Type of "backend" is partially unknown
+    Type of "backend" is "str | Unknown | Any" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:12:58 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:16:50 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:16:50 - warning: Type of "get" is partially unknown
+    Type of "get" is "Unknown | Any" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:19:48 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:19:48 - warning: Type of "get" is partially unknown
+    Type of "get" is "Unknown | Any" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:24:37 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:24:37 - warning: Type of "get" is partially unknown
+    Type of "get" is "Unknown | Any" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:29:13 - warning: Implicit string concatenation not allowed (reportImplicitStringConcatenation)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:34:45 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:34:78 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:36:5 - warning: Type of "storage_config" is partially unknown
+    Type of "storage_config" is "Any | dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:36:51 - warning: Unnecessary isinstance call; "dict[str, Any]" is always an instance of "dict[Unknown, Unknown]" (reportUnnecessaryIsInstance)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:37:5 - warning: Type of "backend" is partially unknown
+    Type of "backend" is "str | Unknown | Any" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:37:58 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:65:31 - warning: Type of parameter "configured_value" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:65:49 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\config\required_env_validator.py:71:16 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "__new__" (reportAny)
+c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:15:20 - warning: Import "Protocol" is not accessed (reportUnusedImport)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:27:5 - warning: Type of "build_llm_client" is partially unknown
+    Type of "build_llm_client" is "(config: dict[Unknown, Unknown] | None = None) -> LLMClient" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:28:5 - warning: Type of "check_graph_repository_health" is partially unknown
+    Type of "check_graph_repository_health" is "(repository: GraphRepository | None = None) -> dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:32:5 - warning: Type of "load_config" is partially unknown
+    Type of "load_config" is "(config_path: str | None = None) -> dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:94:23 - warning: Import "build_document_listing" is not accessed (reportUnusedImport)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:115:17 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:116:17 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:117:17 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:118:13 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:119:15 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:120:14 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:121:16 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:122:21 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:123:27 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:124:27 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:127:31 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:138:9 - warning: Return type is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:138:29 - warning: Type of parameter "default" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:138:38 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:138:53 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:139:16 - warning: Return type is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:139:35 - warning: Argument type is Any
+    Argument corresponds to parameter "default" in function "getattr" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:141:9 - warning: Return type is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:141:40 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:142:16 - warning: Return type is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:144:37 - warning: Type of parameter "value" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:144:44 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:158:5 - warning: Type of "value" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:160:9 - warning: Type of "value" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:183:22 - warning: Type of parameter "request" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:183:31 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:186:5 - warning: Type of "provided" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:187:9 - warning: Type of "headers" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:187:9 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:188:12 - warning: Type of "headers" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:188:12 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:188:12 - warning: Type of "removeprefix" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:188:12 - warning: Type of "strip" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:195:25 - warning: Type of parameter "request" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:195:34 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:201:18 - warning: Type of "client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:201:18 - warning: Type of "host" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:201:41 - warning: Type of "client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:209:24 - warning: Type of parameter "request" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:209:33 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:212:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:212:19 - warning: Type of "learning_event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:214:9 - warning: Type of "append_audit" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:216:27 - warning: Type of "method" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:216:27 - warning: Type of "lower" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:217:25 - warning: Type of "url" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:217:25 - warning: Type of "path" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:218:27 - warning: Type of "client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:218:27 - warning: Type of "host" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:218:50 - warning: Type of "client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:223:9 - warning: Type of "method" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:223:9 - warning: Argument type is Any
+    Argument corresponds to parameter "args" in function "info" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:224:9 - warning: Type of "url" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:224:9 - warning: Type of "path" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:224:9 - warning: Argument type is Any
+    Argument corresponds to parameter "args" in function "info" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:225:9 - warning: Type of "client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:225:9 - warning: Type of "host" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:225:32 - warning: Type of "client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:229:20 - warning: Type of parameter "request" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:229:29 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:235:5 - warning: Function "_maybe_guard_request" is not accessed (reportUnusedFunction)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:235:35 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:261:47 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:274:5 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:275:31 - warning: Argument type is Any
+    Argument corresponds to parameter "obj" in function "hasattr" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:277:13 - warning: Type of "model_name" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:277:26 - warning: Type of "get_model_name" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:300:5 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:303:13 - warning: Type of "member_statuses" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:303:31 - warning: Type of "refresh_member_availability" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:308:13 - warning: Type of "member_statuses" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:308:31 - warning: Type of "get_member_statuses" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:310:41 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:311:13 - warning: Type of "member" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:311:23 - warning: Type of "member_registry" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:311:23 - warning: Type of "list_members" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:312:13 - warning: Type of "member_result" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:312:29 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:312:49 - warning: Type of "member_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:313:13 - warning: Type of "missing_env" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:313:27 - warning: Type of "member_registry" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:313:27 - warning: Type of "auth_manager" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:313:27 - warning: Type of "missing_env_vars" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:314:17 - warning: Type of "auth" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:318:34 - warning: Type of "member_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:319:29 - warning: Type of "role" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:319:29 - warning: Type of "value" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:320:33 - warning: Type of "provider" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:320:33 - warning: Type of "value" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:321:55 - warning: Type of "provider" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:321:55 - warning: Argument type is Any
+    Argument corresponds to parameter "provider" in function "_provider_label" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:322:35 - warning: Type of "effective_model_name" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:322:66 - warning: Type of "model_name" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:323:33 - warning: Type of "auth" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:323:33 - warning: Type of "base_url" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:324:34 - warning: Type of "auth" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:324:34 - warning: Type of "auth_type" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:324:34 - warning: Type of "value" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:325:38 - warning: Type of "auth" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:325:38 - warning: Type of "auth_type" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:326:49 - warning: Argument type is Any
+    Argument corresponds to parameter "o" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:327:39 - warning: Argument type is Any
+    Argument corresponds to parameter "o" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:327:57 - warning: Type of "success" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:329:42 - warning: Type of "success" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:332:25 - warning: Type of "message" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:337:25 - warning: Type of "checked_url" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:339:33 - warning: Type of "auth" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:339:33 - warning: Type of "base_url" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:339:33 - warning: Type of "rstrip" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:339:68 - warning: Type of "auth" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:339:68 - warning: Type of "healthcheck_path" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:339:68 - warning: Type of "lstrip" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:341:41 - warning: Type of "available_models" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:365:13 - warning: Type of "documents" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:367:36 - warning: Argument type is Any
+    Argument corresponds to parameter "obj" in function "len" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:369:13 - warning: Type of "doc" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:370:13 - warning: Type of "doc_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:370:22 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:371:13 - warning: Type of "text" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:371:20 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:372:29 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:372:29 - warning: Argument type is Any
+    Argument corresponds to parameter "map" in function "__init__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:376:16 - warning: Type of "lower" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:376:16 - warning: Type of "endswith" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:378:17 - warning: Type of "pdf_path" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:382:24 - warning: Type of "exists" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:384:50 - warning: Argument type is Any
+    Argument corresponds to parameter "stream" in function "__init__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:400:66 - warning: Argument type is Any
+    Argument corresponds to parameter "doc_id" in function "ingest_text_into_ontology" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:402:13 - warning: Type of "loaded_chunks" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:486:71 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:492:32 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:540:9 - warning: Type of "append" is partially unknown
+    Type of "append" is "(object: Unknown, /) -> None" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:541:24 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "iterable" in function "join"
+    Argument type is "list[Unknown]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:547:27 - warning: Type of parameter "edge" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:547:27 - warning: Type annotation is missing for parameter "edge" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:547:33 - warning: Type of parameter "validation_result" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:547:33 - warning: Type annotation is missing for parameter "validation_result" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:548:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:552:5 - warning: Type of "append" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:555:24 - warning: Type of "raw_edge_id" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:556:28 - warning: Type of "fragment_id" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:557:30 - warning: Type of "fragment_text" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:558:35 - warning: Type of "source_document_id" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:559:28 - warning: Type of "source_type" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:560:29 - warning: Type of "published_at" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:560:29 - warning: Type of "isoformat" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:560:62 - warning: Type of "published_at" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:561:27 - warning: Type of "time_scope" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:562:37 - warning: Type of "citation_page_number" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:563:39 - warning: Type of "citation_chapter_title" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:564:39 - warning: Type of "citation_section_title" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:565:31 - warning: Type of "head_entity_id" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:566:31 - warning: Type of "tail_entity_id" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:567:30 - warning: Type of "relation_type" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:568:31 - warning: Type of "polarity_guess" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:569:34 - warning: Type of "validation_passed" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:570:28 - warning: Type of "destination" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:570:28 - warning: Type of "value" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:571:30 - warning: Type of "combined_conf" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:572:29 - warning: Type of "semantic_result" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:572:29 - warning: Type of "semantic_tag" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:573:16 - warning: Type of "semantic_result" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:575:33 - warning: Type of "rejection_reason" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:580:37 - warning: Type of parameter "conclusion" is partially unknown
+    Parameter type is "Unknown | None" (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:580:37 - warning: Type annotation is missing for parameter "conclusion" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:581:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:592:39 - warning: Argument type is unknown
+    Argument corresponds to parameter "o" in function "getattr" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:593:35 - warning: Argument type is unknown
+    Argument corresponds to parameter "o" in function "getattr" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:594:45 - warning: Argument type is unknown
+    Argument corresponds to parameter "o" in function "getattr" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:597:5 - warning: Type of "append" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:604:25 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:612:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:616:5 - warning: Type of "append" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:632:49 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:640:31 - warning: Type of parameter "value" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:640:38 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:645:16 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:652:25 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:658:44 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:660:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:665:5 - warning: Type of "upsert_document" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:690:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:693:5 - warning: Type of "record" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:693:14 - warning: Type of "get_document" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:696:30 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:696:40 - warning: Type of "item" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:696:48 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:700:25 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:701:39 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:703:5 - warning: Type of "upsert_document" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:711:5 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:766:5 - warning: Type of "candidate" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:766:17 - warning: Type of "submit_candidate" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:782:8 - warning: Type of "council_case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:783:47 - warning: Type of "council_case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:783:47 - warning: Argument type is Any
+    Argument corresponds to parameter "case_id" in function "_append_document_council_case" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:784:17 - warning: Type of "council_case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:788:52 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:790:9 - warning: Type of "section" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:791:12 - warning: Type of "page_number" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:792:35 - warning: Type of "page_number" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:793:12 - warning: Type of "chapter_title" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:794:26 - warning: Type of "chapter_title" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:794:26 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "append" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:795:12 - warning: Type of "section_title" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:796:26 - warning: Type of "section_title" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:796:26 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "append" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:797:22 - warning: Type of "text" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:797:22 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "append" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:803:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:806:12 - warning: Return type is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:823:16 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:836:5 - warning: Result of call expression is of type "Path" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:843:25 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:844:16 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:848:5 - warning: Type of "extraction" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:848:18 - warning: Type of "extraction" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:849:5 - warning: Type of "validation" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:849:18 - warning: Type of "validation" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:850:5 - warning: Type of "domain" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:850:14 - warning: Type of "domain" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:851:5 - warning: Type of "personal" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:851:16 - warning: Type of "personal" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:873:5 - warning: Type of "ext" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:873:11 - warning: Type of "process" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:874:22 - warning: Type of "raw_edges" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:874:22 - warning: Argument type is Any
+    Argument corresponds to parameter "obj" in function "len" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:875:43 - warning: Argument type is Any
+    Argument corresponds to parameter "o" in function "getattr" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:882:12 - warning: Type of "raw_edges" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:895:5 - warning: Type of "vals" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:895:12 - warning: Type of "validate_batch" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:896:15 - warning: Type of "raw_edges" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:897:27 - warning: Type of "resolved_entities" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:899:16 - warning: Type of "edge_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:899:33 - warning: Type of "v" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:900:9 - warning: Type of "edge" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:900:17 - warning: Type of "raw_edges" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:901:41 - warning: Type of "raw_edge_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:903:35 - warning: Argument type is Any
+    Argument corresponds to parameter "edge" in function "_log_validation_event" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:903:41 - warning: Argument type is Any
+    Argument corresponds to parameter "validation_result" in function "_log_validation_event" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:911:13 - warning: Type of "edge" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:911:21 - warning: Type of "raw_edges" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:912:25 - warning: Type of "raw_edge_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:912:47 - warning: Type of "validation_passed" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:912:55 - warning: Type of "raw_edge_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:913:13 - warning: Type of "destination" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:913:21 - warning: Type of "raw_edge_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:917:9 - warning: Type of "domain_results" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:917:26 - warning: Type of "process_batch" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:917:70 - warning: Type of "resolved_entities" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:918:13 - warning: Type of "dom_result" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:919:16 - warning: Type of "final_destination" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:919:63 - warning: Type of "intake_result" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:920:17 - warning: Type of "personal_result" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:920:35 - warning: Type of "process_from_domain_rejection" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:921:21 - warning: Type of "intake_result" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:924:21 - warning: Type of "append" is partially unknown
+    Type of "append" is "(object: Unknown, /) -> None" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:924:45 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "append" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:925:64 - warning: Type of "council_case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:926:41 - warning: Type of "council_case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:926:41 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "append" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:928:9 - warning: Type of "edge" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:928:17 - warning: Type of "raw_edges" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:929:25 - warning: Type of "raw_edge_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:930:25 - warning: Type of "validation_passed" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:933:12 - warning: Type of "destination" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:934:13 - warning: Type of "personal_result" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:934:31 - warning: Type of "process_from_validation" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:934:73 - warning: Type of "resolved_entities" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:936:17 - warning: Type of "append" is partially unknown
+    Type of "append" is "(object: Unknown, /) -> None" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:936:41 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "append" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:944:13 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "obj" in function "len"
+    Argument type is "list[Any | Unknown]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:944:25 - warning: Type of "result" is partially unknown
+    Type of "result" is "Any | Unknown" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:944:53 - warning: Type of "final_destination" is partially unknown
+    Type of "final_destination" is "Any | Unknown" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:946:35 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "obj" in function "len"
+    Argument type is "list[Unknown]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:953:93 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:956:13 - warning: Result of call expression is of type "Response" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:964:5 - warning: Type of "worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:964:14 - warning: Type of "council_worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:966:15 - warning: Type of "stop" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:968:5 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:968:18 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:969:31 - warning: Argument type is Any
+    Argument corresponds to parameter "obj" in function "hasattr" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:970:9 - warning: Type of "close" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:980:5 - warning: Type of "bootstrap_config" is partially unknown
+    Type of "bootstrap_config" is "dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:981:35 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "config" in function "validate_required_runtime_env"
+    Argument type is "dict[Unknown, Unknown]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:984:45 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "config" in function "summarize_runtime_env"
+    Argument type is "dict[Unknown, Unknown]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:987:9 - warning: Argument type is Any
+    Argument corresponds to parameter "args" in function "info" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:988:9 - warning: Argument type is Any
+    Argument corresponds to parameter "args" in function "info" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:989:9 - warning: Argument type is Any
+    Argument corresponds to parameter "args" in function "info" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:990:9 - warning: Argument type is Any
+    Argument corresponds to parameter "args" in function "info" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:991:18 - warning: Argument type is Any
+    Argument corresponds to parameter "iterable" in function "join" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:994:5 - warning: Type of "storage_health" is partially unknown
+    Type of "storage_health" is "dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1041:5 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1044:9 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1044:9 - warning: Type of "refresh_member_availability" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1048:5 - warning: Result of call expression is of type "dict[str, Any]" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1051:17 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1051:17 - warning: Argument type is Any
+    Argument corresponds to parameter "service" in function "__init__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1064:9 - warning: Result of call expression is of type "dict[str, int]" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1081:66 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1088:9 - warning: Result of call expression is of type "object" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1094:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1099:9 - warning: Type of "clear" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1100:5 - warning: Type of "clear_documents" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1107:20 - warning: Argument type is Any
+    Argument corresponds to parameter "doc_id" in function "ingest_text_into_ontology" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1112:20 - warning: Argument type is Any
+    Argument corresponds to parameter "doc_id" in function "_log_ingest_event" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1113:24 - warning: Argument type is Any
+    Argument corresponds to parameter "input_type" in function "_log_ingest_event" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1115:24 - warning: Argument type is Any
+    Argument corresponds to parameter "edge_count" in function "_log_ingest_event" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1117:30 - warning: Argument type is Any
+    Argument corresponds to parameter "council_case_ids" in function "_log_ingest_event" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1123:20 - warning: Argument type is Any
+    Argument corresponds to parameter "doc_id" in function "_sync_source_document_record" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1124:24 - warning: Argument type is Any
+    Argument corresponds to parameter "input_type" in function "_sync_source_document_record" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1126:28 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1128:30 - warning: Argument type is Any
+    Argument corresponds to parameter "council_case_ids" in function "_sync_source_document_record" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1131:36 - warning: Argument type is Any
+    Argument corresponds to parameter "consolidated_relations" in function "_sync_source_document_record" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1135:68 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1143:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1147:5 - warning: Type of "existing_rows" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1147:21 - warning: Type of "read" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1148:29 - warning: Type of "row" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1148:53 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1152:30 - warning: Type of "row" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1152:54 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1154:9 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1154:42 - warning: Type of "row" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1154:70 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1165:47 - warning: Type of "row" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1171:20 - warning: "app" is not accessed (reportUnusedParameter)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1196:11 - warning: Return type is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1196:48 - warning: Type of parameter "call_next" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1196:48 - warning: Type annotation is missing for parameter "call_next" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1207:12 - warning: Return type is unknown (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1213:25 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1220:25 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1262:25 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1297:29 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1301:24 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1306:27 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1311:29 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1336:22 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1337:26 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1338:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1340:23 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1341:25 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1342:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1344:29 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1344:42 - warning: Type of "case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1345:24 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1381:32 - warning: Argument type is Any
+    Argument corresponds to parameter "consolidated_relations" in function "_sync_source_document_record" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1412:29 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1412:42 - warning: Type of "case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1426:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1436:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1440:32 - warning: Argument type is Any
+    Argument corresponds to parameter "consolidated_relations" in function "_sync_source_document_record" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1446:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1447:28 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1448:26 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1495:22 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1496:26 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1497:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1499:23 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1500:25 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1501:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1503:29 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1503:42 - warning: Type of "case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1540:32 - warning: Argument type is Any
+    Argument corresponds to parameter "consolidated_relations" in function "_sync_source_document_record" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1583:22 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1584:26 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1585:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1587:23 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1588:25 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1589:24 - warning: Argument type is Any
+    Argument corresponds to parameter "x" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1591:29 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1591:42 - warning: Type of "case_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1592:24 - warning: Type `Any` is not allowed (reportExplicitAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1630:32 - warning: Argument type is Any
+    Argument corresponds to parameter "consolidated_relations" in function "_sync_source_document_record" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1658:5 - warning: Type of "storage_health" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1659:5 - warning: Type of "council_worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1660:28 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1665:42 - warning: Argument type is Any
+    Argument corresponds to parameter "o" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1665:61 - warning: Type of "is_running" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1670:26 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1671:38 - warning: Argument type is Any
+    Argument corresponds to parameter "o" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1671:57 - warning: Type of "is_running" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1676:11 - warning: Return type, "dict[str, str | bool | int | Any | Unknown | dict[str, str] | dict[str, Any] | None]", is partially unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1677:5 - warning: Type of "domain" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1677:14 - warning: Type of "domain" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1678:5 - warning: Type of "personal" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1678:16 - warning: Type of "personal" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1679:5 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1679:15 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1680:5 - warning: Type of "council_worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1680:22 - warning: Type of "council_worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1681:5 - warning: Type of "event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1681:19 - warning: Type of "learning_event_store" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1684:5 - warning: Type of "storage_backend" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1692:9 - warning: Type of "storage_health" is partially unknown
+    Type of "storage_health" is "dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1693:12 - warning: Type of "get" is partially unknown
+    Type of "get" is "Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1710:9 - warning: Type of "dyn" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1710:15 - warning: Type of "get_dynamic_domain" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1711:37 - warning: Type of "get_all_relations" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1711:37 - warning: Argument type is Any
+    Argument corresponds to parameter "obj" in function "len" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1714:9 - warning: Type of "pkg" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1714:15 - warning: Type of "get_pkg" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1715:39 - warning: Type of "get_all_relations" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1715:39 - warning: Argument type is Any
+    Argument corresponds to parameter "obj" in function "len" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1717:5 - warning: Type of "council_stats" is partially unknown
+    Type of "council_stats" is "Any | dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1717:21 - warning: Type of "get_stats" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1721:12 - warning: Return type, "dict[str, str | bool | int | Any | Unknown | dict[str, str] | dict[str, Any] | None]", is partially unknown (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1723:32 - warning: Type of "get" is partially unknown
+    Type of "get" is "Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)] | Overload[(key: str, default: None = None, /) -> (bool | Any | str | None), (key: str, default: bool | Any | str, /) -> (bool | Any | str), (key: str, default: _T@get, /) -> (bool | Any | str | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1728:28 - warning: Type of "get" is partially unknown
+    Type of "get" is "Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)] | Overload[(key: str, default: None = None, /) -> (bool | Any | str | None), (key: str, default: bool | Any | str, /) -> (bool | Any | str), (key: str, default: _T@get, /) -> (bool | Any | str | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1729:23 - warning: Type of "get" is partially unknown
+    Type of "get" is "Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)] | Overload[(key: str, default: None = None, /) -> (bool | Any | str | None), (key: str, default: bool | Any | str, /) -> (bool | Any | str), (key: str, default: _T@get, /) -> (bool | Any | str | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1730:26 - warning: Type of "get" is partially unknown
+    Type of "get" is "Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)] | Overload[(key: str, default: None = None, /) -> (bool | Any | str | None), (key: str, default: bool | Any | str, /) -> (bool | Any | str), (key: str, default: _T@get, /) -> (bool | Any | str | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1738:26 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1752:28 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1753:27 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1754:31 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1755:30 - warning: Type of "get" is partially unknown
+    Type of "get" is "Any | Overload[(key: Unknown, default: None = None, /) -> (Unknown | None), (key: Unknown, default: Unknown, /) -> Unknown, (key: Unknown, default: _T@get, /) -> (Unknown | _T@get)]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1756:39 - warning: Argument type is Any
+    Argument corresponds to parameter "o" in function "__new__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1756:58 - warning: Type of "is_running" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1757:29 - warning: Type of "last_run_at" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1758:31 - warning: Type of "last_error" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1763:35 - warning: Type of "counts" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1769:5 - warning: Type of "status_payload" is partially unknown
+    Type of "status_payload" is "dict[str, str | bool | int | Any | Unknown | dict[str, str] | dict[str, Any] | None]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1770:36 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "status_payload" in function "build_dashboard_summary"
+    Argument type is "dict[str, str | bool | int | Any | Unknown | dict[str, str] | dict[str, Any] | None]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1770:52 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "build_dashboard_summary" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1787:33 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "list_ingests" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1792:34 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "get_ingest_detail" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1809:9 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "search_documents" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1822:36 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "get_document_detail" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1831:33 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "get_document_graph" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1840:42 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "get_document_structure" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1848:32 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "build_trust_summary" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1853:36 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "list_learning_products" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1858:32 - warning: Argument type is Any
+    Argument corresponds to parameter "event_store" in function "list_audit_events" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1946:5 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1946:15 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1949:5 - warning: Type of "cases" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1949:13 - warning: Type of "list_cases" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1950:23 - warning: Type of "model_dump" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1950:56 - warning: Type of "case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1955:5 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1955:15 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1958:5 - warning: Type of "case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1958:12 - warning: Type of "get_case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1961:5 - warning: Type of "case_payload" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1961:20 - warning: Type of "model_dump" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1962:5 - warning: Type of "candidate_id" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1962:28 - warning: Argument type is Any
+    Argument corresponds to parameter "o" in function "getattr" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1962:50 - warning: Type of "get" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1962:50 - warning: Argument type is Any
+    Argument corresponds to parameter "default" in function "getattr" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1963:17 - warning: Type of "get_candidate" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1966:22 - warning: Type of "model_dump" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1972:5 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1972:15 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1973:5 - warning: Type of "worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1973:14 - warning: Type of "council_worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1976:5 - warning: Type of "case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1976:12 - warning: Type of "retry_case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1977:5 - warning: Type of "result" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1977:20 - warning: Type of "process_pending_once" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1978:21 - warning: Type of "model_dump" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1983:5 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1983:15 - warning: Type of "council" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1986:5 - warning: Type of "case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1986:12 - warning: Type of "get_case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:1997:5 - warning: Type of "record_turn" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2006:5 - warning: Type of "cast_vote" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2013:5 - warning: Type of "candidate" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2013:17 - warning: Type of "finalize_case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2018:5 - warning: Type of "updated_case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2018:20 - warning: Type of "get_case" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2020:17 - warning: Type of "model_dump" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2021:22 - warning: Type of "model_dump" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2026:11 - warning: Return type is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2027:5 - warning: Type of "worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2027:14 - warning: Type of "council_worker" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2030:12 - warning: Return type is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2030:18 - warning: Type of "process_pending_once" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2038:5 - warning: Type of "reasoning" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2038:17 - warning: Type of "reasoning" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2041:9 - warning: Type of "conclusion" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2041:22 - warning: Type of "reason" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2045:13 - warning: Type of "confidence" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2045:57 - warning: Type of "conclusion_text" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2045:57 - warning: Type of "lower" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2046:15 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2047:13 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2047:26 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2062:17 - warning: Type of "response" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2062:28 - warning: Type of "generate" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2065:39 - warning: Type of "content" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2076:29 - warning: Type of "get_stats" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2076:29 - warning: Argument type is Any
+    Argument corresponds to parameter "metrics" in function "__init__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2084:12 - warning: Type of "evidence_summary" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2085:13 - warning: Type of "append" is partially unknown
+    Type of "append" is "(object: Unknown, /) -> None" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2088:29 - warning: Type of "evidence_summary" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2089:35 - warning: Type of "confidence" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2094:12 - warning: Type of "strongest_path_description" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2095:13 - warning: Type of "append" is partially unknown
+    Type of "append" is "(object: Unknown, /) -> None" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2095:45 - warning: Type of "strongest_path_description" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2097:55 - warning: Argument type is Any
+    Argument corresponds to parameter "conclusion" in function "_log_query_event" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2099:20 - warning: Type of "conclusion_text" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2099:20 - warning: Argument type is Any
+    Argument corresponds to parameter "answer" in function "__init__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2100:24 - warning: Type of "confidence" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2100:24 - warning: Argument type is Any
+    Argument corresponds to parameter "confidence" in function "__init__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2101:21 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "sources" in function "__init__"
+    Argument type is "list[Unknown]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2103:29 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "reasoning_trace" in function "__init__"
+    Argument type is "list[Unknown]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2105:21 - warning: Type of "get_stats" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2105:21 - warning: Argument type is Any
+    Argument corresponds to parameter "metrics" in function "__init__" (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2112:12 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2114:17 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2114:30 - warning: Type of "llm_client" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2123:17 - warning: Type of "response" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2123:28 - warning: Type of "generate" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2126:48 - warning: Type of "content" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2144:5 - warning: Type of "reasoning" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2144:17 - warning: Type of "reasoning" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2149:13 - warning: Type of "append" is partially unknown
+    Type of "append" is "(object: Unknown, /) -> None" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2153:13 - warning: Type of "conclusion" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2153:26 - warning: Type of "reason" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2154:13 - warning: Type of "append" is partially unknown
+    Type of "append" is "(object: Unknown, /) -> None" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2157:31 - warning: Type of "conclusion_text" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2158:35 - warning: Type of "confidence" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2159:42 - warning: Type of "evidence_summary" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2163:13 - warning: Type of "append" is partially unknown
+    Type of "append" is "(object: Unknown, /) -> None" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2165:34 - warning: Argument type is partially unknown
+    Argument corresponds to parameter "results" in function "__init__"
+    Argument type is "list[Unknown]" (reportUnknownArgumentType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2170:5 - warning: Type of "reasoning" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2172:32 - warning: Type of "get_stats" is Any (reportAny)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\main.py:2172:32 - warning: Argument type is Any
+    Argument corresponds to parameter "object" in function "__new__" (reportAny)
+c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:14:5 - warning: Type of "build_graph_repository" is partially unknown
+    Type of "build_graph_repository" is "(config: dict[Unknown, Unknown] | None = None) -> GraphRepository" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:41:61 - warning: Type of parameter "monkeypatch" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:41:61 - warning: Type annotation is missing for parameter "monkeypatch" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:42:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:48:67 - warning: Type of parameter "monkeypatch" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:48:67 - warning: Type annotation is missing for parameter "monkeypatch" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:53:17 - warning: Type of "update" is partially unknown
+    Type of "update" is "Overload[(m: SupportsKeysAndGetItem[Unknown, Unknown], /) -> None, (m: SupportsKeysAndGetItem[str, Unknown], /, **kwargs: Unknown) -> None, (m: Iterable[tuple[Unknown, Unknown]], /) -> None, (m: Iterable[tuple[str, Unknown]], /, **kwargs: Unknown) -> None, (**kwargs: Unknown) -> None]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:62:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:63:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:64:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:65:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:66:9 - warning: Type of "setattr" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:70:9 - warning: Result of call expression is of type "GraphRepository" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:84:55 - warning: Type of parameter "monkeypatch" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:84:55 - warning: Type annotation is missing for parameter "monkeypatch" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:84:68 - warning: Type of parameter "tmp_path" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:84:68 - warning: Type annotation is missing for parameter "tmp_path" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:85:9 - warning: Type of "env_file" is unknown (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:86:9 - warning: Type of "write_text" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:96:9 - warning: Type of "chdir" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:97:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:98:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:102:26 - warning: Type of "resolve" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:109:64 - warning: Type of parameter "monkeypatch" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:109:64 - warning: Type annotation is missing for parameter "monkeypatch" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:109:77 - warning: Type of parameter "tmp_path" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:109:77 - warning: Type annotation is missing for parameter "tmp_path" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:110:9 - warning: Type of "env_file" is unknown (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:111:9 - warning: Type of "write_text" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:113:9 - warning: Type of "chdir" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:114:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:116:9 - warning: Result of call expression is of type "Path | None" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:120:70 - warning: Type of parameter "monkeypatch" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:120:70 - warning: Type annotation is missing for parameter "monkeypatch" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:121:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:122:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:123:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:124:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:125:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:130:88 - warning: Type of parameter "monkeypatch" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:130:88 - warning: Type annotation is missing for parameter "monkeypatch" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:131:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:132:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:133:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:134:9 - warning: Type of "delenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:138:64 - warning: Type of parameter "monkeypatch" is unknown (reportUnknownParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:138:64 - warning: Type annotation is missing for parameter "monkeypatch" (reportMissingParameterType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:139:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:140:9 - warning: Type of "setenv" is unknown (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:170:23 - warning: "_repo" is protected and used outside of the class in which it is declared (reportPrivateUsage)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:182:24 - warning: "_repo" is protected and used outside of the class in which it is declared (reportPrivateUsage)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:332:9 - warning: Type of "stats" is partially unknown
+    Type of "stats" is "Dict[Unknown, Unknown]" (reportUnknownVariableType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:332:17 - warning: Type of "get_stats" is partially unknown
+    Type of "get_stats" is "() -> Dict[Unknown, Unknown]" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:351:20 - warning: Type of "generate" is partially unknown
+    Type of "generate" is "(prompt: str, system_prompt: str | None = None, temperature: float = 0.7, max_tokens: int = 1024, json_mode: bool = False, metadata: Dict[Unknown, Unknown] | None = None) -> LLMResponse" (reportUnknownMemberType)
+  c:\Users\hanji\Desktop\Project Vault\01-onTro-Finance\onTro-finance\tests\infrastructure\test_wiring.py:360:5 - warning: Result of call expression is of type "int | ExitCode" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+0 errors, 611 warnings, 0 notes

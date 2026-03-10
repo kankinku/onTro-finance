@@ -5,12 +5,18 @@ services:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
-      - NEO4J_URI=bolt://neo4j:7687
-      - NEO4J_USER=neo4j
-      - NEO4J_PASSWORD=password
+      - ONTRO_STORAGE_BACKEND=neo4j
+      - ONTRO_NEO4J_URI=bolt://neo4j:7687
+      - ONTRO_NEO4J_USER=neo4j
+      - ONTRO_NEO4J_PASSWORD=password
+      - ONTRO_NEO4J_DATABASE=neo4j
+      - ONTRO_APP_HOME=/app
+      - ONTRO_LOAD_SAMPLE_DATA=false
     depends_on:
       neo4j:
         condition: service_healthy
+    volumes:
+      - ontro_app_data:/app/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
       interval: 30s
@@ -37,3 +43,4 @@ services:
 
 volumes:
   neo4j_data:
+  ontro_app_data:

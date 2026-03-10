@@ -1,4 +1,5 @@
 """Wiring Integration 테스트 - 인프라와 도메인 연결 검증"""
+
 import os
 import sys
 from pathlib import Path
@@ -7,6 +8,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from config.required_env_validator import summarize_runtime_env, validate_required_runtime_env
 from config.settings import Settings, StoreSettings, load_project_env
 from src.bootstrap import (
     build_graph_repository,
@@ -61,7 +63,9 @@ class TestBootstrapWiring:
         monkeypatch.delenv("ONTRO_NEO4J_USER", raising=False)
         monkeypatch.setenv("ONTRO_NEO4J_USERNAME", "legacy-user")
         monkeypatch.setenv("ONTRO_NEO4J_PASSWORD", "secret")
-        monkeypatch.setattr("src.storage.neo4j_repository.Neo4jGraphRepository", DummyNeo4jRepository)
+        monkeypatch.setattr(
+            "src.storage.neo4j_repository.Neo4jGraphRepository", DummyNeo4jRepository
+        )
 
         build_graph_repository(
             {
@@ -97,7 +101,10 @@ class TestBootstrapWiring:
 
         assert loaded == env_file.resolve()
         assert os.environ["ONTRO_NEO4J_URI"] == "bolt://from-env:7687"
-        assert build_graph_repository({"storage": {"backend": "neo4j"}}).__class__.__name__ == "InMemoryGraphRepository"
+        assert (
+            build_graph_repository({"storage": {"backend": "neo4j"}}).__class__.__name__
+            == "InMemoryGraphRepository"
+        )
 
     def test_dotenv_does_not_override_existing_shell_env(self, monkeypatch, tmp_path):
         env_file = tmp_path / ".env"
@@ -109,6 +116,32 @@ class TestBootstrapWiring:
         load_project_env(force=True)
 
         assert os.environ["ONTRO_STORAGE_BACKEND"] == "inmemory"
+
+    def test_runtime_env_validation_requires_neo4j_credentials(self, monkeypatch):
+        monkeypatch.setenv("ONTRO_STORAGE_BACKEND", "neo4j")
+        monkeypatch.delenv("ONTRO_NEO4J_URI", raising=False)
+        monkeypatch.delenv("ONTRO_NEO4J_USER", raising=False)
+        monkeypatch.delenv("ONTRO_NEO4J_USERNAME", raising=False)
+        monkeypatch.delenv("ONTRO_NEO4J_PASSWORD", raising=False)
+
+        with pytest.raises(ValueError, match="Missing required runtime environment variables"):
+            validate_required_runtime_env({"storage": {"backend": "neo4j", "neo4j": {}}})
+
+    def test_runtime_env_validation_allows_inmemory_without_external_credentials(self, monkeypatch):
+        monkeypatch.setenv("ONTRO_STORAGE_BACKEND", "inmemory")
+        monkeypatch.delenv("ONTRO_NEO4J_URI", raising=False)
+        monkeypatch.delenv("ONTRO_NEO4J_USER", raising=False)
+        monkeypatch.delenv("ONTRO_NEO4J_PASSWORD", raising=False)
+
+        validate_required_runtime_env({"storage": {"backend": "inmemory"}})
+
+    def test_runtime_env_summary_reports_loaded_switches(self, monkeypatch):
+        monkeypatch.setenv("ONTRO_STORAGE_BACKEND", "inmemory")
+        monkeypatch.setenv("ONTRO_COUNCIL_AUTO_ENABLED", "false")
+        summary = summarize_runtime_env({"storage": {"backend": "inmemory"}})
+
+        assert summary["storage_backend"] == "inmemory"
+        assert "ONTRO_STORAGE_BACKEND" in summary["loaded_env_names"]
 
     def test_packaged_runtime_keeps_read_only_domain_data_under_resource_root(self):
         settings = Settings(
@@ -185,12 +218,20 @@ class TestDomainKGAdapter:
         before_count = len(adapter.get_all_relations())
 
         r1 = DynamicRelation(
-            head_id="A", head_name="A", tail_id="B", tail_name="B",
-            relation_type="supports", sign="+",
+            head_id="A",
+            head_name="A",
+            tail_id="B",
+            tail_name="B",
+            relation_type="supports",
+            sign="+",
         )
         r2 = DynamicRelation(
-            head_id="C", head_name="C", tail_id="D", tail_name="D",
-            relation_type="pressures", sign="-",
+            head_id="C",
+            head_name="C",
+            tail_id="D",
+            tail_name="D",
+            relation_type="pressures",
+            sign="-",
         )
 
         adapter.upsert_relation(r1)
@@ -208,8 +249,12 @@ class TestDomainKGAdapter:
         # 트랜잭션 내에서 저장
         with tx_mgr.transaction() as tx:
             relation = DynamicRelation(
-                head_id="X", head_name="X", tail_id="Y", tail_name="Y",
-                relation_type="Affect", sign="+",
+                head_id="X",
+                head_name="X",
+                tail_id="Y",
+                tail_name="Y",
+                relation_type="Affect",
+                sign="+",
             )
             adapter.upsert_relation(relation, tx=tx)
 
@@ -244,7 +289,6 @@ class TestPersonalKGAdapter:
             source_type=SourceType.USER_WRITTEN,
         )
 
-
         adapter.upsert_relation(relation)
 
         fetched = adapter.get_relation("user_pref", "gold", "Prefer")
@@ -256,16 +300,28 @@ class TestPersonalKGAdapter:
         adapter = get_personal_kg_adapter()
 
         r1 = PersonalRelation(
-            head_id="A", head_name="A", tail_id="B", tail_name="B",
-            relation_type="R1", sign="+",
-            user_id="u1", pcs_score=0.8, personal_weight=0.5,
+            head_id="A",
+            head_name="A",
+            tail_id="B",
+            tail_name="B",
+            relation_type="R1",
+            sign="+",
+            user_id="u1",
+            pcs_score=0.8,
+            personal_weight=0.5,
             personal_label=PersonalLabel.STRONG_BELIEF,
             source_type=SourceType.LLM_INFERRED,
         )
         r2 = PersonalRelation(
-            head_id="C", head_name="C", tail_id="D", tail_name="D",
-            relation_type="R2", sign="-",
-            user_id="u1", pcs_score=0.4, personal_weight=0.3,
+            head_id="C",
+            head_name="C",
+            tail_id="D",
+            tail_name="D",
+            relation_type="R2",
+            sign="-",
+            user_id="u1",
+            pcs_score=0.4,
+            personal_weight=0.3,
             personal_label=PersonalLabel.WEAK_BELIEF,
             source_type=SourceType.LLM_INFERRED,
         )

@@ -176,6 +176,35 @@ class TestLearningEventStore:
         assert stored is not None
         assert stored["edge_count"] == 3
 
+    def test_read_ignores_corrupted_final_jsonl_line_and_quarantines_it(self, tmp_path):
+        store = LearningEventStore(tmp_path)
+        event_path = store._event_path("validation")
+        event_path.parent.mkdir(parents=True, exist_ok=True)
+        event_path.write_text(
+            '{"event_type": "validation", "edge_id": "E1"}\n{"event_type": "validation", "edge_id": ',
+            encoding="utf-8",
+        )
+
+        rows = store.read("validation")
+
+        assert len(rows) == 1
+        assert rows[0]["edge_id"] == "E1"
+        quarantine = event_path.with_suffix(event_path.suffix + ".corrupt")
+        assert quarantine.exists()
+
+    def test_replace_documents_uses_atomic_rewrite(self, tmp_path):
+        store = LearningEventStore(tmp_path)
+        store.replace_documents(
+            [
+                {"doc_id": "doc_001", "title": "One"},
+                {"doc_id": "doc_002", "title": "Two"},
+            ]
+        )
+
+        rows = store.read_documents()
+
+        assert [row["doc_id"] for row in rows] == ["doc_001", "doc_002"]
+
 
 class TestOfflineEvaluation:
     def test_evaluate_dataset_matches_goldset(self):

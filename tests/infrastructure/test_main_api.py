@@ -153,6 +153,55 @@ class TestCallbackValidation:
             app_main._guard_request(request)
         assert exc_info.value.status_code == 401
 
+    def test_guard_request_enforces_role_based_authorization(self, monkeypatch):
+        monkeypatch.setenv("ONTRO_API_KEY_VIEWER", "viewer-key")
+        viewer_request = SimpleNamespace(
+            headers={"x-api-key": "viewer-key"},
+            client=SimpleNamespace(host="127.0.0.1"),
+            method="POST",
+            url=SimpleNamespace(path="/api/learning/evaluations/run"),
+            state=SimpleNamespace(),
+        )
+        with pytest.raises(app_main.HTTPException) as exc_info:
+            app_main._guard_request(viewer_request)
+        assert exc_info.value.status_code == 403
+
+        operator_request = SimpleNamespace(
+            headers={"x-api-key": "operator-key"},
+            client=SimpleNamespace(host="127.0.0.1"),
+            method="POST",
+            url=SimpleNamespace(path="/api/learning/evaluations/run"),
+            state=SimpleNamespace(),
+        )
+        monkeypatch.setenv("ONTRO_API_KEY_OPERATOR", "operator-key")
+        app_main._guard_request(operator_request)
+        assert operator_request.state.api_role == "operator"
+
+        admin_request = SimpleNamespace(
+            headers={"x-api-key": "admin-key"},
+            client=SimpleNamespace(host="127.0.0.1"),
+            method="POST",
+            url=SimpleNamespace(path="/api/council/process-pending"),
+            state=SimpleNamespace(),
+        )
+        monkeypatch.setenv("ONTRO_API_KEY_ADMIN", "admin-key")
+        app_main._guard_request(admin_request)
+        assert admin_request.state.api_role == "admin"
+
+    def test_viewer_role_can_access_read_only_document_paths(self, monkeypatch):
+        monkeypatch.setenv("ONTRO_API_KEY_VIEWER", "viewer-key")
+        viewer_request = SimpleNamespace(
+            headers={"x-api-key": "viewer-key"},
+            client=SimpleNamespace(host="127.0.0.1"),
+            method="GET",
+            url=SimpleNamespace(path="/api/documents/doc_001/graph"),
+            state=SimpleNamespace(),
+        )
+
+        app_main._guard_request(viewer_request)
+
+        assert viewer_request.state.api_role == "viewer"
+
     def test_guard_request_enforces_rate_limit(self, monkeypatch):
         monkeypatch.setenv("ONTRO_RATE_LIMIT_PER_MINUTE", "1")
         request = SimpleNamespace(
@@ -182,6 +231,24 @@ class TestCallbackValidation:
 
         assert result["count"] == 1
         assert result["items"][0]["path"] == "/api/learning/evaluations/run"
+
+    def test_metrics_endpoint_returns_prometheus_text(self):
+        app_main.app_state.ready = True
+        app_main.app_state.ingested_docs = 3
+        app_main.app_state.ingested_edge_count = 9
+        app_main.app_state.ingested_pdf_doc_count = 1
+        app_main.app_state.storage_health = {"ok": True}
+        app_main.app_state.request_totals = {"/api/documents": 4}
+        app_main.app_state.request_errors = {"/api/learning/evaluations/run": 1}
+        app_main.app_state.learning_event_store = SimpleNamespace(audit_count=lambda: 2)
+
+        response = asyncio.run(app_main.metrics())
+
+        assert response.media_type == "text/plain; version=0.0.4"
+        body = response.body.decode("utf-8")
+        assert "ontro_ready 1" in body
+        assert "ontro_ingested_documents_total 3" in body
+        assert 'ontro_requests_total{path="/api/documents"' in body
 
 
 class TestStartupBehavior:

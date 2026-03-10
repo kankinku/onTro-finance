@@ -61,6 +61,11 @@ GITHUB_COPILOT_CLIENT_SECRET=
 
 애플리케이션은 시작 시 `.env`를 자동 로드한다. 운영체제 환경변수에 이미 값이 있으면 그 값이 우선한다.
 
+운영 경로에서는 startup 단계에서 필수 환경변수 검증을 수행한다.
+
+- `ONTRO_STORAGE_BACKEND=neo4j` 이면 `ONTRO_NEO4J_URI`, `ONTRO_NEO4J_USER`, `ONTRO_NEO4J_PASSWORD`가 없을 경우 서버가 즉시 실패한다.
+- `inmemory` 경로는 외부 저장소 자격 증명 없이도 시작 가능하다.
+
 ```powershell
 python -m venv "$env:TEMP\ontro-finance-venv"
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" -m pip install -r requirements.txt
@@ -107,6 +112,28 @@ docker run --name ontro-neo4j `
   -d neo4j:5
 ```
 
+## Docker Compose 운영 기본값
+
+`docker-compose.yml`은 단일 VM 기준 운영 경로를 위한 기본 persistence 구성을 포함합니다.
+
+- `neo4j_data`: Neo4j 그래프 저장소 유지
+- `ontro_app_data`: `/app/data` 아래 runtime 데이터 유지
+  - audit/event logs
+  - learning snapshots / goldsets / bundles
+  - personal/raw runtime data
+
+기본 smoke 절차:
+
+```powershell
+docker compose up -d
+curl -f http://localhost:8000/healthz
+curl -f http://localhost:8000/status
+docker compose restart app
+curl -f http://localhost:8000/healthz
+```
+
+이 경로에서는 컨테이너 재시작 후에도 `ontro_app_data`와 `neo4j_data` 볼륨에 저장된 데이터가 유지되어야 합니다.
+
 ## 공식 API
 
 - `POST /api/text/add-to-vectordb`
@@ -118,6 +145,16 @@ docker run --name ontro-neo4j `
 - `GET /api/council/cases/{case_id}`
 - `POST /api/council/cases/{case_id}/retry`
 - `POST /api/council/process-pending`
+
+## Role-based API keys
+
+Protected operations support three roles.
+
+- `ONTRO_API_KEY_ADMIN`: full access including council decisions, replay/delete, bundle promotion
+- `ONTRO_API_KEY_OPERATOR`: ingest, learning evaluation, audit/document operational reads
+- `ONTRO_API_KEY_VIEWER`: read-only document/graph/trust/product inspection
+
+If legacy `ONTRO_API_KEY` is set, it is treated as an admin key for backward compatibility.
 
 ingest 응답은 다음 카운터를 제공합니다.
 
@@ -182,3 +219,5 @@ python -m src.council.cli models --json
 
 - 시스템 명세: `docs/SYSTEM_SPECIFICATION.md`
 - 시작 가이드: `docs/TUTORIAL_KO.md`
+- 배포/롤백 runbook: `docs/DEPLOY_RUNBOOK.md`
+- OCR/table parser feature track: `docs/OCR_TABLE_TRACK.md`

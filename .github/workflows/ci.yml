@@ -31,7 +31,10 @@ jobs:
       - name: Run tests with coverage
         run: pytest --cov=src --cov-report=term-missing --cov-fail-under=50
         env:
-          ONTRO_STORAGE_BACKEND: memory
+          ONTRO_STORAGE_BACKEND: inmemory
+
+      - name: Typecheck with basedpyright
+        run: python -m basedpyright main.py src tests
 
   docker-build:
     runs-on: ubuntu-latest
@@ -50,9 +53,15 @@ jobs:
         run: |
           docker run -d --name ontro-test \
             -p 8000:8000 \
-            -e ONTRO_STORAGE_BACKEND=memory \
+            -e ONTRO_STORAGE_BACKEND=inmemory \
             -e ONTRO_LOAD_SAMPLE_DATA=false \
+            -e ONTRO_API_KEY_ADMIN=ci-admin \
+            -e ONTRO_API_KEY_OPERATOR=ci-operator \
+            -e ONTRO_JSON_LOGS=true \
             ontro-finance:${{ github.sha }}
           sleep 15
           curl -f http://localhost:8000/healthz || (docker logs ontro-test && exit 1)
+          curl -f http://localhost:8000/status || (docker logs ontro-test && exit 1)
+          curl -f http://localhost:8000/metrics || (docker logs ontro-test && exit 1)
+          curl -f -H "x-api-key: ci-operator" http://localhost:8000/api/audit/logs || (docker logs ontro-test && exit 1)
           docker stop ontro-test

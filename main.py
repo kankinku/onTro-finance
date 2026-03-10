@@ -8,19 +8,20 @@ import socket
 import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
-from typing import Protocol
 from urllib.parse import urlparse
 
 import httpx
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
+from config.required_env_validator import summarize_runtime_env, validate_required_runtime_env
 from config.settings import get_settings
 from src.bootstrap import (
     build_llm_client,
@@ -28,6 +29,7 @@ from src.bootstrap import (
     get_council_service,
     get_graph_repository,
     get_transaction_manager,
+    load_config,
     reset_all,
 )
 from src.council.worker import CouncilAutomationWorker
@@ -101,11 +103,47 @@ from src.web.operations_console import (
     list_ingests as build_ingest_listing,
 )
 
+
 # Logging setup
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+class JsonLogFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "timestamp": datetime.fromtimestamp(record.created, timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        extra_payload = getattr(record, "structured", None)
+        if isinstance(extra_payload, dict):
+            payload.update(extra_payload)
+        if record.exc_info:
+            payload["exception"] = self.formatException(record.exc_info)
+        return json.dumps(payload, ensure_ascii=False)
+
+
+def _configure_logging() -> None:
+    json_logs = os.environ.get("ONTRO_JSON_LOGS", "false").lower() in {"1", "true", "yes", "on"}
+    root_logger = logging.getLogger()
+    if not root_logger.handlers:
+        handler = logging.StreamHandler()
+        root_logger.addHandler(handler)
+    for handler in root_logger.handlers:
+        handler.setFormatter(
+            JsonLogFormatter()
+            if json_logs
+            else logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        )
+    root_logger.setLevel(logging.INFO)
+
+
+_configure_logging()
 logger = logging.getLogger(__name__)
+
+
+def log_event(level: int, event: str, **fields: Any) -> None:
+    logger.log(level, event, extra={"structured": {"event": event, **fields}})
 
 
 @dataclass
@@ -129,6 +167,8 @@ class AppState:
     ingested_edge_count: int = 0
     ingested_pdf_doc_count: int = 0
     request_counters: dict[str, list[float]] = field(default_factory=dict)
+    request_totals: dict[str, int] = field(default_factory=dict)
+    request_errors: dict[str, int] = field(default_factory=dict)
     # Deprecated aliases kept for one release while callers migrate.
     ingested_chunks: int = 0
     ingested_pdf_docs: int = 0
@@ -175,19 +215,77 @@ def _generate_doc_id(prefix: str) -> str:
 
 
 def _api_security_enabled() -> bool:
-    return os.environ.get("ONTRO_API_KEY", "").strip() != ""
+    return any(
+        os.environ.get(name, "").strip()
+        for name in (
+            "ONTRO_API_KEY",
+            "ONTRO_API_KEY_ADMIN",
+            "ONTRO_API_KEY_OPERATOR",
+            "ONTRO_API_KEY_VIEWER",
+        )
+    )
+
+
+def _resolve_api_key_role(request: Any) -> str | None:
+    provided = (
+        request.headers.get("x-api-key")
+        or request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+    )
+    if not provided:
+        return None
+    role_to_key = {
+        "admin": os.environ.get("ONTRO_API_KEY_ADMIN", "").strip(),
+        "operator": os.environ.get("ONTRO_API_KEY_OPERATOR", "").strip(),
+        "viewer": os.environ.get("ONTRO_API_KEY_VIEWER", "").strip(),
+    }
+    if os.environ.get("ONTRO_API_KEY", "").strip():
+        role_to_key["admin"] = os.environ.get("ONTRO_API_KEY", "").strip()
+    for role, expected in role_to_key.items():
+        if expected and provided == expected:
+            return role
+    return None
 
 
 def _enforce_api_key(request: Any) -> None:
     if not _api_security_enabled():
         return
-    provided = (
-        request.headers.get("x-api-key")
-        or request.headers.get("authorization", "").removeprefix("Bearer ").strip()
-    )
-    expected = os.environ.get("ONTRO_API_KEY", "").strip()
-    if not provided or provided != expected:
+    role = _resolve_api_key_role(request)
+    if role is None:
         raise HTTPException(status_code=401, detail="Invalid API key")
+    request.state.api_role = role
+
+
+def _authorize_request(request: Any) -> None:
+    role = getattr(request.state, "api_role", None)
+    if role is None:
+        return
+    path = request.url.path
+    method = request.method.upper()
+    admin_only = {
+        "/api/ingests/delete",
+        "/api/council/process-pending",
+        "/api/learning/bundles/promote",
+    }
+    operator_or_admin_prefixes = (
+        "/api/text/",
+        "/api/news/",
+        "/api/pdf/",
+        "/api/documents/ingest-structured",
+        "/api/learning/evaluations/run",
+    )
+    if path in admin_only or path.startswith("/api/council/cases/") and path.endswith("/decision"):
+        if role != "admin":
+            raise HTTPException(status_code=403, detail="Admin role required")
+    elif (
+        path.startswith(operator_or_admin_prefixes)
+        or path.startswith("/api/council/cases/")
+        and path.endswith("/retry")
+    ):
+        if role not in {"admin", "operator"}:
+            raise HTTPException(status_code=403, detail="Operator role required")
+    elif path.startswith("/api/audit/"):
+        if role not in {"admin", "operator"}:
+            raise HTTPException(status_code=403, detail="Operator role required")
 
 
 def _rate_limit_request(request: Any) -> None:
@@ -202,6 +300,9 @@ def _rate_limit_request(request: Any) -> None:
     if len(bucket) >= limit:
         raise HTTPException(status_code=429, detail="Rate limit exceeded")
     bucket.append(now_ts)
+    app_state.request_totals[request.url.path] = (
+        app_state.request_totals.get(request.url.path, 0) + 1
+    )
 
 
 def _audit_log_request(request: Any) -> None:
@@ -214,18 +315,22 @@ def _audit_log_request(request: Any) -> None:
                 "action": request.method.lower(),
                 "path": request.url.path,
                 "client": request.client.host if request.client else "unknown",
+                "role": getattr(request.state, "api_role", None),
             }
         )
-    logger.info(
-        "AUDIT %s %s client=%s",
-        request.method,
-        request.url.path,
-        request.client.host if request.client else "unknown",
+    log_event(
+        logging.INFO,
+        "audit_request",
+        method=request.method,
+        path=request.url.path,
+        client=request.client.host if request.client else "unknown",
+        role=getattr(request.state, "api_role", None),
     )
 
 
 def _guard_request(request: Any) -> None:
     _enforce_api_key(request)
+    _authorize_request(request)
     _rate_limit_request(request)
     _audit_log_request(request)
 
@@ -975,6 +1080,19 @@ async def _initialize_runtime(*, load_sample_data_override: bool | None = None) 
     logger.info("Initializing Ontology System v11...")
     reset_app_state()
     settings = get_settings()
+    bootstrap_config = load_config()
+    validate_required_runtime_env(bootstrap_config)
+    if os.environ.get("ONTRO_NEO4J_USERNAME") and not os.environ.get("ONTRO_NEO4J_USER"):
+        logger.warning("ONTRO_NEO4J_USERNAME is deprecated; use ONTRO_NEO4J_USER")
+    runtime_summary = summarize_runtime_env(bootstrap_config)
+    logger.info(
+        "Startup configuration: backend=%s council_auto=%s sample_data=%s callbacks=%s env=%s",
+        runtime_summary["storage_backend"],
+        runtime_summary["council_auto_enabled"],
+        runtime_summary["load_sample_data"],
+        runtime_summary["callbacks_enabled"],
+        ",".join(runtime_summary["loaded_env_names"]),
+    )
     repo = get_graph_repository()
     storage_health = check_graph_repository_health(repo)
     if not storage_health["ok"]:
@@ -1187,9 +1305,21 @@ async def guard_api_requests(request: Request, call_next):
         "/api/ingests/delete",
         "/api/council/",
     )
-    if request.url.path.startswith(guarded_paths):
-        _guard_request(request)
-    return await call_next(request)
+    try:
+        if request.url.path.startswith(guarded_paths):
+            _guard_request(request)
+        response = await call_next(request)
+        return response
+    except HTTPException:
+        app_state.request_errors[request.url.path] = (
+            app_state.request_errors.get(request.url.path, 0) + 1
+        )
+        raise
+    except Exception:
+        app_state.request_errors[request.url.path] = (
+            app_state.request_errors.get(request.url.path, 0) + 1
+        )
+        raise
 
 
 # Models
@@ -2152,10 +2282,34 @@ async def batch_ask(request: BatchRequest):
 
 @app.get("/metrics")
 async def metrics():
-    reasoning = app_state["reasoning"]
-    if reasoning:
-        return {"metrics": str(reasoning.get_stats())}
-    return {"metrics": ""}
+    storage_health = app_state.storage_health
+    lines = [
+        "# HELP ontro_ready App readiness state",
+        "# TYPE ontro_ready gauge",
+        f"ontro_ready {1 if app_state.ready else 0}",
+        "# HELP ontro_ingested_documents_total Total ingested documents",
+        "# TYPE ontro_ingested_documents_total counter",
+        f"ontro_ingested_documents_total {app_state.ingested_docs}",
+        "# HELP ontro_ingested_edges_total Total extracted edges",
+        "# TYPE ontro_ingested_edges_total counter",
+        f"ontro_ingested_edges_total {app_state.ingested_edge_count}",
+        "# HELP ontro_ingested_pdf_documents_total Total ingested pdf documents",
+        "# TYPE ontro_ingested_pdf_documents_total counter",
+        f"ontro_ingested_pdf_documents_total {app_state.ingested_pdf_doc_count}",
+        "# HELP ontro_storage_ok Storage health status",
+        "# TYPE ontro_storage_ok gauge",
+        f"ontro_storage_ok {1 if storage_health.get('ok') else 0}",
+        "# HELP ontro_audit_events_total Total audit events",
+        "# TYPE ontro_audit_events_total counter",
+        f"ontro_audit_events_total {app_state.learning_event_store.audit_count() if app_state.learning_event_store else 0}",
+    ]
+    for path, count in sorted(app_state.request_totals.items()):
+        sanitized = path.strip("/").replace("/", "_").replace("-", "_") or "root"
+        lines.append(f'ontro_requests_total{{path="{path}",path_key="{sanitized}"}} {count}')
+    for path, count in sorted(app_state.request_errors.items()):
+        sanitized = path.strip("/").replace("/", "_").replace("-", "_") or "root"
+        lines.append(f'ontro_request_errors_total{{path="{path}",path_key="{sanitized}"}} {count}')
+    return PlainTextResponse("\n".join(lines) + "\n", media_type="text/plain; version=0.0.4")
 
 
 _RESERVED_NON_CONSOLE_PREFIXES = (
