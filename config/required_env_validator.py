@@ -10,6 +10,8 @@ def validate_required_runtime_env(config: dict[str, Any] | None = None) -> None:
     config = config or {}
     storage_config = config.get("storage", {}) if isinstance(config, dict) else {}
     backend = os.environ.get("ONTRO_STORAGE_BACKEND") or storage_config.get("backend") or "neo4j"
+    llm_config = config.get("llm", {}) if isinstance(config, dict) else {}
+    llm_backend = llm_config.get("backend") or "ollama"
 
     missing: list[str] = []
     if backend == "neo4j":
@@ -24,10 +26,17 @@ def validate_required_runtime_env(config: dict[str, Any] | None = None) -> None:
             "ONTRO_NEO4J_PASSWORD", storage_config.get("neo4j", {}).get("password")
         ):
             missing.append("ONTRO_NEO4J_PASSWORD")
+    if llm_backend == "openai":
+        openai_config = llm_config.get("openai", {})
+        auth_config = openai_config.get("auth", {}) if isinstance(openai_config, dict) else {}
+        api_key_env = auth_config.get("api_key_env") or openai_config.get("api_key_env") or "OPENAI_API_KEY"
+        direct_api_key = openai_config.get("api_key")
+        if not (direct_api_key or os.environ.get(api_key_env)):
+            missing.append(api_key_env)
     if missing:
         raise ValueError(
             "Missing required runtime environment variables for "
-            f"backend '{backend}': {', '.join(missing)}"
+            f"backend '{backend}' / llm '{llm_backend}': {', '.join(sorted(set(missing)))}"
         )
 
 
@@ -50,6 +59,7 @@ def summarize_runtime_env(config: dict[str, Any] | None = None) -> dict[str, Any
             "ONTRO_RATE_LIMIT_PER_MINUTE",
             "ONTRO_AUDIT_LOG",
             "OPENAI_API_KEY",
+            "OPENAI_BASE_URL",
         )
         if os.environ.get(name)
     )

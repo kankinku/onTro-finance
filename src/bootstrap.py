@@ -136,6 +136,7 @@ def get_transaction_manager() -> KGTransactionManager:
 
 from src.llm.llm_client import LLMClient
 from src.llm.gateway import LLMGateway
+from src.llm.provider_auth import AuthType, ProviderAuthConfig, ProviderKind
 
 
 def build_llm_client(config: Optional[dict] = None) -> LLMClient:
@@ -155,6 +156,23 @@ def build_llm_client(config: Optional[dict] = None) -> LLMClient:
             model=ollama_conf.get("model", "llama3.2"),
             timeout=ollama_conf.get("timeout", 30.0),
         )
+
+    elif backend == "openai":
+        from src.llm.openai_compatible_adapter import OpenAICompatibleLLMClient
+
+        openai_conf = llm_config.get("openai", {})
+        auth_config, direct_api_key = _build_openai_auth_config(openai_conf)
+        logger.info(
+            "Using OpenAI-compatible LLM: %s (%s)",
+            openai_conf.get("model", "gpt-4o-mini"),
+            auth_config.base_url,
+        )
+        return OpenAICompatibleLLMClient(
+            auth_config=auth_config,
+            model=openai_conf.get("model", "gpt-4o-mini"),
+            api_key=direct_api_key,
+            env=os.environ,
+        )
     
     elif backend == "mock":
         from src.llm.ollama_adapter import MockLLMClient
@@ -163,6 +181,35 @@ def build_llm_client(config: Optional[dict] = None) -> LLMClient:
     
     else:
         raise ValueError(f"Unknown LLM backend: {backend}")
+
+
+def _build_openai_auth_config(openai_conf: Optional[dict]) -> tuple[ProviderAuthConfig, Optional[str]]:
+    openai_conf = openai_conf or {}
+    auth_conf = dict(openai_conf.get("auth", {}))
+    api_key_env = (
+        auth_conf.get("api_key_env")
+        or openai_conf.get("api_key_env")
+        or "OPENAI_API_KEY"
+    )
+    direct_api_key = str(openai_conf.get("api_key") or "").strip() or None
+    auth_type_raw = auth_conf.get("auth_type") or ("api_key" if (api_key_env or direct_api_key) else "none")
+    auth_type = AuthType(auth_type_raw)
+
+    config = ProviderAuthConfig(
+        provider=ProviderKind.OPENAI_GPT_SDK,
+        auth_type=auth_type,
+        base_url=auth_conf.get("base_url") or openai_conf.get("base_url", "https://api.openai.com/v1"),
+        healthcheck_path=auth_conf.get("healthcheck_path") or openai_conf.get("healthcheck_path", "/models"),
+        api_key_env=api_key_env if auth_type == AuthType.API_KEY else None,
+        timeout_seconds=float(auth_conf.get("timeout_seconds") or openai_conf.get("timeout", 60.0)),
+    )
+
+    if auth_type == AuthType.API_KEY and not (direct_api_key or os.environ.get(api_key_env)):
+        raise ValueError(
+            "OpenAI backend requires credentials via auth.api_key_env/api_key_env or api_key"
+        )
+
+    return config, direct_api_key
 
 
 def build_llm_gateway(config: Optional[dict] = None) -> LLMGateway:

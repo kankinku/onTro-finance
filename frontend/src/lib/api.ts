@@ -1,6 +1,7 @@
 import type {
   AskResponse,
   AiRuntimeStatus,
+  AuditLogDetailResponse,
   AuditLogResponse,
   CouncilCasesResponse,
   CouncilDecisionResponse,
@@ -16,9 +17,11 @@ import type {
   IngestListResponse,
   IngestResult,
   LearningEvaluationRunResponse,
+  LearningProductDetailResponse,
   LearningProductsResponse,
   TrustSummary,
 } from "./types";
+import { buildAuthHeaders } from "./auth";
 
 const apiBase = import.meta.env.VITE_API_BASE ?? "";
 
@@ -44,12 +47,15 @@ const buildUrl = (path: string, params?: Record<string, string | number | undefi
 };
 
 const apiFetch = async <T>(path: string, init?: RequestInit, params?: Record<string, string | number | undefined>) => {
+  const headers = {
+    ...buildAuthHeaders(),
+    ...(init?.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+    ...(init?.headers ?? {}),
+  };
+
   const response = await fetch(buildUrl(path, params), {
-    headers: {
-      ...(init?.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
-      ...init?.headers,
-    },
     ...init,
+    headers,
   });
 
   if (!response.ok) {
@@ -72,6 +78,9 @@ export const getDashboardSummary = () => apiFetch<DashboardSummary>("/api/dashbo
 
 export const getAuditLogs = (limit = 20, action?: string) =>
   apiFetch<AuditLogResponse>("/api/audit/logs", undefined, { limit, action });
+
+export const getAuditLogDetail = (eventId: string) =>
+  apiFetch<AuditLogDetailResponse>(`/api/audit/logs/${eventId}`);
 
 export const getIngests = (limit = 20) =>
   apiFetch<IngestListResponse>("/api/ingests", undefined, { limit });
@@ -99,6 +108,14 @@ export const getDocuments = (
     document_quality_tier: params.documentQualityTier,
   });
 
+export const probeAuthProfile = async () => {
+  const response = await apiFetch<DocumentListResponse>("/api/documents", undefined, { limit: 1 });
+  return {
+    ok: true,
+    count: response.items.length,
+  };
+};
+
 export const getDocumentDetail = (docId: string) => apiFetch<DocumentDetail>(`/api/documents/${docId}`);
 
 export const getDocumentGraph = (docId: string) => apiFetch<GraphResponse>(`/api/documents/${docId}/graph`);
@@ -110,6 +127,9 @@ export const getTrustSummary = () => apiFetch<TrustSummary>("/api/trust/summary"
 
 export const getLearningProducts = (limit = 10) =>
   apiFetch<LearningProductsResponse>("/api/learning/products", undefined, { limit });
+
+export const getLearningProductDetail = (kind: string, fileName: string) =>
+  apiFetch<LearningProductDetailResponse>(`/api/learning/products/${kind}/${fileName}`);
 
 export const runLearningEvaluation = (payload: { snapshotFilename?: string; goldsetFilename: string; taskType?: string }) =>
   apiFetch<LearningEvaluationRunResponse>("/api/learning/evaluations/run", {

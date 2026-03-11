@@ -18,6 +18,13 @@ llm:
     timeout: 30
   
   openai:
-    api_key: "${OPENAI_API_KEY}"
+    # OpenClaw-style pattern: keep credential references in config,
+    # resolve the actual secret from env at runtime.
+    api_key_env: "OPENAI_API_KEY"
+    base_url: "https://api.openai.com/v1"
     model: "gpt-4o-mini"
     timeout: 60
+    auth:
+      auth_type: "api_key"
+      api_key_env: "OPENAI_API_KEY"
+      healthcheck_path: "/models"

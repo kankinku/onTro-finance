@@ -129,6 +129,14 @@ def list_audit_events(
     return {"items": items, "count": len(items)}
 
 
+def get_audit_event_detail(
+    event_store: Optional[LearningEventStore], event_id: str
+) -> Optional[Dict[str, Any]]:
+    if event_store is None:
+        return None
+    return event_store.get_audit_event(event_id)
+
+
 def list_ingests(event_store: Optional[LearningEventStore], limit: int = 20) -> Dict[str, Any]:
     if event_store is None:
         return {"items": [], "count": 0}
@@ -302,6 +310,8 @@ def get_document_structure(
             "caption": block.get("table_caption"),
             "rows": block.get("table_rows"),
             "columns": block.get("table_columns"),
+            "headers": block.get("table_headers", []),
+            "cells": block.get("table_cells", []),
         }
         for block in pdf_blocks
         if isinstance(block, dict) and block.get("block_type") == "table"
@@ -649,6 +659,32 @@ def list_learning_products(
             "goldsets": len(goldset_items),
         },
         "items": all_items,
+    }
+
+
+def get_learning_product_detail(
+    event_store: Optional[LearningEventStore], kind: str, file_name: str
+) -> Optional[Dict[str, Any]]:
+    if event_store is None:
+        return None
+    directory_map = {
+        "snapshot": event_store.snapshot_path("placeholder").parent,
+        "evaluation": event_store.snapshot_path("placeholder").parent,
+        "goldset": event_store.goldset_path("placeholder").parent,
+        "bundle": event_store.bundle_path("placeholder").parent,
+    }
+    directory = directory_map.get(kind)
+    if directory is None:
+        return None
+    path = directory / file_name
+    if not path.exists():
+        return None
+    payload = _load_json(path)
+    return {
+        "kind": kind,
+        "file_name": file_name,
+        "path": str(path),
+        "payload": payload,
     }
 
 

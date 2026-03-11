@@ -205,6 +205,52 @@ class TestLearningEventStore:
 
         assert [row["doc_id"] for row in rows] == ["doc_001", "doc_002"]
 
+    def test_audit_retention_prunes_old_events(self, tmp_path, monkeypatch):
+        store = LearningEventStore(tmp_path)
+        monkeypatch.setenv("ONTRO_AUDIT_RETENTION_DAYS", "1")
+        audit_path = store._event_path("audit")
+        audit_path.parent.mkdir(parents=True, exist_ok=True)
+        audit_path.write_text(
+            "\n".join(
+                [
+                    '{"event_id":"old","event_type":"audit","logged_at":"2020-01-01T00:00:00Z","action":"post"}',
+                    '{"event_id":"new","event_type":"audit","logged_at":"2999-01-01T00:00:00Z","action":"post"}',
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        rows = store.list_audit()
+
+        assert len(rows) == 1
+        assert rows[0]["event_id"] == "new"
+
+    def test_event_store_uses_distributed_lock_when_redis_enabled(self, tmp_path, monkeypatch):
+        entered = []
+
+        class _FakeProvider:
+            def lock(self, key, ttl_seconds=30):
+                from contextlib import contextmanager
+
+                @contextmanager
+                def _ctx():
+                    entered.append((key, ttl_seconds))
+                    yield
+
+                return _ctx()
+
+        monkeypatch.setenv("ONTRO_REDIS_URL", "redis://fake")
+        monkeypatch.setattr(
+            "src.learning.event_store.get_coordination_provider", lambda: _FakeProvider()
+        )
+
+        store = LearningEventStore(tmp_path)
+        store.append("validation", {"edge_id": "E1"})
+
+        assert entered
+        assert entered[0][0].startswith("ontro:lock:")
+
 
 class TestOfflineEvaluation:
     def test_evaluate_dataset_matches_goldset(self):

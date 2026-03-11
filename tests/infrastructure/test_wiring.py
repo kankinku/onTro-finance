@@ -12,6 +12,7 @@ from config.required_env_validator import summarize_runtime_env, validate_requir
 from config.settings import Settings, StoreSettings, load_project_env
 from src.bootstrap import (
     build_graph_repository,
+    build_llm_client,
     get_domain_kg_adapter,
     get_graph_repository,
     get_llm_gateway,
@@ -135,6 +136,25 @@ class TestBootstrapWiring:
 
         validate_required_runtime_env({"storage": {"backend": "inmemory"}})
 
+    def test_runtime_env_validation_requires_openai_credentials_when_backend_selected(self, monkeypatch):
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+        with pytest.raises(ValueError, match="OPENAI_API_KEY"):
+            validate_required_runtime_env(
+                {
+                    "storage": {"backend": "inmemory"},
+                    "llm": {
+                        "backend": "openai",
+                        "openai": {
+                            "auth": {
+                                "auth_type": "api_key",
+                                "api_key_env": "OPENAI_API_KEY",
+                            }
+                        },
+                    },
+                }
+            )
+
     def test_runtime_env_summary_reports_loaded_switches(self, monkeypatch):
         monkeypatch.setenv("ONTRO_STORAGE_BACKEND", "inmemory")
         monkeypatch.setenv("ONTRO_COUNCIL_AUTO_ENABLED", "false")
@@ -174,6 +194,50 @@ class TestBootstrapWiring:
         assert gateway is not None
         # 싱글톤 확인
         assert get_llm_gateway() is gateway
+
+    def test_build_llm_client_supports_openai_backend_with_env_ref(self, monkeypatch):
+        monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+
+        client = build_llm_client(
+            {
+                "llm": {
+                    "backend": "openai",
+                    "openai": {
+                        "base_url": "https://api.openai.com/v1",
+                        "model": "gpt-4o-mini",
+                        "timeout": 45,
+                        "auth": {
+                            "auth_type": "api_key",
+                            "api_key_env": "OPENAI_API_KEY",
+                            "healthcheck_path": "/models",
+                        },
+                    },
+                }
+            }
+        )
+
+        assert client.__class__.__name__ == "OpenAICompatibleLLMClient"
+        assert client.get_model_name() == "gpt-4o-mini"
+        assert client.auth_config.base_url == "https://api.openai.com/v1"
+
+    def test_build_llm_client_openai_backend_rejects_missing_credentials(self, monkeypatch):
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+        with pytest.raises(ValueError, match="OpenAI backend requires credentials"):
+            build_llm_client(
+                {
+                    "llm": {
+                        "backend": "openai",
+                        "openai": {
+                            "model": "gpt-4o-mini",
+                            "auth": {
+                                "auth_type": "api_key",
+                                "api_key_env": "OPENAI_API_KEY",
+                            },
+                        },
+                    }
+                }
+            )
 
     def test_get_domain_kg_adapter(self):
         adapter = get_domain_kg_adapter()

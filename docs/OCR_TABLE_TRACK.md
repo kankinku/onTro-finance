@@ -4,6 +4,12 @@
 
 This is a parallel feature track and is not part of the deployment-readiness critical path.
 
+Current implementation status:
+
+- OCR engine hook is implemented through a local `tesseract` CLI path for pages with `ocr_required=true` and embedded page images.
+- True table parser is implemented for machine-readable text tables with header/cell grid extraction.
+- Image-based or OCR-derived complex table reconstruction is still not implemented.
+
 ## OCR Scope
 
 - Target only scanned PDF pages that currently surface `ocr_required=true`

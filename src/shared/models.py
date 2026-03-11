@@ -98,6 +98,8 @@ class Fragment(BaseModel):
     table_caption: Optional[str] = Field(default=None, description="표 제목")
     table_rows: Optional[int] = Field(default=None, description="표 추정 행 수")
     table_columns: Optional[int] = Field(default=None, description="표 추정 열 수")
+    table_headers: List[str] = Field(default_factory=list, description="table header cells")
+    table_cells: List[List[str]] = Field(default_factory=list, description="table cell grid")
     source_document: Optional[SourceDocument] = Field(
         default=None, description="원천 문서 메타데이터"
     )

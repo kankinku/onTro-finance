@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { SectionCard } from "../components/SectionCard";
 import { StatCard } from "../components/StatCard";
 import { StatusPill } from "../components/StatusPill";
 import { useI18n } from "../app/i18n";
-import { getAuditLogs, getDashboardSummary, promoteLearningBundle, runLearningEvaluation } from "../lib/api";
+import { getAuditLogDetail, getAuditLogs, getDashboardSummary, promoteLearningBundle, runLearningEvaluation } from "../lib/api";
 import type { LearningProductItem } from "../lib/types";
 
 export const OverviewPage = () => {
@@ -15,6 +16,7 @@ export const OverviewPage = () => {
   const [snapshotFilename, setSnapshotFilename] = useState("dataset-test.json");
   const [bundleFilename, setBundleFilename] = useState("bundle-test.json");
   const [auditAction, setAuditAction] = useState("");
+  const [selectedAuditId, setSelectedAuditId] = useState("");
   const summaryQuery = useQuery({
     queryKey: ["dashboard-summary"],
     queryFn: getDashboardSummary,
@@ -22,6 +24,11 @@ export const OverviewPage = () => {
   const auditQuery = useQuery({
     queryKey: ["audit-logs", auditAction],
     queryFn: () => getAuditLogs(10, auditAction || undefined),
+  });
+  const auditDetailQuery = useQuery({
+    queryKey: ["audit-log-detail", selectedAuditId],
+    queryFn: () => getAuditLogDetail(selectedAuditId),
+    enabled: Boolean(selectedAuditId),
   });
 
   const summary = summaryQuery.data;
@@ -177,7 +184,11 @@ export const OverviewPage = () => {
                     <strong>{item.version ?? item.file_name}</strong>
                     <span className="list-secondary">{item.kind}</span>
                   </div>
-                  <span>{item.task_type ?? item.status ?? "-"}</span>
+                  <span>
+                    <Link className="inline-link" to={`/learning/${item.kind}/${item.file_name}`}>
+                      {item.task_type ?? item.status ?? "Open"}
+                    </Link>
+                  </span>
                 </li>
               ))
             ) : (
@@ -197,7 +208,9 @@ export const OverviewPage = () => {
               auditItems.map((item, index) => (
                 <li key={`${item.path}-${item.logged_at ?? index}`}>
                   <div className="list-primary">
-                    <strong>{item.action.toUpperCase()}</strong>
+                    <button className="inline-link inline-button" onClick={() => setSelectedAuditId(String(item.event_id ?? ""))} type="button">
+                      {item.action.toUpperCase()}
+                    </button>
                     <span className="list-secondary">{item.path}</span>
                   </div>
                   <span>{item.client}</span>
@@ -207,6 +220,9 @@ export const OverviewPage = () => {
               <li className="empty-state">{t("overview.audit.empty")}</li>
             )}
           </ul>
+          {auditDetailQuery.data ? (
+            <pre className="code-block">{JSON.stringify(auditDetailQuery.data, null, 2)}</pre>
+          ) : null}
         </SectionCard>
       </div>
 

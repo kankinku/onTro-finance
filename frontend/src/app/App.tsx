@@ -11,6 +11,7 @@ const DataIntakePage = lazy(async () => import("../routes/DataIntakePage").then(
 const SavedDataPage = lazy(async () => import("../routes/SavedDataPage").then((module) => ({ default: module.SavedDataPage })));
 const GraphExplorerPage = lazy(async () => import("../routes/GraphExplorerPage").then((module) => ({ default: module.GraphExplorerPage })));
 const CouncilAskPage = lazy(async () => import("../routes/CouncilAskPage").then((module) => ({ default: module.CouncilAskPage })));
+const LearningDetailPage = lazy(async () => import("../routes/LearningDetailPage").then((module) => ({ default: module.LearningDetailPage })));
 
 export const App = () => {
   const [queryClient] = useState(createQueryClient);
@@ -26,6 +27,7 @@ export const App = () => {
               <Route element={<SavedDataPage />} path="saved" />
               <Route element={<GraphExplorerPage />} path="graph" />
               <Route element={<CouncilAskPage />} path="council" />
+              <Route element={<LearningDetailPage />} path="learning/:kind/:fileName" />
             </Route>
             <Route element={<Navigate replace to="/" />} path="*" />
           </Routes>

@@ -7,10 +7,13 @@ import os
 import tempfile
 import threading
 import time
+import uuid
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
+
+from src.infrastructure import distributed_coordination_enabled, get_coordination_provider
 
 
 class LearningEventStore:
@@ -24,6 +27,7 @@ class LearningEventStore:
 
     def append(self, event_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         record = {
+            "event_id": uuid.uuid4().hex,
             "event_type": event_type,
             "logged_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             **payload,
@@ -153,13 +157,48 @@ class LearningEventStore:
         return self.append("audit", payload)
 
     def list_audit(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        self.prune_audit()
         rows = list(reversed(self.read("audit")))
         if limit is None:
             return rows
         return rows[: max(limit, 1)]
 
     def audit_count(self) -> int:
+        self.prune_audit()
         return self.count("audit")
+
+    def get_audit_event(self, event_id: str) -> Optional[Dict[str, Any]]:
+        self.prune_audit()
+        for row in self.read("audit"):
+            if row.get("event_id") == event_id:
+                return row
+        return None
+
+    def prune_audit(self, retention_days: Optional[int] = None) -> int:
+        retention_raw = retention_days
+        if retention_raw is None:
+            env_value = os.environ.get("ONTRO_AUDIT_RETENTION_DAYS", "0").strip()
+            retention_raw = int(env_value) if env_value else 0
+        if retention_raw <= 0:
+            return 0
+        rows = self.read("audit")
+        cutoff = datetime.now(timezone.utc) - timedelta(days=retention_raw)
+        kept: List[Dict[str, Any]] = []
+        removed = 0
+        for row in rows:
+            logged_at = str(row.get("logged_at") or "")
+            try:
+                parsed = datetime.fromisoformat(logged_at.replace("Z", "+00:00"))
+            except ValueError:
+                kept.append(row)
+                continue
+            if parsed >= cutoff:
+                kept.append(row)
+            else:
+                removed += 1
+        if removed:
+            self.replace("audit", kept)
+        return removed
 
     def snapshot_path(self, name: str) -> Path:
         path = self.base_path / "snapshots"
@@ -209,6 +248,13 @@ class LearningEventStore:
 
     @contextmanager
     def _locked_path(self, path: Path):
+        if distributed_coordination_enabled():
+            provider = get_coordination_provider()
+            if provider is None:
+                raise RuntimeError("Distributed coordination is enabled but unavailable")
+            with provider.lock(f"ontro:lock:{path.resolve()}"):
+                yield
+            return
         lock_path = path.with_suffix(path.suffix + ".lock")
         path.parent.mkdir(parents=True, exist_ok=True)
         with self._thread_lock:

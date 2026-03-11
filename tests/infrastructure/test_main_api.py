@@ -202,6 +202,40 @@ class TestCallbackValidation:
 
         assert viewer_request.state.api_role == "viewer"
 
+    def test_guard_request_accepts_external_bearer_role(self, monkeypatch):
+        monkeypatch.setenv("ONTRO_JWKS_URI", "https://issuer.example/jwks")
+        monkeypatch.setattr(app_main, "validate_bearer_role", lambda token: "operator")
+        request = SimpleNamespace(
+            headers={"authorization": "Bearer test.jwt.token"},
+            client=SimpleNamespace(host="127.0.0.1"),
+            method="POST",
+            url=SimpleNamespace(path="/api/learning/evaluations/run"),
+            state=SimpleNamespace(),
+        )
+
+        app_main._guard_request(request)
+
+        assert request.state.api_role == "operator"
+
+    def test_guard_request_rejects_invalid_external_bearer_role(self, monkeypatch):
+        monkeypatch.setenv("ONTRO_JWKS_URI", "https://issuer.example/jwks")
+        monkeypatch.setattr(
+            app_main,
+            "validate_bearer_role",
+            lambda token: (_ for _ in ()).throw(ValueError("bad token")),
+        )
+        request = SimpleNamespace(
+            headers={"authorization": "Bearer bad.jwt.token"},
+            client=SimpleNamespace(host="127.0.0.1"),
+            method="POST",
+            url=SimpleNamespace(path="/api/learning/evaluations/run"),
+            state=SimpleNamespace(),
+        )
+
+        with pytest.raises(app_main.HTTPException) as exc_info:
+            app_main._guard_request(request)
+        assert exc_info.value.status_code == 401
+
     def test_guard_request_enforces_rate_limit(self, monkeypatch):
         monkeypatch.setenv("ONTRO_RATE_LIMIT_PER_MINUTE", "1")
         request = SimpleNamespace(
@@ -211,6 +245,24 @@ class TestCallbackValidation:
             url=SimpleNamespace(path="/api/test"),
         )
         app_main._guard_request(request)
+        with pytest.raises(app_main.HTTPException) as exc_info:
+            app_main._guard_request(request)
+        assert exc_info.value.status_code == 429
+
+    def test_guard_request_uses_distributed_rate_limit_when_redis_enabled(self, monkeypatch):
+        class _FakeProvider:
+            def rate_limit(self, key, limit, window_seconds):
+                return False
+
+        monkeypatch.setenv("ONTRO_RATE_LIMIT_PER_MINUTE", "1")
+        monkeypatch.setenv("ONTRO_REDIS_URL", "redis://fake")
+        monkeypatch.setattr(app_main, "get_coordination_provider", lambda: _FakeProvider())
+        request = SimpleNamespace(
+            headers={},
+            client=SimpleNamespace(host="127.0.0.1"),
+            method="POST",
+            url=SimpleNamespace(path="/api/test"),
+        )
         with pytest.raises(app_main.HTTPException) as exc_info:
             app_main._guard_request(request)
         assert exc_info.value.status_code == 429
@@ -231,6 +283,16 @@ class TestCallbackValidation:
 
         assert result["count"] == 1
         assert result["items"][0]["path"] == "/api/learning/evaluations/run"
+
+    def test_audit_log_detail_endpoint_returns_single_event(self, monkeypatch, tmp_path):
+        store = LearningEventStore(tmp_path)
+        record = store.append_audit({"action": "post", "path": "/api/test", "client": "127.0.0.1"})
+        monkeypatch.setitem(app_main.app_state, "learning_event_store", store)
+
+        result = asyncio.run(app_main.get_audit_log_detail(record["event_id"]))
+
+        assert result["event_id"] == record["event_id"]
+        assert result["path"] == "/api/test"
 
     def test_metrics_endpoint_returns_prometheus_text(self):
         app_main.app_state.ready = True
@@ -1059,7 +1121,36 @@ class TestStatusAndFallback:
         assert len(graph["nodes"]) == 2
         assert graph["edges"][0]["type"] == "pressures"
         assert structure["table_blocks"][0]["caption"] == "Scenario Table"
+        assert structure["table_blocks"][0]["headers"] == []
         assert structure["ocr_needed_pages"] == [2]
+
+    def test_document_structure_exposes_true_table_parser_cells(self, monkeypatch, tmp_path):
+        store = LearningEventStore(tmp_path)
+        store.upsert_document(
+            {
+                "doc_id": "doc_table_001",
+                "title": "Table note",
+                "metadata": {
+                    "pdf_blocks": [
+                        {
+                            "page_number": 1,
+                            "block_type": "table",
+                            "table_caption": "Scenario Table",
+                            "table_rows": 3,
+                            "table_columns": 3,
+                            "table_headers": ["Rate", "EPS", "Banks"],
+                            "table_cells": [["5.0", "2.1", "1.4"], ["5.5", "1.8", "1.7"]],
+                        }
+                    ]
+                },
+            }
+        )
+        monkeypatch.setitem(app_main.app_state, "learning_event_store", store)
+
+        structure = asyncio.run(app_main.get_document_structure("doc_table_001"))
+
+        assert structure["table_blocks"][0]["headers"] == ["Rate", "EPS", "Banks"]
+        assert structure["table_blocks"][0]["cells"][0] == ["5.0", "2.1", "1.4"]
 
     def test_learning_action_endpoints_run_evaluation_and_promote_bundle(
         self, monkeypatch, tmp_path
@@ -1125,6 +1216,19 @@ class TestStatusAndFallback:
         assert metrics["f1"] == 0.8
         assert promoted["status"] == "DEPLOYED"
         assert promoted["review_notes"] == "ship it"
+
+    def test_learning_product_detail_endpoint_returns_payload(self, monkeypatch, tmp_path):
+        store = LearningEventStore(tmp_path)
+        bundle_path = store.bundle_path("bundle.json")
+        bundle_path.write_text(
+            json.dumps({"version": "bundle_v1", "status": "DEPLOYED"}), encoding="utf-8"
+        )
+        monkeypatch.setitem(app_main.app_state, "learning_event_store", store)
+
+        result = asyncio.run(app_main.get_learning_product_detail("bundle", "bundle.json"))
+
+        assert result["kind"] == "bundle"
+        assert result["payload"]["status"] == "DEPLOYED"
 
     def test_council_decision_endpoint_records_manual_adjudication(self, monkeypatch):
         case = SimpleNamespace(
@@ -1365,6 +1469,41 @@ class TestStatusAndFallback:
 
         assert blocks[0]["block_type"] == "table"
         assert blocks[1]["ocr_required"] is True
+
+    def test_extract_pdf_blocks_uses_tesseract_for_image_only_page(self, monkeypatch):
+        class _FakeImage:
+            def __init__(self, data, name):
+                self.data = data
+                self.name = name
+
+        class _FakePage:
+            def __init__(self):
+                self.images = [_FakeImage(b"fake-image-bytes", "page.png")]
+
+            def extract_text(self):
+                return ""
+
+        class _FakeReader:
+            def __init__(self, _stream):
+                self.pages = [_FakePage()]
+
+        fake_module = SimpleNamespace(PdfReader=_FakeReader)
+        monkeypatch.setitem(sys.modules, "pypdf", fake_module)
+        monkeypatch.setenv("ONTRO_OCR_ENABLED", "true")
+        monkeypatch.setattr(
+            app_main.subprocess,
+            "run",
+            lambda *args, **kwargs: SimpleNamespace(
+                returncode=0, stdout="OCR recovered text", stderr=""
+            ),
+        )
+
+        payload = base64.b64encode(b"fake-pdf").decode("ascii")
+        blocks = app_main.extract_pdf_blocks_from_base64(payload)
+
+        assert blocks[0]["text"] == "OCR recovered text"
+        assert blocks[0]["ocr_applied"] is True
+        assert blocks[0]["ocr_engine"] == "tesseract"
 
     def test_entity_and_graph_endpoints_return_console_shapes(self, monkeypatch):
         repo = InMemoryGraphRepository()

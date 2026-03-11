@@ -16,6 +16,10 @@ Single-VM Docker Compose deployment for `onTro-finance`.
 - `ONTRO_JSON_LOGS=true`
 - `ONTRO_AUDIT_LOG=true`
 
+Optional distributed mode:
+
+- `ONTRO_REDIS_URL=redis://redis:6379/0`
+
 ## Deploy
 
 ```bash
@@ -68,4 +72,5 @@ curl -f http://localhost:8000/status
 
 - `neo4j_data` and `ontro_app_data` volumes must be preserved across rollback.
 - Do not delete named volumes during routine rollback.
+- If `ONTRO_REDIS_URL` is enabled, Redis availability becomes part of health validation for multi-instance deployment.
 - OCR and table parser enhancements are tracked separately and do not block deployability.

@@ -1,1 +1,0 @@
-import{j as s}from"./index-BC1OLg71.js";const i=({title:c,subtitle:e,action:r,children:n})=>s.jsxs("section",{className:"section-card",children:[s.jsxs("header",{className:"section-header",children:[s.jsxs("div",{children:[s.jsx("h2",{children:c}),e?s.jsx("p",{children:e}):null]}),r?s.jsx("div",{children:r}):null]}),n]});export{i as S};

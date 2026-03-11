@@ -4,9 +4,11 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, test, vi } from "vitest";
 
 import { App } from "./App";
+import { clearAuthStorage } from "../lib/auth";
 
 describe("App shell", () => {
   test("opens settings, switches locales, and deletes selected ingest records", async () => {
+    clearAuthStorage();
     let ingests = [
       {
         doc_id: "doc_001",
@@ -171,6 +173,11 @@ describe("App shell", () => {
           );
         }
 
+        if (url.includes("/api/documents?limit=1")) {
+          expect(init?.headers).toMatchObject({ "x-api-key": "viewer-secret" });
+          return new Response(JSON.stringify({ items: [] }));
+        }
+
         if (url.endsWith("/api/learning/evaluations/run")) {
           const payload = JSON.parse(String(init?.body ?? "{}"));
           expect(payload.goldset_filename).toBe("custom-gold.json");
@@ -192,8 +199,13 @@ describe("App shell", () => {
         }
 
         if (url.includes("/api/audit/logs")) {
+          if (url.endsWith("/api/audit/logs/event-1")) {
+            return new Response(
+              JSON.stringify({ event_id: "event-1", action: "post", path: "/api/council/process-pending", client: "127.0.0.1" }),
+            );
+          }
           return new Response(
-            JSON.stringify({ count: 1, items: [{ action: "post", path: "/api/council/process-pending", client: "127.0.0.1" }] }),
+            JSON.stringify({ count: 1, items: [{ event_id: "event-1", action: "post", path: "/api/council/process-pending", client: "127.0.0.1" }] }),
           );
         }
 
@@ -223,6 +235,7 @@ describe("App shell", () => {
     await user.click(screen.getByRole("button", { name: /run evaluation/i }));
     await user.click(screen.getByRole("button", { name: /promote bundle/i }));
     await user.type(screen.getByPlaceholderText(/filter action/i), "post");
+    await user.click(screen.getByRole("button", { name: /^POST$/i }));
 
     await user.click(screen.getByRole("button", { name: /settings/i }));
 
@@ -232,6 +245,12 @@ describe("App shell", () => {
     expect(within(dialog).getAllByText("Disconnected").length).toBeGreaterThan(0);
     expect(within(dialog).getByText("OpenAI GPT SDK")).toBeInTheDocument();
     expect(within(dialog).getByText("GitHub Copilot OAuth App")).toBeInTheDocument();
+
+    await user.type(within(dialog).getByPlaceholderText(/profile label/i), "viewer key");
+    await user.type(within(dialog).getByPlaceholderText(/secret or token/i), "viewer-secret");
+    await user.click(within(dialog).getByRole("button", { name: /save profile/i }));
+    await user.click(within(dialog).getByRole("button", { name: /test auth/i }));
+    await waitFor(() => expect(within(dialog).getByText(/access confirmed/i)).toBeInTheDocument());
 
     await user.click(within(dialog).getByRole("button", { name: /check connection/i }));
     await waitFor(() => expect(within(dialog).getAllByText("Connected").length).toBeGreaterThan(0));

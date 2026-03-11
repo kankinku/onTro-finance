@@ -119,6 +119,13 @@ export interface LearningProductsResponse {
   items: LearningProductItem[];
 }
 
+export interface LearningProductDetailResponse {
+  kind: string;
+  file_name: string;
+  path: string;
+  payload: Record<string, unknown>;
+}
+
 export interface LearningEvaluationRunResponse {
   snapshot_filename: string;
   goldset_filename: string;
@@ -136,6 +143,13 @@ export interface AuditLogItem {
 export interface AuditLogResponse {
   items: AuditLogItem[];
   count: number;
+}
+
+export interface AuditLogDetailResponse extends AuditLogItem {
+  event_id?: string;
+  event_type?: string;
+  role?: string | null;
+  [key: string]: unknown;
 }
 
 export interface DocumentDetail extends DocumentListItem {

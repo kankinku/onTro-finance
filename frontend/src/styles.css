@@ -468,6 +468,14 @@ a {
   text-decoration: none;
 }
 
+.inline-button {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
 .inline-error {
   color: #9b3d2d;
 }
@@ -478,6 +486,16 @@ a {
 
 .empty-state {
   color: var(--muted);
+}
+
+.code-block {
+  margin: 0;
+  padding: 0.9rem;
+  border-radius: 12px;
+  background: rgba(45, 32, 22, 0.08);
+  overflow: auto;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .graph-canvas,
@@ -612,6 +630,46 @@ a {
 
 .settings-ai-message {
   margin: 0;
+}
+
+.settings-auth-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.settings-auth-profile-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.settings-auth-profile {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  background: rgba(23, 76, 70, 0.06);
+  border: 1px solid rgba(23, 76, 70, 0.12);
+}
+
+.settings-auth-profile.is-active {
+  background: linear-gradient(180deg, rgba(23, 76, 70, 0.12), rgba(23, 76, 70, 0.05));
+}
+
+.settings-auth-profile-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.settings-auth-profile-copy strong {
+  font-size: 0.98rem;
+}
+
+.settings-auth-profile-copy span {
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .icon-button {

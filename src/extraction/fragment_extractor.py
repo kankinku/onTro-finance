@@ -10,7 +10,7 @@ Fragment Extraction Module
 
 import re
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, List, Optional, cast
 from datetime import datetime
 
@@ -38,6 +38,8 @@ class _DocumentBlock:
     table_caption: Optional[str] = None
     table_rows: Optional[int] = None
     table_columns: Optional[int] = None
+    table_headers: List[str] = field(default_factory=list)
+    table_cells: List[List[str]] = field(default_factory=list)
 
 
 # 노이즈 패턴 (감탄문, 감정 표현 등)
@@ -224,6 +226,8 @@ quality 값: informative, noisy, unclear, emotional, incomplete"""
                         table_caption=block.table_caption,
                         table_rows=block.table_rows,
                         table_columns=block.table_columns,
+                        table_headers=block.table_headers,
+                        table_cells=block.table_cells,
                     )
                     fragments.append(fragment)
 
@@ -243,7 +247,9 @@ quality 값: informative, noisy, unclear, emotional, incomplete"""
             nonlocal buffer, buffer_start
             text = "".join(buffer).strip()
             if text and buffer_start is not None:
-                block_type, table_caption, table_rows, table_columns = self._classify_block(text)
+                block_type, table_caption, table_rows, table_columns, table_headers, table_cells = (
+                    self._classify_block(text)
+                )
                 blocks.append(
                     _DocumentBlock(
                         text=text,
@@ -256,6 +262,8 @@ quality 값: informative, noisy, unclear, emotional, incomplete"""
                         table_caption=cast(Optional[str], table_caption),
                         table_rows=cast(Optional[int], table_rows),
                         table_columns=cast(Optional[int], table_columns),
+                        table_headers=cast(List[str], table_headers),
+                        table_cells=cast(List[List[str]], table_cells),
                     )
                 )
             buffer = []
@@ -294,8 +302,8 @@ quality 값: informative, noisy, unclear, emotional, incomplete"""
         flush_buffer(len(raw_text))
         if blocks:
             return blocks
-        block_type, table_caption, table_rows, table_columns = self._classify_block(
-            raw_text.strip()
+        block_type, table_caption, table_rows, table_columns, table_headers, table_cells = (
+            self._classify_block(raw_text.strip())
         )
         return [
             _DocumentBlock(
@@ -309,6 +317,8 @@ quality 값: informative, noisy, unclear, emotional, incomplete"""
                 table_caption=cast(Optional[str], table_caption),
                 table_rows=cast(Optional[int], table_rows),
                 table_columns=cast(Optional[int], table_columns),
+                table_headers=cast(List[str], table_headers),
+                table_cells=cast(List[List[str]], table_cells),
             )
         ]
 
@@ -323,7 +333,9 @@ quality 값: informative, noisy, unclear, emotional, incomplete"""
             return True
         return len(text) < 120 and text == text.upper() and any(char.isalpha() for char in text)
 
-    def _classify_block(self, text: str) -> tuple[str, Optional[str], Optional[int], Optional[int]]:
+    def _classify_block(
+        self, text: str
+    ) -> tuple[str, Optional[str], Optional[int], Optional[int], List[str], List[List[str]]]:
         raw_lines = [line for line in text.splitlines() if line.strip()]
         lines = [line.strip() for line in raw_lines]
         if len(lines) >= 2:
@@ -334,28 +346,62 @@ quality 값: informative, noisy, unclear, emotional, incomplete"""
             ):
                 caption = (
                     lines[0]
-                    if len(lines[0]) < 80 and not re.search(r"\d\s{2,}\d", lines[0])
+                    if len(lines[0]) < 80
+                    and not re.search(r"\d\s{2,}\d", lines[0])
+                    and len(re.split(r"\s{2,}|\t|\|", lines[0])) < 2
                     else None
                 )
                 data_lines = lines[1:] if caption else lines
+                headers, cells = self._parse_table_block(data_lines)
                 column_count = (
-                    max(len(re.split(r"\s{2,}|\t|\|", line)) for line in data_lines)
-                    if data_lines
-                    else None
+                    len(headers)
+                    if headers
+                    else (max((len(row) for row in cells), default=0) or None)
                 )
-                return ("table", caption, len(data_lines), column_count)
+                return ("table", caption, len(data_lines), column_count, headers, cells)
             if len(lines) >= 3 and numeric_cells >= 2:
-                return ("table", lines[0] if len(lines[0]) < 80 else None, len(lines), None)
+                headers, cells = self._parse_table_block(lines)
+                return (
+                    "table",
+                    lines[0] if len(lines[0]) < 80 else None,
+                    len(lines),
+                    len(headers) or None,
+                    headers,
+                    cells,
+                )
             header_like = len(re.split(r"\s{2,}|\t|\|", lines[0])) >= 2
             if (
                 len(lines) >= 3
                 and header_like
                 and any(any(char.isdigit() for char in line) for line in lines[1:])
             ):
-                return ("table", lines[0] if len(lines[0]) < 80 else None, len(lines), None)
+                headers, cells = self._parse_table_block(lines)
+                return (
+                    "table",
+                    lines[0] if len(lines[0]) < 80 else None,
+                    len(lines),
+                    len(headers) or None,
+                    headers,
+                    cells,
+                )
         if len(text) < 120 and self._is_heading(text.strip()):
-            return ("heading", None, None, None)
-        return ("paragraph", None, None, None)
+            return ("heading", None, None, None, [], [])
+        return ("paragraph", None, None, None, [], [])
+
+    def _parse_table_block(self, lines: List[str]) -> tuple[List[str], List[List[str]]]:
+        parsed_rows = [self._split_table_row(line) for line in lines if line.strip()]
+        if not parsed_rows:
+            return [], []
+        headers = parsed_rows[0]
+        cells = parsed_rows[1:] if len(parsed_rows) > 1 else []
+        return headers, cells
+
+    def _split_table_row(self, line: str) -> List[str]:
+        if "|" in line:
+            return [cell.strip() for cell in line.split("|") if cell.strip()]
+        if "\t" in line:
+            return [cell.strip() for cell in line.split("\t") if cell.strip()]
+        return [cell.strip() for cell in re.split(r"\s{2,}", line) if cell.strip()]
 
     def _split_sentences(self, text: str) -> List[str]:
         """문장 분할"""

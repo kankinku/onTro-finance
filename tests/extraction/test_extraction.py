@@ -85,6 +85,8 @@ Rate   EPS   Banks
 
         assert fragments
         assert fragments[0].block_type == "table"
+        assert fragments[0].table_headers == ["Rate", "EPS", "Banks"]
+        assert fragments[0].table_cells == [["5.0", "2.1", "1.4"], ["5.5", "1.8", "1.7"]]
 
 
 class TestNERStudent:

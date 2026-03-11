@@ -5,6 +5,8 @@ import logging
 import os
 import shutil
 import socket
+import subprocess
+import tempfile
 import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
@@ -23,6 +25,7 @@ from pydantic import BaseModel, Field
 
 from config.required_env_validator import summarize_runtime_env, validate_required_runtime_env
 from config.settings import get_settings
+from src.auth import external_identity_enabled, validate_bearer_role
 from src.bootstrap import (
     build_llm_client,
     check_graph_repository_health,
@@ -44,6 +47,7 @@ from src.integrations import (
     impact_to_relation_fields,
     strongest_impact,
 )
+from src.infrastructure import distributed_coordination_enabled, get_coordination_provider
 from src.learning.event_store import LearningEventStore, dump_json, load_json
 from src.learning.offline_runner import evaluate_dataset, export_dataset
 from src.learning.models import TaskType
@@ -65,6 +69,9 @@ from src.web.operations_console import (
 )
 from src.web.operations_console import (
     list_audit_events as build_audit_listing,
+)
+from src.web.operations_console import (
+    get_audit_event_detail as build_audit_detail,
 )
 from src.web.operations_console import (
     build_trust_summary,
@@ -89,6 +96,9 @@ from src.web.operations_console import (
 )
 from src.web.operations_console import (
     list_learning_products as build_learning_products,
+)
+from src.web.operations_console import (
+    get_learning_product_detail as build_learning_product_detail,
 )
 from src.web.operations_console import (
     list_documents as build_document_listing,
@@ -215,7 +225,7 @@ def _generate_doc_id(prefix: str) -> str:
 
 
 def _api_security_enabled() -> bool:
-    return any(
+    return external_identity_enabled() or any(
         os.environ.get(name, "").strip()
         for name in (
             "ONTRO_API_KEY",
@@ -246,16 +256,31 @@ def _resolve_api_key_role(request: Any) -> str | None:
     return None
 
 
+def _resolve_request_role(request: Any) -> str | None:
+    auth_header = request.headers.get("authorization", "")
+    if auth_header.lower().startswith("bearer ") and external_identity_enabled():
+        token = auth_header.split(" ", 1)[1].strip()
+        return validate_bearer_role(token)
+    return _resolve_api_key_role(request)
+
+
 def _enforce_api_key(request: Any) -> None:
     if not _api_security_enabled():
         return
-    role = _resolve_api_key_role(request)
+    if not hasattr(request, "state"):
+        request.state = SimpleNamespace()
+    try:
+        role = _resolve_request_role(request)
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
     if role is None:
         raise HTTPException(status_code=401, detail="Invalid API key")
     request.state.api_role = role
 
 
 def _authorize_request(request: Any) -> None:
+    if not hasattr(request, "state"):
+        request.state = SimpleNamespace()
     role = getattr(request.state, "api_role", None)
     if role is None:
         return
@@ -293,13 +318,20 @@ def _rate_limit_request(request: Any) -> None:
     if not limit_raw or limit_raw == "0":
         return
     limit = max(int(limit_raw), 1)
-    now_ts = datetime.now().timestamp()
     client_key = request.client.host if request.client else "unknown"
-    bucket = app_state.request_counters.setdefault(client_key, [])
-    bucket[:] = [ts for ts in bucket if now_ts - ts < 60.0]
-    if len(bucket) >= limit:
-        raise HTTPException(status_code=429, detail="Rate limit exceeded")
-    bucket.append(now_ts)
+    if distributed_coordination_enabled():
+        provider = get_coordination_provider()
+        if provider is None or not provider.rate_limit(
+            key=f"ontro:rate:{client_key}:{request.url.path}", limit=limit, window_seconds=60
+        ):
+            raise HTTPException(status_code=429, detail="Rate limit exceeded")
+    else:
+        now_ts = datetime.now().timestamp()
+        bucket = app_state.request_counters.setdefault(client_key, [])
+        bucket[:] = [ts for ts in bucket if now_ts - ts < 60.0]
+        if len(bucket) >= limit:
+            raise HTTPException(status_code=429, detail="Rate limit exceeded")
+        bucket.append(now_ts)
     app_state.request_totals[request.url.path] = (
         app_state.request_totals.get(request.url.path, 0) + 1
     )
@@ -329,6 +361,8 @@ def _audit_log_request(request: Any) -> None:
 
 
 def _guard_request(request: Any) -> None:
+    if not hasattr(request, "state"):
+        request.state = SimpleNamespace()
     _enforce_api_key(request)
     _authorize_request(request)
     _rate_limit_request(request)
@@ -596,12 +630,32 @@ def extract_pdf_blocks_from_base64(pdf_base64: str) -> list[dict[str, Any]]:
         for index, page in enumerate(reader.pages, start=1):
             page_text = (page.extract_text() or "").strip()
             if not page_text:
+                ocr_text, ocr_error = _ocr_page_images(page)
+                if ocr_text:
+                    for raw_block in [
+                        block.strip() for block in ocr_text.split("\n\n") if block.strip()
+                    ]:
+                        block_type = "table" if _looks_like_table_block(raw_block) else "paragraph"
+                        blocks.append(
+                            {
+                                "page_number": index,
+                                "text": raw_block,
+                                "block_type": block_type,
+                                "ocr_required": False,
+                                "ocr_applied": True,
+                                "ocr_engine": _ocr_command(),
+                            }
+                        )
+                    continue
                 blocks.append(
                     {
                         "page_number": index,
                         "text": "",
                         "block_type": "ocr_needed",
                         "ocr_required": True,
+                        "ocr_applied": False,
+                        "ocr_engine": _ocr_command() if _ocr_enabled() else None,
+                        "ocr_error": ocr_error,
                     }
                 )
                 continue
@@ -613,6 +667,8 @@ def extract_pdf_blocks_from_base64(pdf_base64: str) -> list[dict[str, Any]]:
                         "text": raw_block,
                         "block_type": block_type,
                         "ocr_required": False,
+                        "ocr_applied": False,
+                        "ocr_engine": None,
                     }
                 )
         if not blocks:
@@ -629,6 +685,53 @@ def _looks_like_table_block(text: str) -> bool:
     numeric_lines = sum(1 for line in lines if any(char.isdigit() for char in line))
     separated_lines = sum(1 for line in lines if "|" in line or "\t" in line or "  " in line)
     return numeric_lines >= max(1, len(lines) // 2) and separated_lines >= max(1, len(lines) // 2)
+
+
+def _ocr_enabled() -> bool:
+    return os.environ.get("ONTRO_OCR_ENABLED", "false").lower() in {"1", "true", "yes", "on"}
+
+
+def _ocr_command() -> str:
+    return os.environ.get("ONTRO_OCR_COMMAND", "tesseract").strip() or "tesseract"
+
+
+def _ocr_page_images(page: Any) -> tuple[str, str | None]:
+    if not _ocr_enabled():
+        return "", None
+    images = list(getattr(page, "images", []) or [])
+    if not images:
+        return "", "no_page_images"
+
+    outputs: list[str] = []
+    for index, image in enumerate(images, start=1):
+        image_data = getattr(image, "data", None)
+        if not image_data:
+            continue
+        image_name = getattr(image, "name", f"page-image-{index}.png")
+        suffix = Path(str(image_name)).suffix or ".png"
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as handle:
+            handle.write(image_data)
+            temp_path = Path(handle.name)
+        try:
+            result = subprocess.run(
+                [_ocr_command(), str(temp_path), "stdout", "--psm", "6"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                outputs.append(result.stdout.strip())
+        except FileNotFoundError:
+            return "", "tesseract_not_installed"
+        except subprocess.TimeoutExpired:
+            return "", "tesseract_timeout"
+        finally:
+            temp_path.unlink(missing_ok=True)
+
+    if not outputs:
+        return "", "no_ocr_output"
+    return "\n\n".join(outputs), None
 
 
 def extract_pdf_text_from_base64(pdf_base64: str) -> str:
@@ -1968,9 +2071,25 @@ async def get_learning_products(limit: int = 20):
     return build_learning_products(app_state.get("learning_event_store"), limit=limit)
 
 
+@app.get("/api/learning/products/{kind}/{file_name}")
+async def get_learning_product_detail(kind: str, file_name: str):
+    detail = build_learning_product_detail(app_state.get("learning_event_store"), kind, file_name)
+    if detail is None:
+        raise HTTPException(status_code=404, detail="Learning product not found")
+    return detail
+
+
 @app.get("/api/audit/logs")
 async def get_audit_logs(limit: int = 20, action: str | None = None):
     return build_audit_listing(app_state.get("learning_event_store"), limit=limit, action=action)
+
+
+@app.get("/api/audit/logs/{event_id}")
+async def get_audit_log_detail(event_id: str):
+    detail = build_audit_detail(app_state.get("learning_event_store"), event_id)
+    if detail is None:
+        raise HTTPException(status_code=404, detail="Audit event not found")
+    return detail
 
 
 @app.post("/api/learning/evaluations/run")

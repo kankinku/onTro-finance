@@ -156,6 +156,40 @@ Protected operations support three roles.
 
 If legacy `ONTRO_API_KEY` is set, it is treated as an admin key for backward compatibility.
 
+## External identity (OIDC/JWT bearer)
+
+External bearer token validation can be enabled without removing API key support.
+
+- `ONTRO_JWKS_URI`: provider JWKS endpoint
+- `ONTRO_JWT_AUDIENCE`: expected `aud` claim (optional)
+- `ONTRO_JWT_ISSUER`: expected `iss` claim (optional)
+- `ONTRO_JWT_ROLE_CLAIM`: role claim path, default `roles`
+- `ONTRO_JWT_ROLE_MAPPING`: JSON map from provider roles to `admin` / `operator` / `viewer`
+
+When `ONTRO_JWKS_URI` is configured, `Authorization: Bearer <token>` requests are validated first. If no bearer token is supplied, the service falls back to API key auth.
+
+## Distributed coordination (optional)
+
+For multi-instance deployment, Redis-backed coordination can be enabled.
+
+- `ONTRO_REDIS_URL=redis://host:6379/0`
+
+When configured, the service uses Redis for:
+
+- distributed request rate limiting
+- distributed event-store locking
+
+If unset, the service falls back to in-process counters and local file locks.
+
+## OCR support
+
+Scanned PDF pages can be OCR-processed when the following flags are enabled.
+
+- `ONTRO_OCR_ENABLED=true`
+- `ONTRO_OCR_COMMAND=tesseract` (default)
+
+Current OCR path only runs for pages where `pypdf` extracted no text layer and embedded page images are available.
+
 ingest 응답은 다음 카운터를 제공합니다.
 
 - `edge_count`: 현재 문서에서 처리된 raw edge 수

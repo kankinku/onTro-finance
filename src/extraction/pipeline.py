@@ -133,6 +133,8 @@ class ExtractionPipeline:
                             "table_caption": fragment.table_caption,
                             "table_rows": fragment.table_rows,
                             "table_columns": fragment.table_columns,
+                            "table_headers": fragment.table_headers,
+                            "table_cells": fragment.table_cells,
                             **source_document.metadata,
                         }
                     all_edges.extend(raw_edges)
