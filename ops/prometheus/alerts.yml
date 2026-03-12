@@ -1,0 +1,17 @@
+groups:
+  - name: ontro-finance
+    rules:
+      - alert: OnTroAppNotReady
+        expr: ontro_ready == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: onTro-Finance readiness dropped to zero
+      - alert: OnTroStorageUnavailable
+        expr: ontro_storage_ok == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: onTro-Finance storage health is failing

@@ -9,6 +9,7 @@ __pycache__/
 .ruff_cache/
 .env
 .tmp_pytest/
+.tmp_perf_baseline.json
 build/
 dist/
 frontend/dist/
