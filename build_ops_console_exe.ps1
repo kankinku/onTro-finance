@@ -35,7 +35,7 @@ Push-Location $ScriptDir
 try {
     Push-Location frontend
     try {
-        npm install
+        npm ci
         npm run build
     }
     finally {

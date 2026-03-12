@@ -12,3 +12,4 @@ python-jose[cryptography]==3.3.0
 redis==5.3.1
 pytest-cov==5.0.0
 ruff==0.4.4
+basedpyright==1.38.2

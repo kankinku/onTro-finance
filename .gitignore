@@ -8,3 +8,13 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .env
+.tmp_pytest/
+build/
+dist/
+frontend/dist/
+frontend/node_modules/
+frontend/*.tsbuildinfo
+functional_test_report.json
+backups/
+starter.log
+starter-local.log

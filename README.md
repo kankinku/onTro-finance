@@ -77,12 +77,23 @@ python -m venv "$env:TEMP\ontro-finance-venv"
 & "$env:TEMP\ontro-finance-venv\Scripts\python.exe" onTroFinanceStarter.py
 ```
 
+반복 실행용 진입점은 `Makefile`에도 정리되어 있습니다.
+
+```bash
+make starter
+make test
+make demo-data
+make load-baseline
+```
+
 `onTroFinanceStarter.py`는 다음을 자동으로 처리합니다.
 
 - `ONTRO_STORAGE_BACKEND=inmemory` 기본 적용
 - FastAPI와 operations console을 한 프로세스에서 실행
 - `frontend/dist`가 있으면 같은 서버에서 SPA 제공
 - 브라우저 자동 오픈
+
+운영 콘솔 산출물(`frontend/dist`)과 패키징 산출물(`build/`, `dist/`)은 커밋 대상이 아니라 로컬 빌드 또는 CI/packaging 단계에서 재생성하는 것을 기준으로 합니다.
 
 Neo4j 기반 `main.py` 경로를 쓰려면 아래 환경 변수가 필요합니다.
 
@@ -102,6 +113,19 @@ Neo4j 기반 서버 실행:
 ```
 
 starter 전용 실행 방법과 EXE 빌드는 `docs/OPS_CONSOLE_STARTER.md`를 참고하면 됩니다.
+
+저장소 위생과 첫 릴리즈 규칙은 `docs/REPOSITORY_BASELINE.md`를 참고하면 됩니다.
+
+운영/배포 확장 문서는 아래를 참고하면 됩니다.
+
+- `docs/FIRST_RUN_SCENARIOS.md`
+- `docs/ENVIRONMENT_PROFILES.md`
+- `docs/BACKUP_AND_RESTORE.md`
+- `docs/VERSIONING_AND_SUPPORT.md`
+- `docs/PERFORMANCE_BASELINE.md`
+- `docs/SECURITY_TRIAGE.md`
+- `docs/RELEASE_NOTES_TEMPLATE.md`
+- `docs/OPERATIONS_CHECKLIST.md`
 
 ## 로컬 Neo4j 예시
 

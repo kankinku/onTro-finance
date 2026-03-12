@@ -134,6 +134,7 @@ export interface LearningEvaluationRunResponse {
 }
 
 export interface AuditLogItem {
+  event_id?: string;
   action: string;
   path: string;
   client: string;

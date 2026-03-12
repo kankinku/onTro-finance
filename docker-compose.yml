@@ -10,6 +10,7 @@ services:
       - ONTRO_NEO4J_USER=neo4j
       - ONTRO_NEO4J_PASSWORD=password
       - ONTRO_NEO4J_DATABASE=neo4j
+      - ONTRO_REDIS_URL=${ONTRO_REDIS_URL:-}
       - ONTRO_APP_HOME=/app
       - ONTRO_LOAD_SAMPLE_DATA=false
     depends_on:
@@ -35,12 +36,49 @@ services:
     volumes:
       - neo4j_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7474"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:7474"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 30s
 
+  redis:
+    image: redis:7-alpine
+    profiles: ["distributed"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    profiles: ["observability"]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./ops/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    profiles: ["observability"]
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
 volumes:
   neo4j_data:
   ontro_app_data:
+  prometheus_data:
+  grafana_data:

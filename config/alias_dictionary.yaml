@@ -118,6 +118,17 @@ entities:
       - "gold"
       - "bullion"
 
+  Commodities:
+    canonical_name: "commodities"
+    type: AssetGroup
+    subtype: CommodityBasket
+    aliases:
+      - "원자재"
+      - "상품"
+      - "commodities"
+      - "commodity basket"
+      - "raw materials"
+
   Energy_Sector:
     canonical_name: "energy sector"
     type: Sector
